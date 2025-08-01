@@ -1,0 +1,33 @@
+{
+    "title": "Chapter 9: Trees and Search",
+    "concepts": [
+      {
+        "term": "Tree",
+        "definition": "A tree consists of nodes connected by edges. It is a hierarchical structure that places elements in nodes along branches that originate from a root." 
+      },
+      {
+        "term": "Binary Search Tree",
+        "definition": "A binary tree where every node can have at most two children. A node's left child must have a key less than its parent, and a node's right child must have a key greater than or equal to its parent."
+      },
+      {
+        "term": "Root",
+        "definition": "The node at the top of the tree. There is only one root in a tree."
+      },
+      {
+        "term": "Leaf",
+        "definition": "A node that has no children is called a leaf node." 
+      }
+    ],
+    "algorithms": [
+      {
+        "name": "Finding a Node",
+        "description": "Start at the root. If the key is less than the current node's value, go to the left child; if greater, go to the right child. Repeat until the node is found or the path ends." ,
+        "code": "public Node find(int key) { ... }" 
+      },
+      {
+        "name": "Inorder Traversal",
+        "description": "An inorder traversal visits nodes in ascending order of their key values. The process is: 1. Traverse the left subtree. 2. Visit the node itself. 3. Traverse the right subtree.",
+        "code": "private void inOrder(Node localRoot) { ... }"
+      }
+    ]
+  }
