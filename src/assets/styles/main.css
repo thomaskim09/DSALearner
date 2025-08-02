@@ -1,0 +1,91 @@
+/* Basic Reset and Font */
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+    Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  background-color: #1a1a1a;
+  color: #f0f0f0;
+}
+  /* App Layout */
+.app-container {
+  display: flex;
+  height: 100vh;
+  background-color: #1e1e1e;
+  color: #d4d4d4;
+}
+
+.sidebar {
+  width: 250px;
+  flex-shrink: 0;
+  background-color: #252526;
+  padding: 20px;
+  border-right: 1px solid #333;
+  color: #ccc;
+}
+
+.sidebar-title {
+    font-size: 1.5em;
+    color: #00aaff;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.sidebar nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar nav li a {
+    display: block;
+    padding: 10px 15px;
+    color: #ccc;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.sidebar nav li a:hover {
+    background-color: #3a3a3a;
+}
+
+.sidebar nav li.active a {
+    background-color: #007acc;
+    color: white;
+}
+
+.main-content {
+  flex-grow: 1;
+  overflow: auto;
+  display: flex; /* Ensure child can grow */
+}
+
+/* Chapter Page & Playground */
+.chapter-page {
+  padding: 20px;
+  flex-grow: 1; /* Make chapter page take full width of main-content */
+  display: flex;
+}
+
+.playground-section {
+  flex-grow: 1; /* Make playground take full width of chapter-page */
+  border: 1px solid #333;
+  padding: 20px;
+  border-radius: 8px;
+  background-color: #252526;
+  display: flex;
+  flex-direction: column;
+}
+
+.playground-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.playground-header h2 {
+    margin: 0;
+    border-bottom: 2px solid #007acc;
+    padding-bottom: 10px;
+}

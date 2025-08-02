@@ -1,29 +1,26 @@
 {
-    "chapter": 9,
-    "title": "Trees and Search",
-    "concepts": [
-      {
-        "term": "Binary Tree",
-        "definition": "If every node in a tree can have at most two children, the tree is called a binary tree. The two children of each node in a binary tree are called the left child and the right child."
-      },
-      {
-        "term": "Root",
-        "definition": "The node at the top of the tree is called the root. There is only one root in a tree."
-      },
-      {
-        "term": "Leaf Node",
-        "definition": "A node that has no children is called a leaf node or simply a leaf"
-      },
-      {
-        "term": "Visiting a Node",
-        "definition": "A node is visited when program control arrives at the node, usually for the purpose of carrying out some operation[cite: 236, 237]."
-      }
-    ],
-    "algorithms": [
-      {
-        "name": "Finding a Node",
-        "description": "To find a node, you start at the root[cite: 382]. [cite_start]If the key you are looking for is less than the current node's value, you go to the left child[cite: 384]. [cite_start]If it's greater, you go to the right child[cite: 385]. [cite_start]This process is repeated until you find the node or reach a null child [cite: 386, 427-430]. [cite_start]This efficiency is generally O(log N)[cite: 440].",
-        "code": "public Node find(int key) { ... }"
-      }
-    ]
-  }
+  "chapter": 9,
+  "title": "Trees and Search",
+  "concepts": [
+    {
+      "term": "Binary Search Tree",
+      "definition": "A binary tree where a node's left child must have a key less than its parent, and a node's right child must have a key greater than or equal to its parent."
+    },
+    {
+      "term": "Tree Traversal",
+      "definition": "To traverse a tree means to visit all the nodes in some specified order. There are three simple ways: inorder, preorder, and postorder."
+    },
+    {
+      "term": "Inorder Traversal",
+      "definition": "Visits the left child, then the node itself, then the right child. An inorder traversal of a binary search tree will cause all the nodes to be visited in ascending order."
+    },
+    {
+      "term": "Preorder Traversal",
+      "definition": "Visits the node itself, then the node's left subtree, and finally the node's right subtree."
+    },
+    {
+      "term": "Postorder Traversal",
+      "definition": "Traverses the node's left subtree, then the right subtree, and finally visits the node itself."
+    }
+  ]
+}

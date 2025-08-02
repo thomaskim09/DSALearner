@@ -1,12 +1,12 @@
-# React + Vite
+# Data Structures & Algorithms Learning Platform
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This project is an interactive web-based platform designed to help users learn and visualize fundamental data structures and algorithms. The primary goal is to provide a hands-on learning experience that goes beyond static text and diagrams.
 
-Currently, two official plugins are available:
+## Core Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Interactive Visualizations:** Key data structures, like Binary Search Trees, are rendered visually. Users can see how the structure changes as they perform operations like insertion and deletion.
+- **Side-by-Side Code Display:** For every action performed in the visualizer, the corresponding source code is displayed. This helps bridge the gap between the abstract concept and its concrete implementation.
+- **Complexity Analysis:** Each operation's code is accompanied by its Big O time complexity, a critical concept for understanding algorithm efficiency.
+- **Step-by-Step Animations:** Complex processes, such as tree traversals, are broken down into step-by-step animations. Users can play, pause, and step through the animation to understand the flow of the algorithm in detail.
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+This platform aims to make learning data structures and algorithms more engaging and intuitive by providing immediate feedback and clear visualizations.
