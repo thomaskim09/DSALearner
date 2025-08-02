@@ -1,25 +1,52 @@
 import React, { useState } from 'react';
 
-const ControlsPanel = ({ bst, onOperationChange, startTraversal, startFind, isAnimating }) => {
+const ControlsPanel = ({ onOperationChange, onInsert, startTraversal, startFind, startDelete, isAnimating }) => {
   const [insertValue, setInsertValue] = useState('');
   const [findValue, setFindValue] = useState('');
   const [deleteValue, setDeleteValue] = useState('');
+
+  const handleInsert = () => {
+    if (insertValue !== '') {
+      onInsert(Number(insertValue));
+      setInsertValue('');
+    }
+  };
+
+  const handleFind = () => {
+    if (findValue !== '') {
+      startFind(Number(findValue));
+      setFindValue('');
+    }
+  };
+
+  const handleDelete = () => {
+    if (deleteValue !== '') {
+      startDelete(Number(deleteValue));
+      setDeleteValue('');
+    }
+  };
+
+  const handleKeyDown = (e, action) => {
+    if (e.key === 'Enter') {
+      action();
+    }
+  };
 
   return (
     <div className="controls-panel">
       <div className="control-grid">
         <div className="control-row">
             <div className="control-group">
-                <input type="number" value={insertValue} onChange={(e) => setInsertValue(e.target.value)} onFocus={() => onOperationChange('insert')} placeholder="Insert" disabled={isAnimating} />
-                <button onClick={() => { bst.insert(Number(insertValue)); setInsertValue(''); }} disabled={isAnimating || insertValue === ''}>Insert</button>
+                <input type="number" value={insertValue} onChange={(e) => setInsertValue(e.target.value)} onKeyDown={(e) => handleKeyDown(e, handleInsert)} onFocus={() => onOperationChange('insert')} placeholder="Insert Value" disabled={isAnimating} />
+                <button onClick={handleInsert} disabled={isAnimating || insertValue === ''}>Insert</button>
             </div>
             <div className="control-group">
-                <input type="number" value={findValue} onChange={(e) => setFindValue(e.target.value)} onFocus={() => onOperationChange('find')} placeholder="Find" disabled={isAnimating} />
-                <button onClick={() => { startFind(findValue); setFindValue(''); }} disabled={isAnimating || findValue === ''}>Find</button>
+                <input type="number" value={findValue} onChange={(e) => setFindValue(e.target.value)} onKeyDown={(e) => handleKeyDown(e, handleFind)} onFocus={() => onOperationChange('find')} placeholder="Find Value" disabled={isAnimating} />
+                <button onClick={handleFind} disabled={isAnimating || findValue === ''}>Find</button>
             </div>
             <div className="control-group">
-                <input type="number" value={deleteValue} onChange={(e) => setDeleteValue(e.target.value)} onFocus={() => onOperationChange('delete')} placeholder="Delete" disabled={isAnimating} />
-                <button onClick={() => { bst.deleteNode(Number(deleteValue)); setDeleteValue(''); }} disabled={isAnimating || deleteValue === ''}>Delete</button>
+                <input type="number" value={deleteValue} onChange={(e) => setDeleteValue(e.target.value)} onKeyDown={(e) => handleKeyDown(e, handleDelete)} onFocus={() => onOperationChange('delete')} placeholder="Delete Value" disabled={isAnimating} />
+                <button onClick={handleDelete} disabled={isAnimating || deleteValue === ''}>Delete</button>
             </div>
         </div>
         <div className="control-row">

@@ -23,16 +23,29 @@ const ChapterPage = () => {
   const bst = useBinarySearchTree();
   const [currentOperation, setCurrentOperation] = useState('insert');
   const [animationSteps, setAnimationSteps] = useState([]);
-  const [animationType, setAnimationType] = useState(null); // 'traversal' or 'find'
+  const [animationType, setAnimationType] = useState(null);
+  const [latestNodeId, setLatestNodeId] = useState(null);
   
   const isAnimating = animationType !== null;
 
+  const handleInsert = (value) => {
+    const newNode = bst.insert(value);
+    setLatestNodeId(newNode.id);
+  };
+
   const startAnimation = (type, steps) => {
+      setLatestNodeId(null);
       setAnimationSteps(steps);
       setAnimationType(type);
   }
 
   const stopAnimation = () => {
+      if (animationType === 'delete' && animationSteps.length > 0) {
+          const lastStep = animationSteps[animationSteps.length - 1];
+          if (lastStep.finalTree !== undefined) {
+              bst.setRoot(lastStep.finalTree ? { ...lastStep.finalTree } : null);
+          }
+      }
       setAnimationSteps([]);
       setAnimationType(null);
   }
@@ -46,16 +59,23 @@ const ChapterPage = () => {
 
   const handleStartFind = (value) => {
     if (!bst.root || value === '') return;
-    const steps = bst.find(Number(value));
+    const steps = bst.find(value);
     setCurrentOperation('find');
     startAnimation('find', steps);
   }
+
+  const handleStartDelete = (value) => {
+    if (!bst.root || value === '') return;
+    const steps = bst.deleteNode(value);
+    setCurrentOperation('delete');
+    startAnimation('delete', steps);
+  };
 
   return (
     <div className="chapter-page">
       <section className="playground-section">
         <div className="playground-header">
-            <h2>Interactive Playground</h2>
+            <h2>Interactive BST Playground</h2>
             <div className="header-utility-buttons">
                 <button onClick={bst.refreshTree} disabled={isAnimating} title="Refresh Tree"><RefreshIcon /></button>
                 <button onClick={bst.clear} disabled={isAnimating} title="Clear Tree"><TrashIcon /></button>
@@ -64,10 +84,11 @@ const ChapterPage = () => {
         <div className="interactive-area">
           <div className="controls-and-visualizer">
             <ControlsPanel
-              bst={bst}
               onOperationChange={setCurrentOperation}
+              onInsert={handleInsert}
               startTraversal={handleStartTraversal}
               startFind={handleStartFind}
+              startDelete={handleStartDelete}
               isAnimating={isAnimating}
             />
             <TreeVisualizer
@@ -76,9 +97,13 @@ const ChapterPage = () => {
               animationSteps={animationSteps}
               animationType={animationType}
               stopAnimation={stopAnimation}
+              latestNodeId={latestNodeId}
+              key={bst.root ? bst.root.id : 'empty'}
             />
           </div>
-          <CodeDisplay operation={currentOperation} />
+          <div className="code-display-container">
+            <CodeDisplay operation={currentOperation} />
+          </div>
         </div>
       </section>
     </div>

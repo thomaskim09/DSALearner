@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 
 const TraversalControls = ({ onPlayPause, onStep, onRestart, isPlaying, onClose }) => (
     <div className="traversal-controls">
@@ -10,71 +10,102 @@ const TraversalControls = ({ onPlayPause, onStep, onRestart, isPlaying, onClose 
     </div>
 );
 
-const TreeVisualizer = ({ root, getTreeHeight, animationSteps, animationType, stopAnimation }) => {
-    const [highlightedNode, setHighlightedNode] = useState(null);
-    const [foundNode, setFoundNode] = useState(null);
+const TreeVisualizer = ({ root, getTreeHeight, animationSteps, animationType, stopAnimation, latestNodeId }) => {
+    const [viewMatrix, setViewMatrix] = useState({ x: 0, y: 0, zoom: 1 });
+    const [isPanning, setIsPanning] = useState(false);
+    const lastMousePosition = useRef({ x: 0, y: 0 });
+    const viewportRef = useRef(null);
+
+    const [highlightedNodeId, setHighlightedNodeId] = useState(null);
+    const [foundNodeId, setFoundNodeId] = useState(null);
     const [message, setMessage] = useState('');
     const [traversalOutput, setTraversalOutput] = useState([]);
     const [currentStep, setCurrentStep] = useState(0);
     const [isPlaying, setIsPlaying] = useState(false);
 
-    // --- ✨ NEW & IMPROVED SCALING LOGIC ✨ ---
-    
-    // These constants control the new exponential decay scaling.
-    // You can tweak them easily to change the look of the tree.
-    const BASE_RADIUS = 24;          // The size of the root node.
-    const MINIMUM_RADIUS = 18;       // The smallest size a node can approach.
-    const RADIUS_DECAY_RATE = 0.85;  // How quickly nodes shrink per level (e.g., 0.9 = slower, 0.8 = faster).
-    
-    const BASE_FONT_SIZE = 14;
-    const MINIMUM_FONT_SIZE = 12;
-    const FONT_DECAY_RATE = 0.9;
-    
-    const LEVEL_HEIGHT = 90; // Increased vertical spacing.
+    const NODE_RADIUS = 25;
+    const FONT_SIZE = 14;
+    const LEVEL_HEIGHT = 90;
+    const HORIZONTAL_GAP_MULTIPLIER = 30;
 
     const layout = useMemo(() => {
         const positions = new Map();
-        let minX = 0, maxX = 0;
-        const treeH = getTreeHeight(root);
-        
         function calcPos(node, x, y, level) {
             if (!node) return;
-            
-            // NEW: Exponential decay for smooth scaling.
-            // This formula creates a natural curve, so nodes never "suddenly" become small.
-            const radius = MINIMUM_RADIUS + (BASE_RADIUS - MINIMUM_RADIUS) * Math.pow(RADIUS_DECAY_RATE, level);
-            const fontSize = MINIMUM_FONT_SIZE + (BASE_FONT_SIZE - MINIMUM_FONT_SIZE) * Math.pow(FONT_DECAY_RATE, level);
-
-            positions.set(node.value, { x, y, radius, fontSize });
-            minX = Math.min(minX, x);
-            maxX = Math.max(maxX, x);
-
-            // A more balanced gap calculation for better layout.
-            const gap = Math.pow(1.7, treeH - level) * (radius * 0.8);
-            if (node.left) calcPos(node.left, x - gap, y + LEVEL_HEIGHT, level + 1);
-            if (node.right) calcPos(node.right, x + gap, y + LEVEL_HEIGHT, level + 1);
+            positions.set(node.id, { x, y });
+            const dynamicGap = Math.pow(1.6, getTreeHeight(root) - level - 1) * HORIZONTAL_GAP_MULTIPLIER;
+            if (node.left) calcPos(node.left, x - dynamicGap, y + LEVEL_HEIGHT, level + 1);
+            if (node.right) calcPos(node.right, x + dynamicGap, y + LEVEL_HEIGHT, level + 1);
         }
-
-        if (root) calcPos(root, 0, 50, 0);
-        return { positions, minX, maxX };
+        if (root) calcPos(root, 0, 0, 0);
+        return { positions };
     }, [root, getTreeHeight]);
-    
-    // --- ✨ END OF CHANGES ✨ ---
 
-    const treeHeight = getTreeHeight(root);
-    const svgHeight = treeHeight * LEVEL_HEIGHT + 60;
-    const padding = 40;
-    const viewBox = root ? `${layout.minX - padding} 0 ${layout.maxX - layout.minX + padding * 2} ${svgHeight}` : '0 0 100 100';
+    // ✨ FIX: Center tree on initial load
+    useEffect(() => {
+        const viewport = viewportRef.current;
+        if (viewport) {
+            const { width, height } = viewport.getBoundingClientRect();
+            setViewMatrix({ x: width / 2, y: height * 0.1, zoom: 1 });
+        }
+    }, []);
+
+    const handleMouseDown = (e) => {
+        setIsPanning(true);
+        lastMousePosition.current = { x: e.clientX, y: e.clientY };
+    };
+
+    const handleMouseUp = () => setIsPanning(false);
+
+    const handleMouseMove = (e) => {
+        if (!isPanning) return;
+        const dx = e.clientX - lastMousePosition.current.x;
+        const dy = e.clientY - lastMousePosition.current.y;
+        lastMousePosition.current = { x: e.clientX, y: e.clientY };
+        setViewMatrix(prev => ({ ...prev, x: prev.x + dx, y: prev.y + dy }));
+    };
+
+    const handleWheel = (e) => {
+        e.preventDefault();
+        const zoomFactor = 1.1;
+        const newZoom = e.deltaY < 0 ? viewMatrix.zoom * zoomFactor : viewMatrix.zoom / zoomFactor;
+        setViewMatrix(prev => ({...prev, zoom: Math.max(0.1, Math.min(newZoom, 5))}));
+    };
+    
+    useEffect(() => {
+        if (latestNodeId) {
+            setHighlightedNodeId(latestNodeId);
+            setTimeout(() => setHighlightedNodeId(null), 1500);
+        }
+    }, [latestNodeId]);
 
     const clearState = useCallback(() => {
-        setHighlightedNode(null);
-        setFoundNode(null);
+        setHighlightedNodeId(null);
+        setFoundNodeId(null);
         setMessage('');
         setTraversalOutput([]);
         setCurrentStep(0);
         setIsPlaying(false);
     }, []);
+    
+    // ✨ FIX: Separated step display from step execution
+    const displayStep = (stepIndex) => {
+        const step = animationSteps[stepIndex];
+        if (!step) return;
+        setHighlightedNodeId(step.nodeId);
+        setMessage(step.message || '');
+    };
 
+    const executeStep = (stepIndex) => {
+        const step = animationSteps[stepIndex];
+        if (!step) return;
+        displayStep(stepIndex);
+        if (animationType === 'traversal' && step.type === 'visit') {
+             setTraversalOutput(prev => [...prev, step.nodeValue]);
+        }
+        if (step.type === 'found') setFoundNodeId(step.nodeId);
+    };
+    
     useEffect(() => {
         if (animationType) {
             clearState();
@@ -82,93 +113,80 @@ const TreeVisualizer = ({ root, getTreeHeight, animationSteps, animationType, st
         }
     }, [animationType, animationSteps, clearState]);
 
-    const runAnimationStep = useCallback((stepIndex) => {
-        if (!animationSteps || stepIndex >= animationSteps.length) {
+    useEffect(() => {
+        if (!isPlaying || !animationType) return;
+        if (currentStep >= animationSteps.length) {
             setIsPlaying(false);
-            if (animationType === 'traversal') {
-                const lastStep = animationSteps[animationSteps.length - 1];
-                if(lastStep) setHighlightedNode(lastStep.nodeValue);
-            }
             return;
         }
-
-        const step = animationSteps[stepIndex];
-        setHighlightedNode(step.nodeValue);
-        setCurrentStep(stepIndex);
-
-        if (animationType === 'traversal') {
-            setTraversalOutput(prev => [...prev, step.nodeValue]);
-        } else if (animationType === 'find') {
-            if (step.type === 'found') {
-                setIsPlaying(false);
-                setFoundNode(step.nodeValue);
-                setMessage(`Node ${step.nodeValue} found!`);
-            } else if (step.type === 'not-found') {
-                setIsPlaying(false);
-                setMessage(`Node ${step.value} not found.`);
-            }
-        }
-    }, [animationSteps, animationType]);
-
-    useEffect(() => {
-        if (isPlaying && animationType) {
-            const timer = setTimeout(() => runAnimationStep(currentStep + 1), 700);
-            return () => clearTimeout(timer);
-        }
-    }, [isPlaying, animationType, currentStep, runAnimationStep]);
+        const timer = setTimeout(() => {
+            executeStep(currentStep);
+            setCurrentStep(prev => prev + 1);
+        }, 700);
+        return () => clearTimeout(timer);
+    }, [isPlaying, currentStep, animationSteps, animationType]);
 
     const handlePlayPause = () => setIsPlaying(!isPlaying);
+
     const handleStep = (dir) => {
         setIsPlaying(false);
-        runAnimationStep(currentStep + dir);
+        const nextStep = Math.max(0, Math.min(animationSteps.length - 1, currentStep + dir));
+        setCurrentStep(nextStep);
+        displayStep(nextStep); // Only display the step, don't execute it
     };
+
     const handleRestart = () => {
         clearState();
         setTimeout(() => setIsPlaying(true), 50);
     };
 
     const renderNodesRecursive = (node) => {
-        if (!node || !layout.positions.has(node.value)) return null;
-        
-        const { x, y, radius, fontSize } = layout.positions.get(node.value);
-        const leftChildPos = node.left ? layout.positions.get(node.left.value) : null;
-        const rightChildPos = node.right ? layout.positions.get(node.right.value) : null;
-        
-        let fill = '#4a90e2';
-        if (foundNode === node.value) fill = '#2e7d32';
-        else if (highlightedNode === node.value) fill = '#f9a825';
+        if (!node || !layout.positions.has(node.id)) return null;
+        const { x, y } = layout.positions.get(node.id);
+        let fill = 'var(--node-primary)';
+        if (foundNodeId === node.id) fill = 'var(--node-found)';
+        else if (highlightedNodeId === node.id) fill = 'var(--node-highlight)';
 
         return (
-            <g key={node.value}>
-                {leftChildPos && <line x1={x} y1={y} x2={leftChildPos.x} y2={leftChildPos.y} stroke="#666" />}
-                {rightChildPos && <line x1={x} y1={y} x2={rightChildPos.x} y2={rightChildPos.y} stroke="#666" />}
+            <g key={node.id}>
+                {node.left && <line x1={x} y1={y} x2={layout.positions.get(node.left.id).x} y2={layout.positions.get(node.left.id).y} stroke="var(--border-color)" strokeWidth="2" />}
+                {node.right && <line x1={x} y1={y} x2={layout.positions.get(node.right.id).x} y2={layout.positions.get(node.right.id).y} stroke="var(--border-color)" strokeWidth="2" />}
                 {renderNodesRecursive(node.left)}
                 {renderNodesRecursive(node.right)}
-                <circle cx={x} cy={y} r={radius} fill={fill} stroke="#fff" strokeWidth="2" />
-                <text x={x} y={y + 5} textAnchor="middle" fill="white" fontSize={`${fontSize}px`} fontWeight="bold">{node.value}</text>
+                <circle cx={x} cy={y} r={NODE_RADIUS} fill={fill} stroke="var(--bg-content)" strokeWidth="3" />
+                <text x={x} y={y + 5} textAnchor="middle" fill="white" fontSize={`${FONT_SIZE}px`} fontWeight="bold">{node.value}</text>
             </g>
         );
     };
   
     return (
-        <div className="tree-visualizer-container">
-            <div className="svg-wrapper">
-                <svg width="100%" height="100%" viewBox={viewBox} preserveAspectRatio="xMidYMin meet">
+        <div className={`tree-visualizer-container ${isPanning ? 'is-panning' : ''}`} ref={viewportRef}
+            onMouseDown={handleMouseDown}
+            onMouseUp={handleMouseUp}
+            onMouseLeave={handleMouseUp}
+            onMouseMove={handleMouseMove}
+            onWheel={handleWheel}
+        >
+            <svg className="svg-viewport">
+                <g transform={`translate(${viewMatrix.x}, ${viewMatrix.y}) scale(${viewMatrix.zoom})`}>
                     {root && renderNodesRecursive(root)}
-                </svg>
-            </div>
-            {animationType === 'traversal' && (
-                <div className="traversal-footer">
-                    <TraversalControls onPlayPause={handlePlayPause} onStep={handleStep} onRestart={handleRestart} isPlaying={isPlaying} onClose={stopAnimation}/>
-                    <div className="traversal-output">Traversal Order: {traversalOutput.join(' → ')}</div>
-                </div>
-            )}
-            {animationType === 'find' && (
+                </g>
+            </svg>
+            
+             {animationType && 
                  <div className="traversal-footer">
-                    <div className="traversal-output">{message}</div>
-                    <button onClick={stopAnimation} className="close-btn single-close">Close</button>
+                    <div className="traversal-message">{message}</div>
+                     {animationType === 'traversal' && (
+                        <>
+                            <div className="traversal-output">Order: {traversalOutput.join(' → ')}</div>
+                            <TraversalControls onPlayPause={handlePlayPause} onStep={handleStep} onRestart={handleRestart} isPlaying={isPlaying} onClose={stopAnimation}/>
+                        </>
+                    )}
+                    {(animationType === 'find' || animationType === 'delete') && (
+                        <button onClick={stopAnimation} className="close-btn single-close">Close</button>
+                    )}
                  </div>
-            )}
+            }
         </div>
     );
 };

@@ -1,204 +1,189 @@
-
-  .header-utility-buttons {
-      display: flex;
-      gap: 8px;
+:root {
+    --bg-main: #1a1a1a;
+    --bg-content: #242424;
+    --bg-interactive: #2d2d2d;
+    --bg-interactive-hover: #3a3a3a;
+    --border-color: #444;
+    --text-primary: #f0f0f0;
+    --text-secondary: #a0a0a0;
+    --text-button: #ffffff;
+    --node-primary: #007acc;
+    --node-highlight: #ffa500;
+    --node-found: #4caf50;
+    --button-bg: #007acc;
+    --button-hover-bg: #005f9e;
+    --button-disabled-bg: #555;
+    --button-disabled-text: #888;
   }
   
-  .header-utility-buttons button {
-      background: none;
-      border: 1px solid #555;
-      color: #ccc;
-      padding: 5px;
-      border-radius: 4px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+  .chapter-page {
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    padding: 20px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
   }
   
-  .header-utility-buttons button:hover {
-      background-color: #444;
-      border-color: #777;
+  .playground-section {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--bg-content);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  .playground-header {
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  
+  .playground-header h2 {
+    margin: 0;
+    font-size: 1.5em;
   }
   
   .interactive-area {
     display: flex;
-    gap: 20px;
-    flex-grow: 1; /* Allow this area to grow vertically */
+    flex-grow: 1;
+    overflow: hidden;
+    min-height: 0;
   }
   
   .controls-and-visualizer {
-    flex: 1 1 auto; /* Let it grow and shrink, with a base size of auto */
-    min-width: 0; /* Prevents flexbox overflow */
+    flex-grow: 1;
     display: flex;
     flex-direction: column;
+    border-right: 1px solid var(--border-color);
+    min-width: 0;
   }
   
-  /* Controls Panel new layout */
+  .code-display-container {
+    flex: 0 0 450px;
+    background-color: var(--bg-main);
+    overflow-y: auto;
+  }
+  
   .controls-panel {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    margin-bottom: 20px;
     padding: 15px;
-    background-color: #333;
-    border-radius: 8px;
+    background-color: var(--bg-content);
+    border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0;
   }
   
   .control-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
   }
   
   .control-row {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 10px;
+    display: flex;
+    justify-content: space-around;
+    gap: 10px;
   }
   
   .control-group {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-  }
-  
-  .control-group.traversal-group {
-      width: 100%;
-      justify-content: center;
-  padding: 20px;
-}
-  
-  .control-group input {
-      padding: 8px;
-      border: 1px solid #555;
-      border-radius: 4px;
-      background-color: #3c3c3c;
-      color: #d4d4d4;
-      width: 90px;
-  }
-  
-  .control-group button {
-      padding: 8px 12px;
-      border: none;
-      background-color: #007acc;
-      color: white;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: background-color 0.2s;
-  }
-  
-  .control-group button:hover {
-      background-color: #005a9e;
-  }
-  
-  .control-group button:disabled {
-      background-color: #555;
-      cursor: not-allowed;
-  }
-  
-  /* Tree Visualizer */
-  .tree-visualizer-container {
-      position: relative; /* For overlay positioning */
-      flex-grow: 1;
-      border: 1px solid #333;
-      background-color: #1e1e1e;
-      border-radius: 8px;
-      display: flex;
-      flex-direction: column;
-      min-height: 450px;
-      min-width: 900px;
-  }
-  
-  .svg-wrapper {
-      flex-grow: 1;
-      overflow: hidden;
-      padding: 10px;
-  }
-  
-  .svg-wrapper svg {
-      display: block;
-      width: 100%;
-      height: 100%;
-  }
-  
-  /* Traversal Footer as an overlay */
-  .traversal-footer {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      padding: 10px;
-      background-color: rgba(37, 37, 38, 0.9); /* Semi-transparent background */
-      backdrop-filter: blur(4px);
-      border-top: 1px solid #333;
-      border-radius: 0 0 8px 8px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-  }
-  
-  .traversal-controls {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-  }
-  
-  .traversal-controls button {
-      padding: 5px 15px;
-      background-color: #007acc;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-  }
-  
-  .traversal-controls button.close-btn {
-      background-color: #7a7a7a;
-  }
-  
-  .traversal-controls button.close-btn:hover {
-      background-color: #999999;
-  }
-  
-  .traversal-output {
-      width: 100%;
-      font-family: monospace;
-      font-size: 1.1em;
-      padding: 10px;
-      background-color: #333;
-      border-radius: 4px;
-      text-align: center;
-      min-height: 20px;
-      color: #9cdcfe;
-      box-sizing: border-box;
-  }
-  
-  .traversal-footer .single-close {
-      margin-top: 5px;
-  }
-  
-  
-  /* Code Display */
-  .code-display {
-    flex: 0 0 450px; /* Don't grow, don't shrink, base width 450px */
-    background-color: #252526;
-    color: #d4d4d4;
-    padding: 20px;
-    border-radius: 8px;
-    border: 1px solid #333;
-    overflow-x: auto;
     display: flex;
-    flex-direction: column;
-  }
-  
-  .code-display pre {
-    margin: 0;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    color: #9cdcfe;
     flex-grow: 1;
   }
   
+  .control-group input {
+    flex-grow: 1;
+    padding: 8px 10px;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-interactive);
+    color: var(--text-primary);
+    border-radius: 4px 0 0 4px;
+    outline: none;
+  }
+  
+  .control-group button, .traversal-group button {
+    padding: 8px 15px;
+    border: none;
+    background-color: var(--button-bg);
+    color: var(--text-button);
+    cursor: pointer;
+    transition: background-color 0.2s;
+    border-radius: 0 4px 4px 0;
+  }
+  
+  .traversal-group {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+  }
+  
+  .traversal-group button {
+    border-radius: 4px;
+  }
+  
+  .tree-visualizer-container {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--bg-interactive);
+    position: relative;
+    overflow: hidden;
+    cursor: grab;
+  }
+  
+  .tree-visualizer-container.is-panning {
+    cursor: grabbing;
+  }
+  
+  .svg-viewport {
+    width: 100%;
+    height: 100%;
+  }
+  
+  .zoom-controls {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  
+  .zoom-controls button {
+    width: 30px;
+    height: 30px;
+    font-size: 18px;
+    font-weight: bold;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-content);
+    color: var(--text-primary);
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .traversal-footer {
+    padding: 12px 15px;
+    background-color: var(--bg-content);
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    min-height: 54px;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+  }
+  
+  .code-display {
+      padding: 20px;
+      font-family: 'Courier New', Courier, monospace;
+      color: #f8f8f2;
+      background-color: #282a36;
+      line-height: 1.5;
+      font-size: 14px;
+  }

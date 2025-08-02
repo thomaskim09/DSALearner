@@ -1,101 +1,132 @@
 import React from 'react';
 
-const codeSnippets = {
-  insert: `// Complexity: O(log n)
-public void insert(int value) {
-  Node newNode = new Node(value);
-  if (root == null) {
-    root = newNode;
-    return;
-  }
-  Node current = root;
-  while (true) {
-    if (value < current.value) {
-      if (current.left == null) {
-        current.left = newNode;
-        return;
-      }
-      current = current.left;
-    } else {
-      if (current.right == null) {
-        current.right = newNode;
-        return;
-      }
-      current = current.right;
-    }
-  }
-}`,
-  find: `// Complexity: O(log n)
-public Node find(int value) {
-  Node current = root;
-  while (current != null) {
-    if (value == current.value) {
-      return current;
-    } else if (value < current.value) {
-      current = current.left;
-    } else {
-      current = current.right;
-    }
-  }
-  return null; // Not found
-}`,
-  delete: `// Complexity: O(log n)
-public Node deleteNode(Node node, int value) {
-    if (node == null) return null;
-
-    if (value < node.value) {
-        node.left = deleteNode(node.left, value);
-    } else if (value > node.value) {
-        node.right = deleteNode(node.right, value);
-    } else {
-        // Node with only one child or no child
-        if (node.left == null) return node.right;
-        if (node.right == null) return node.left;
-
-        // Node with two children: Get the inorder successor
-        Node successor = findMin(node.right);
-        node.value = successor.value;
-        node.right = deleteNode(node.right, successor.value);
-    }
-    return node;
-}`,
-    inOrder: `// Complexity: O(n)
-public void inOrder(Node node) {
-    if (node != null) {
-        inOrder(node.left);
-        System.out.print(node.value + " ");
-        inOrder(node.right);
-    }
-}`,
-    preOrder: `// Complexity: O(n)
-public void preOrder(Node node) {
-    if (node != null) {
-        System.out.print(node.value + " ");
-        preOrder(node.left);
-        preOrder(node.right);
-    }
-}`,
-    postOrder: `// Complexity: O(n)
-public void postOrder(Node node) {
-    if (node != null) {
-        postOrder(node.left);
-        postOrder(node.right);
-        System.out.print(node.value + " ");
-    }
-}`,
-  clear: `// Clears all nodes from the tree
-public void clearTree() {
-    root = null;
-}`
-};
-
 const CodeDisplay = ({ operation }) => {
-  return (
-    <div className="code-display">
-      <h4>Code: {operation}</h4>
-      <pre><code>{codeSnippets[operation] || 'Select an operation to see the code.'}</code></pre>
-    </div>
-  );
+    const codeSnippets = {
+        insert: `// Complexity: O(log n) 
+// To insert a node, first find the appropriate
+// position by traversing from the root. 
+// Then, connect the new node as a child.
+
+public void insert(int id, double dd) {
+  Node newNode = new Node();
+  newNode.iData = id;
+  if(root == null)
+    root = newNode;
+  else {
+    Node current = root;
+    Node parent;
+    while(true) {
+      parent = current;
+      if(id < current.iData) { // Go left?
+        current = current.leftChild;
+        if(current == null) {
+          parent.leftChild = newNode;
+          return;
+        }
+      } else { // Go right?
+        current = current.rightChild;
+        if(current == null) {
+          parent.rightChild = newNode;
+          return;
+        }
+      }
+    }
+  }
+}`,
+
+        find: `// Complexity: O(log n) 
+// Start at the root. If the key is less than the
+// current node, go left. If greater, go right,
+// until the node is found. 
+
+public Node find(int key) {
+  Node current = root;
+  while(current.iData != key) {
+    if(key < current.iData)
+      current = current.leftChild;
+    else
+      current = current.rightChild;
+    if(current == null)
+      return null; // Not found
+  }
+  return current; // Found it
+}`,
+
+        delete: `// Complexity: O(log n) 
+// Deletion has three cases:
+// 1. The node is a leaf (no children). 
+// 2. The node has one child. 
+// 3. The node has two children. 
+// For case 3, replace the node with its
+// inorder successor. 
+
+public boolean delete(int key) {
+  // ... (code to find node)
+
+  // Case 1: No children
+  if(current.leftChild == null && current.rightChild == null) {
+    // ... (disconnect from parent)
+  }
+  // Case 2: One child
+  else if(current.rightChild == null) {
+    // ... (replace with left subtree)
+  }
+  else if(current.leftChild == null) {
+    // ... (replace with right subtree)
+  }
+  // Case 3: Two children
+  else {
+    Node successor = getSuccessor(current);
+    // ... (replace current with successor)
+  }
+  return true;
+}`,
+
+        inOrder: `// Complexity: O(n)
+// An inorder traversal visits nodes in ascending
+// order of their key values. 
+// The sequence is: left child, the node
+// itself, then the right child. 
+
+private void inOrder(Node localRoot) {
+  if(localRoot != null) {
+    inOrder(localRoot.leftChild);
+    System.out.print(localRoot.iData + " ");
+    inOrder(localRoot.rightChild);
+  }
+}`,
+
+        preOrder: `// Complexity: O(n)
+// A preorder traversal visits the node first,
+// then its left child, then its right child.
+
+private void preOrder(Node localRoot) {
+  if(localRoot != null) {
+    System.out.print(localRoot.iData + " ");
+    preOrder(localRoot.leftChild);
+    preOrder(localRoot.rightChild);
+  }
+}`,
+
+        postOrder: `// Complexity: O(n)
+// A postorder traversal visits the left child,
+// then the right child, and finally the node
+// itself. 
+
+private void postOrder(Node localRoot) {
+  if(localRoot != null) {
+    postOrder(localRoot.leftChild);
+    postOrder(localRoot.rightChild);
+    System.out.print(localRoot.iData + " ");
+  }
+}`,
+    };
+
+    return (
+        <div className="code-display">
+            <pre dangerouslySetInnerHTML={{ __html: codeSnippets[operation] || codeSnippets.insert }} />
+        </div>
+    );
 };
 
 export default CodeDisplay;
