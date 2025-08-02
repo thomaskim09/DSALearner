@@ -18,28 +18,51 @@ const TreeVisualizer = ({ root, getTreeHeight, animationSteps, animationType, st
     const [currentStep, setCurrentStep] = useState(0);
     const [isPlaying, setIsPlaying] = useState(false);
 
-    const nodeRadius = 20;
-    const levelHeight = 80;
+    // --- ✨ NEW & IMPROVED SCALING LOGIC ✨ ---
+    
+    // These constants control the new exponential decay scaling.
+    // You can tweak them easily to change the look of the tree.
+    const BASE_RADIUS = 24;          // The size of the root node.
+    const MINIMUM_RADIUS = 18;       // The smallest size a node can approach.
+    const RADIUS_DECAY_RATE = 0.85;  // How quickly nodes shrink per level (e.g., 0.9 = slower, 0.8 = faster).
+    
+    const BASE_FONT_SIZE = 14;
+    const MINIMUM_FONT_SIZE = 12;
+    const FONT_DECAY_RATE = 0.9;
+    
+    const LEVEL_HEIGHT = 90; // Increased vertical spacing.
 
     const layout = useMemo(() => {
         const positions = new Map();
         let minX = 0, maxX = 0;
         const treeH = getTreeHeight(root);
+        
         function calcPos(node, x, y, level) {
             if (!node) return;
-            positions.set(node.value, { x, y });
+            
+            // NEW: Exponential decay for smooth scaling.
+            // This formula creates a natural curve, so nodes never "suddenly" become small.
+            const radius = MINIMUM_RADIUS + (BASE_RADIUS - MINIMUM_RADIUS) * Math.pow(RADIUS_DECAY_RATE, level);
+            const fontSize = MINIMUM_FONT_SIZE + (BASE_FONT_SIZE - MINIMUM_FONT_SIZE) * Math.pow(FONT_DECAY_RATE, level);
+
+            positions.set(node.value, { x, y, radius, fontSize });
             minX = Math.min(minX, x);
             maxX = Math.max(maxX, x);
-            const gap = Math.pow(2, treeH - level - 1) * (nodeRadius * 1.2);
-            if (node.left) calcPos(node.left, x - gap, y + levelHeight, level + 1);
-            if (node.right) calcPos(node.right, x + gap, y + levelHeight, level + 1);
+
+            // A more balanced gap calculation for better layout.
+            const gap = Math.pow(1.7, treeH - level) * (radius * 0.8);
+            if (node.left) calcPos(node.left, x - gap, y + LEVEL_HEIGHT, level + 1);
+            if (node.right) calcPos(node.right, x + gap, y + LEVEL_HEIGHT, level + 1);
         }
-        if (root) calcPos(root, 0, 40, 0);
+
+        if (root) calcPos(root, 0, 50, 0);
         return { positions, minX, maxX };
     }, [root, getTreeHeight]);
+    
+    // --- ✨ END OF CHANGES ✨ ---
 
     const treeHeight = getTreeHeight(root);
-    const svgHeight = treeHeight * levelHeight + 50;
+    const svgHeight = treeHeight * LEVEL_HEIGHT + 60;
     const padding = 40;
     const viewBox = root ? `${layout.minX - padding} 0 ${layout.maxX - layout.minX + padding * 2} ${svgHeight}` : '0 0 100 100';
 
@@ -63,7 +86,6 @@ const TreeVisualizer = ({ root, getTreeHeight, animationSteps, animationType, st
         if (!animationSteps || stepIndex >= animationSteps.length) {
             setIsPlaying(false);
             if (animationType === 'traversal') {
-                // Persist highlight on last traversal node
                 const lastStep = animationSteps[animationSteps.length - 1];
                 if(lastStep) setHighlightedNode(lastStep.nodeValue);
             }
@@ -107,13 +129,14 @@ const TreeVisualizer = ({ root, getTreeHeight, animationSteps, animationType, st
 
     const renderNodesRecursive = (node) => {
         if (!node || !layout.positions.has(node.value)) return null;
-        const { x, y } = layout.positions.get(node.value);
+        
+        const { x, y, radius, fontSize } = layout.positions.get(node.value);
         const leftChildPos = node.left ? layout.positions.get(node.left.value) : null;
         const rightChildPos = node.right ? layout.positions.get(node.right.value) : null;
         
-        let fill = '#4a90e2'; // Default color
-        if (foundNode === node.value) fill = '#2e7d32'; // Green for found
-        else if (highlightedNode === node.value) fill = '#f9a825'; // Yellow for highlight
+        let fill = '#4a90e2';
+        if (foundNode === node.value) fill = '#2e7d32';
+        else if (highlightedNode === node.value) fill = '#f9a825';
 
         return (
             <g key={node.value}>
@@ -121,8 +144,8 @@ const TreeVisualizer = ({ root, getTreeHeight, animationSteps, animationType, st
                 {rightChildPos && <line x1={x} y1={y} x2={rightChildPos.x} y2={rightChildPos.y} stroke="#666" />}
                 {renderNodesRecursive(node.left)}
                 {renderNodesRecursive(node.right)}
-                <circle cx={x} cy={y} r={nodeRadius} fill={fill} stroke="#fff" strokeWidth="2" />
-                <text x={x} y={y + 5} textAnchor="middle" fill="white" fontSize="14px">{node.value}</text>
+                <circle cx={x} cy={y} r={radius} fill={fill} stroke="#fff" strokeWidth="2" />
+                <text x={x} y={y + 5} textAnchor="middle" fill="white" fontSize={`${fontSize}px`} fontWeight="bold">{node.value}</text>
             </g>
         );
     };

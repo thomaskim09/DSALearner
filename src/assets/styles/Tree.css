@@ -67,7 +67,8 @@
   .control-group.traversal-group {
       width: 100%;
       justify-content: center;
-  }
+  padding: 20px;
+}
   
   .control-group input {
       padding: 8px;
@@ -107,6 +108,7 @@
       display: flex;
       flex-direction: column;
       min-height: 450px;
+      min-width: 900px;
   }
   
   .svg-wrapper {
