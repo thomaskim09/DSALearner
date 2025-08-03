@@ -77,16 +77,3 @@ body {
   border: 1px solid var(--border-color);
   overflow: hidden;
 }
-
-.playground-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.playground-header h2 {
-    margin: 0;
-    border-bottom: 2px solid #007acc;
-    padding-bottom: 10px;
-}

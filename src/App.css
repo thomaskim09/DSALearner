@@ -10,23 +10,22 @@
     --border-color: #444444;
     --text-primary: #e0e0e0;
     --text-secondary: #b0b0b0;
-    --accent-color: #64b5f6; /* A pleasant light blue for accents */
+    --accent-color: #007acc; /* Darker Blue */
     --node-primary: #757575;
     --node-highlight: #ffcc80; /* A soft orange for highlights */
     --code-bg: #212121;
 
     /* New Button and Interactive Colors */
-    --button-bg: #64b5f6;
-    --button-hover-bg: #81c784;
+    --button-bg: #007acc; /* Darker Blue */
+    --button-hover-bg: #005f9e; /* Darker Hover */
     --button-text: #ffffff;
-    --node-bg: #64b5f6;
+    --node-bg: #007acc; /* Darker Blue */
     --node-text: #ffffff;
     --node-border: #90caf9;
     --node-highlight-bg: #ffcc80;
     --node-highlight-text: #000000;
     --node-highlight-border: #ffa726;
 }
-
 /* Global Styles */
 body {
     margin: 0;

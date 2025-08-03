@@ -1,73 +1,65 @@
-import React, { useState, useCallback } from 'react';
-import { useLinkedList } from '../hooks/useLinkedList';
-import LinkedListVisualizer from '../components/LinkedList/LinkedListVisualizer';
+import React, { useState } from 'react';
 import LinkedListControls from '../components/LinkedList/LinkedListControls';
+import LinkedListVisualizer from '../components/LinkedList/LinkedListVisualizer';
 import LinkedListCodeDisplay from '../components/LinkedList/LinkedListCodeDisplay';
-import PlaygroundUtils from '../components/common/PlaygroundUtils';
+import { useLinkedList } from '../hooks/useLinkedList';
 import '../assets/styles/LinkedList.css';
 
 const LinkedListPage = () => {
-    const { head, refreshList, clear, insertFirst, deleteFirst, insertLast, find, deleteByKey, setHead } = useLinkedList();
+    const { head, setHead, insertFirst, deleteFirst, insertLast, find, deleteByKey, refreshList } = useLinkedList();
     const [listType, setListType] = useState('Singly-Linked');
-    const [currentOperation, setCurrentOperation] = useState('insertFirst');
     const [animationSteps, setAnimationSteps] = useState([]);
     const [isAnimating, setIsAnimating] = useState(false);
+    const [hoveredOperation, setHoveredOperation] = useState('insertFirst'); // Default operation to show
 
-    const handleAnimation = useCallback((operation, steps) => {
-        setCurrentOperation(operation);
-        setAnimationSteps(steps);
+    const handleOperation = (operation) => {
+        if (isAnimating) return;
         setIsAnimating(true);
-    }, []);
+        const steps = operation();
+        setAnimationSteps(steps);
+    };
 
-    const onAnimationComplete = () => {
+    const handleAnimationComplete = () => {
         const lastStep = animationSteps[animationSteps.length - 1];
         if (lastStep && lastStep.finalState) {
             setHead(lastStep.finalState);
         }
         setIsAnimating(false);
         setAnimationSteps([]);
+        refreshList(); // Or update based on final state
     };
 
-    const handleInsertFirst = (value) => handleAnimation('insertFirst', insertFirst(value));
-    const handleDeleteFirst = () => handleAnimation('deleteFirst', deleteFirst());
-    const handleInsertLast = (value) => handleAnimation('insertLast', insertLast(value));
-    const handleFind = (value) => handleAnimation('find', find(value));
-    const handleDeleteByKey = (value) => handleAnimation('delete', deleteByKey(value));
+    // New: Handle hover to update code display
+    const handleOperationHover = (operationName) => {
+        setHoveredOperation(operationName);
+    };
 
     return (
         <div className="chapter-page">
-            <section className="playground-section">
-                <div className="playground-header">
-                    <h2>Linked List Playground</h2>
-                    <PlaygroundUtils onRefresh={refreshList} onClear={clear} isAnimating={isAnimating} />
+            <div className="interactive-area">
+                <div className="controls-and-visualizer">
+                    <LinkedListControls
+                        listType={listType}
+                        setListType={setListType}
+                        onInsertFirst={(val) => handleOperation(() => insertFirst(val))}
+                        onDeleteFirst={() => handleOperation(deleteFirst)}
+                        onInsertLast={(val) => handleOperation(() => insertLast(val))}
+                        onDeleteByKey={(val) => handleOperation(() => deleteByKey(val))}
+                        onFind={(val) => handleOperation(() => find(val))}
+                        isAnimating={isAnimating}
+                        onHover={handleOperationHover} // Pass hover handler
+                    />
+                    <LinkedListVisualizer
+                        head={head}
+                        listType={listType}
+                        animationSteps={animationSteps}
+                        onAnimationComplete={handleAnimationComplete}
+                    />
                 </div>
-                <div className="interactive-area">
-                    <div className="controls-and-visualizer">
-                        <LinkedListVisualizer 
-                            head={head}
-                            animationSteps={animationSteps}
-                            onAnimationComplete={onAnimationComplete}
-                            listType={listType}
-                        />
-                    </div>
-                    <div className="code-and-controls-container">
-                        <LinkedListControls
-                            listType={listType}
-                            setListType={setListType}
-                            onInsertFirst={handleInsertFirst}
-                            onDeleteFirst={handleDeleteFirst}
-                            onInsertLast={handleInsertLast}
-                            onFind={handleFind}
-                            onDeleteByKey={handleDeleteByKey}
-                            isAnimating={isAnimating}
-                        />
-                        <LinkedListCodeDisplay 
-                            operation={currentOperation} 
-                            listType={listType} 
-                        />
-                    </div>
+                <div className="code-display-container">
+                    <LinkedListCodeDisplay listType={listType} operation={hoveredOperation} />
                 </div>
-            </section>
+            </div>
         </div>
     );
 };

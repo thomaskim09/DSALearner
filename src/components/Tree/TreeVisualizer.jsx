@@ -146,7 +146,7 @@ const TreeVisualizer = ({ root, getTreeHeight, animationSteps, animationType, st
         let fill = 'var(--node-primary)';
         if (foundNodeId === node.id) fill = 'var(--node-found)';
         else if (highlightedNodeId === node.id) fill = 'var(--node-highlight)';
-
+    
         return (
             <g key={node.id}>
                 {node.left && <line x1={x} y1={y} x2={layout.positions.get(node.left.id).x} y2={layout.positions.get(node.left.id).y} stroke="var(--border-color)" strokeWidth="2" />}

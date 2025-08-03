@@ -1,46 +1,47 @@
 import React from 'react';
 
+// Code snippets extracted from chap6_LinkedLists.pdf
 const codeSnippets = {
     'Singly-Linked': {
         insertFirst: `// Inserts a new link at the beginning of the list.
 // Complexity: O(1)
 public void insertFirst(int id, double dd) {
-  Link newLink = new Link(id, dd); // make new link
+  Link newLink = new Link(id, dd); // make new link,
   newLink.next = first;            // newLink --> old first
   first = newLink;                 // first --> newLink
 }`,
         deleteFirst: `// Deletes the first link from the list.
 // Complexity: O(1)
-public Link deleteFirst() { 
-  Link temp = first;
-  first = first.next; // delete it: first-->old next
-  return temp;        // return deleted link
+public Link deleteFirst() { // delete first item
+  Link temp = first;       // save reference to link
+  first = first.next;      // delete it: first-->old next
+  return temp;             // return deleted link
 }`,
         find: `// Finds a link with a given key.
 // Complexity: O(n)
-public Link find(int key) { 
-  Link current = first;
+public Link find(int key) { // find link with given key
+  Link current = first;    // start at 'first'
   while(current.iData != key) {
-    if(current.next == null)
-      return null; // didn't find it
+    if(current.next == null) // if end of list,
+      return null;           // didn't find it
     else
-      current = current.next;
+      current = current.next; // go to next link
   }
   return current; // found it
 }`,
         delete: `// Deletes a link with a given key.
 // Complexity: O(n)
-public Link delete(int key) {
+public Link delete(int key) { // delete link with given key
   Link current = first;
   Link previous = first;
   while(current.iData != key) {
     if(current.next == null)
       return null; // didn't find it
     else {
-      previous = current;
+      previous = current; // go to next link
       current = current.next;
     }
-  }
+  } // found it
   if(current == first)
     first = first.next; // if first link, change first
   else
@@ -49,66 +50,85 @@ public Link delete(int key) {
 }`
     },
     'Double-Ended': {
+        insertFirst: `// Inserts a new link at the front of the list.
+// Complexity: O(1)
+public void insertFirst(long dd) {
+  Link newLink = new Link(dd); // make new link
+  if( isEmpty() )              // if empty list,
+    last = newLink;            // newLink <-- last
+  newLink.next = first;        // newLink --> old first
+  first = newLink;             // first --> newLink
+}`,
         insertLast: `// Inserts a new link at the end of the list.
 // Complexity: O(1)
 public void insertLast(long dd) {
-  Link newLink = new Link(dd);
-  if( isEmpty() )
-    first = newLink;
+  Link newLink = new Link(dd); // make new link
+  if( isEmpty() )              // if empty list,
+    first = newLink;           // first --> newLink
   else
-    last.next = newLink;
-  last = newLink;
+    last.next = newLink;       // old last --> newLink
+  last = newLink;              // newLink <-- last
+}`,
+        deleteFirst: `// Deletes the first link from the list.
+// Complexity: O(1)
+public long deleteFirst() { // (assumes non-empty list)
+  long temp = first.dData;
+  if(first.next == null)   // if only one item
+    last = null;           // null <-- last
+  first = first.next;      // first --> old next
+  return temp;
 }`
     },
     'Sorted': {
         insert: `// Inserts a new link in sorted order.
+// This is the primary insertion method for a sorted list.
 // Complexity: O(n)
 public void insert(long key) {
-  Link newLink = new Link(key);
+  Link newLink = new Link(key); // make new link
   Link previous = null;
   Link current = first;
-  
-  while(current != null && key > current.dData) {
+  // until end of list or key > current,
+  while(current != null && key > current.dData) { 
     previous = current;
-    current = current.next;
+    current = current.next; // go to next item
   }
-  if(previous==null)
-    first = newLink;
-  else
-    previous.next = newLink;
-  newLink.next = current;
+  if(previous==null)          // at beginning of list
+    first = newLink;          // first --> newLink
+  else                        // not at beginning
+    previous.next = newLink;  // old prev --> newLink
+  newLink.next = current;     // newLink --> old current
 }`,
         remove: `// Removes the first link (smallest item).
 // Complexity: O(1)
-public Link remove() {
-  Link temp = first;
-  first = first.next;
-  return temp;
+public Link remove() { // (assumes non-empty list)
+  Link temp = first;   // save first
+  first = first.next;  // delete first
+  return temp;         // return value
 }`
     },
     'Doubly-Linked': {
         insertFirst: `// Inserts at the front of the list.
 // Complexity: O(1)
 public void insertFirst(long dd) {
-  Link newLink = new Link(dd);
-  if( isEmpty() )
-    last = newLink;
+  Link newLink = new Link(dd);   // make new link
+  if( isEmpty() )                // if empty list,
+    last = newLink;              // newLink <-- last
   else
-    first.previous = newLink;
-  newLink.next = first;
-  first = newLink;
+    first.previous = newLink;    // newLink <-- old first
+  newLink.next = first;          // newLink --> old first
+  first = newLink;               // first --> newLink
 }`,
         insertLast: `// Inserts at the end of the list.
 // Complexity: O(1)
 public void insertLast(long dd) {
-  Link newLink = new Link(dd);
-  if( isEmpty() )
-    first = newLink;
+  Link newLink = new Link(dd);   // make new link
+  if( isEmpty() )                // if empty list,
+    first = newLink;             // first --> newLink
   else {
-    last.next = newLink;
-    newLink.previous = last;
+    last.next = newLink;         // old last --> newLink
+    newLink.previous = last;     // old last <-- newLink
   }
-  last = newLink;
+  last = newLink;                // newLink <-- last
 }`,
         insertAfter: `// Inserts a new link after an existing key.
 // Complexity: O(n)
@@ -120,18 +140,18 @@ public boolean insertAfter(long key, long dd) {
       return false; // didn't find it
   }
   Link newLink = new Link(dd);
-  if(current==last) {
+  if(current==last) { // if last link
     newLink.next = null;
-    last = newLink;
-  } else {
+    last = newLink; // newLink <-- last
+  } else { // not last link
     newLink.next = current.next;
     current.next.previous = newLink;
   }
   newLink.previous = current;
   current.next = newLink;
-  return true;
+  return true; // found it, did insertion
 }`,
-        deleteKey: `// Deletes a link with a given key.
+        delete: `// Deletes a link with a given key.
 // Complexity: O(n)
 public Link deleteKey(long key) {
   Link current = first;
@@ -140,14 +160,14 @@ public Link deleteKey(long key) {
     if(current == null)
       return null; // didn't find it
   }
-  if(current==first)
-    first = current.next;
-  else
+  if(current==first) // found it; first item?
+    first = current.next; // first --> old next
+  else // not first
     current.previous.next = current.next;
   
-  if(current==last)
-    last = current.previous;
-  else
+  if(current==last) // last item?
+    last = current.previous; // old previous <-- last
+  else // not last
     current.next.previous = current.previous;
   return current;
 }`
@@ -156,18 +176,29 @@ public Link deleteKey(long key) {
 
 const LinkedListCodeDisplay = ({ listType, operation }) => {
     const getCode = () => {
-        if (codeSnippets[listType] && codeSnippets[listType][operation]) {
-            return codeSnippets[listType][operation];
+        const listCode = codeSnippets[listType];
+        if (listCode && listCode[operation]) {
+            return listCode[operation];
         }
-        // Fallback for operations shared across types
-        if (operation === 'insertFirst' && codeSnippets['Singly-Linked']['insertFirst']) {
-            return codeSnippets['Singly-Linked']['insertFirst'];
+        
+        // Handle special cases for Sorted List
+        if (listType === 'Sorted') {
+            if (operation === 'insertFirst' || operation === 'insertLast') return codeSnippets['Sorted']['insert'];
+            if (operation === 'deleteFirst') return codeSnippets['Sorted']['remove'];
         }
-        return "// Select an operation to see the code.";
+
+        // Fallback for common operations
+        const fallbackOperation = operation === 'delete' ? 'delete' : 'find';
+        if (codeSnippets['Singly-Linked'][fallbackOperation]) {
+            return codeSnippets['Singly-Linked'][fallbackOperation];
+        }
+
+        return "// Hover over an action to see its code.";
     };
 
     return (
         <div className="code-display">
+            <h3>Java Implementation</h3>
             <pre><code>{getCode()}</code></pre>
         </div>
     );

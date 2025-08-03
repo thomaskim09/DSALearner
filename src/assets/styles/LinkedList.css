@@ -9,108 +9,131 @@
     background-color: var(--bg-content);
     border: 1px solid var(--border-color);
     border-radius: 8px;
-    min-height: 200px; /* Increased height */
+    min-height: 250px; /* Fixed min-height */
     position: relative;
+    overflow-x: auto;
 }
 
 .list-container {
     display: flex;
     align-items: center;
     padding: 20px;
-    min-height: 60px; /* Increased height */
+    min-height: 120px; 
 }
 
-/* Node Structure */
+/* New Node Structure */
 .list-node {
     display: flex;
-    height: 60px;
-    line-height: 60px;
-    text-align: center;
+    flex-direction: column;
     border: 2px solid var(--node-primary);
     background-color: var(--bg-main);
     color: var(--text-primary);
-    border-radius: 8px;
+    border-radius: 4px;
     font-weight: bold;
     transition: all 0.3s ease;
-    min-width: 100px;
-    overflow: hidden; /* Ensures border-radius is respected by children */
+    min-width: 80px;
+    text-align: center;
 }
 
 .node-value {
-    padding: 0 20px;
-    flex-grow: 1;
+    padding: 15px;
+    font-size: 1.2em;
+    border-bottom: 1px solid var(--node-primary);
+}
+
+.node-pointer-box {
+    display: flex;
+    flex-direction: column;
 }
 
 .node-pointer {
-    padding: 0 10px;
+    padding: 8px;
     font-size: 0.8em;
     color: var(--text-secondary);
     background-color: var(--bg-interactive);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-right: 1px solid var(--border-color);
 }
+
 .node-pointer.next {
-    border-right: none;
-    border-left: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--node-primary);
 }
+
+.list-node .node-pointer-box .node-pointer:last-child {
+    border-bottom: none;
+}
+
 
 .list-node.highlighted {
     border-color: var(--node-highlight);
     box-shadow: 0 0 15px var(--node-highlight);
+    transform: scale(1.05);
 }
 
 .list-node.empty {
     border-style: dashed;
     color: var(--text-secondary);
+    padding: 20px 40px;
 }
 
-.list-arrow {
-    font-size: 2em;
-    color: var(--text-secondary);
-    margin: 0 20px;
+/* New Arrow Styling */
+.list-arrow-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-self: stretch;
+    margin: 0 15px;
+    position: relative;
+    width: 30px;
+}
+
+.arrow {
+    height: 2px;
+    background-color: var(--text-secondary);
     position: relative;
 }
 
-/* Arrow rendering */
-.list-arrow::before {
-    content: '→';
+.arrow.next-arrow::after {
+    content: '▶';
+    position: absolute;
+    right: -8px;
+    top: -9px;
+    color: var(--text-secondary);
 }
 
-.list-arrow.double::after {
-    content: '←';
-    position: absolute;
-    top: 15px;
-    left: 0;
+.arrow.prev-arrow {
+    margin-top: 30px; 
 }
+
+.arrow.prev-arrow::before {
+    content: '◀';
+    position: absolute;
+    left: -8px;
+    top: -9px;
+    color: var(--text-secondary);
+}
+
 
 .animation-message {
     position: absolute;
     top: 10px;
-    background-color: rgba(0,0,0,0.5);
-    padding: 5px 10px;
+    background-color: rgba(0,0,0,0.7);
+    padding: 8px 15px;
     border-radius: 5px;
-}
-
-/* Layout containers for the Linked List page */
-.chapter-page {
-    padding: 1rem;
-}
-
-.interactive-area {
-    display: flex;
-    gap: 1rem;
+    color: white;
+    z-index: 10;
 }
 
 /* === Controls Panel Styles === */
 .controls-panel {
-    padding: 1rem;
+    padding: 1.5rem;
+    background-color: var(--bg-content);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
 }
+
 .control-grid {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 1.5rem;
 }
 
 .control-row {
@@ -122,4 +145,41 @@
 .control-group {
     flex-grow: 1;
     display: flex;
+}
+
+.control-group input, .control-row select {
+  flex-grow: 1;
+  padding: 10px;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-interactive);
+  color: var(--text-primary);
+  border-radius: 4px;
+  outline: none;
+  font-size: 1em;
+}
+
+.button-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 10px;
+    width: 100%;
+}
+.button-grid button {
+    padding: 10px 15px;
+    border: none;
+    background-color: var(--button-bg);
+    color: var(--button-text);
+    cursor: pointer;
+    transition: background-color 0.2s;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.button-grid button:hover {
+    background-color: var(--button-hover-bg);
+}
+
+.button-grid button:disabled {
+    background-color: #555;
+    cursor: not-allowed;
 }

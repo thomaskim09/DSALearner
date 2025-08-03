@@ -17,25 +17,39 @@ const LinkedListVisualizer = ({ head, animationSteps, onAnimationComplete, listT
     }, [head]);
 
     useEffect(() => {
-        if (animationSteps.length > 0) {
+        if (animationSteps && animationSteps.length > 0) {
             setIsPlaying(true);
             let stepIndex = 0;
-            const interval = setInterval(() => {
+
+            const processStep = () => {
+                if (stepIndex >= animationSteps.length) {
+                    setIsPlaying(false);
+                    setHighlightedNodeId(null);
+                    setMessage('');
+                    if (onAnimationComplete) {
+                        setTimeout(onAnimationComplete, 500);
+                    }
+                    return;
+                }
+
                 const step = animationSteps[stepIndex];
-                setMessage(step.message);
+                setMessage(step.message || '');
+
                 if (step.type === 'highlight' || step.type === 'found' || step.type === 'delete') {
                     setHighlightedNodeId(step.nodeId);
-                }
-                stepIndex++;
-                if (stepIndex >= animationSteps.length) {
-                    clearInterval(interval);
+                } else {
                     setHighlightedNodeId(null);
-                    setTimeout(onAnimationComplete, 500);
                 }
-            }, 1000); // 1 second per step
+                
+                stepIndex++;
+                setTimeout(processStep, 1000); // 1 second per step
+            };
+
+            processStep();
         } else {
             setIsPlaying(false);
             setMessage('');
+            setHighlightedNodeId(null);
         }
     }, [animationSteps, onAnimationComplete]);
 
@@ -46,13 +60,18 @@ const LinkedListVisualizer = ({ head, animationSteps, onAnimationComplete, listT
                 {nodes.map((node, index) => (
                     <React.Fragment key={node.id}>
                         <div className={`list-node ${highlightedNodeId === node.id ? 'highlighted' : ''}`}>
-                            {(listType === 'Doubly-Linked' || listType === 'Sorted') &&
-                                <div className="node-pointer prev">{index === 0 ? 'Null' : '•'}</div>
-                            }
                             <div className="node-value">{node.value}</div>
-                            <div className="node-pointer next">{index === nodes.length - 1 ? 'Null' : '•'}</div>
+                            <div className="node-pointer-box">
+                                <div className="node-pointer next">next</div>
+                                {(listType === 'Doubly-Linked') && <div className="node-pointer prev">prev</div>}
+                            </div>
                         </div>
-                        {index < nodes.length - 1 && <div className={`list-arrow ${listType === 'Doubly-Linked' ? 'double' : ''}`}></div>}
+                        {index < nodes.length - 1 && (
+                            <div className={`list-arrow-container ${listType === 'Doubly-Linked' ? 'double' : ''}`}>
+                                <div className="arrow next-arrow"></div>
+                                {listType === 'Doubly-Linked' && <div className="arrow prev-arrow"></div>}
+                            </div>
+                        )}
                     </React.Fragment>
                 ))}
                 {nodes.length === 0 && <div className="list-node empty">null</div>}

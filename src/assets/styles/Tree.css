@@ -18,12 +18,19 @@
   flex-direction: column;
   border-right: 1px solid var(--border-color);
   min-width: 0;
+  min-height: 400px; /* Ensures a minimum height */
 }
 
 .code-display-container {
   flex: 0 0 450px;
   background-color: var(--bg-main);
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.code-display {
+  flex-grow: 1;
 }
 
 .control-grid {
