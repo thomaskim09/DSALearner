@@ -1,27 +1,30 @@
-/* Specific styles for the visualizer container */
+/* === Visualizer and Node Styles === */
 .linked-list-visualizer {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
-    align-items: center;
     justify-content: center;
-    padding: 20px;
+    align-items: center;
+    padding: 2rem;
     background-color: var(--bg-content);
     border: 1px solid var(--border-color);
     border-radius: 8px;
-    min-height: 150px;
+    min-height: 200px; /* Increased height */
+    position: relative;
 }
 
 .list-container {
     display: flex;
     align-items: center;
-    min-height: 50px;
+    padding: 20px;
+    min-height: 60px; /* Increased height */
 }
 
+/* Node Structure */
 .list-node {
-    width: 50px;
-    height: 50px;
-    line-height: 50px;
+    display: flex;
+    height: 60px;
+    line-height: 60px;
     text-align: center;
     border: 2px solid var(--node-primary);
     background-color: var(--bg-main);
@@ -29,12 +32,33 @@
     border-radius: 8px;
     font-weight: bold;
     transition: all 0.3s ease;
+    min-width: 100px;
+    overflow: hidden; /* Ensures border-radius is respected by children */
+}
+
+.node-value {
+    padding: 0 20px;
+    flex-grow: 1;
+}
+
+.node-pointer {
+    padding: 0 10px;
+    font-size: 0.8em;
+    color: var(--text-secondary);
+    background-color: var(--bg-interactive);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-right: 1px solid var(--border-color);
+}
+.node-pointer.next {
+    border-right: none;
+    border-left: 1px solid var(--border-color);
 }
 
 .list-node.highlighted {
     border-color: var(--node-highlight);
     box-shadow: 0 0 15px var(--node-highlight);
-    transform: scale(1.1);
 }
 
 .list-node.empty {
@@ -45,33 +69,57 @@
 .list-arrow {
     font-size: 2em;
     color: var(--text-secondary);
-    margin: 0 15px;
+    margin: 0 20px;
+    position: relative;
+}
+
+/* Arrow rendering */
+.list-arrow::before {
+    content: '→';
+}
+
+.list-arrow.double::after {
+    content: '←';
+    position: absolute;
+    top: 15px;
+    left: 0;
+}
+
+.animation-message {
+    position: absolute;
+    top: 10px;
+    background-color: rgba(0,0,0,0.5);
+    padding: 5px 10px;
+    border-radius: 5px;
 }
 
 /* Layout containers for the Linked List page */
-.code-and-controls-container {
+.chapter-page {
+    padding: 1rem;
+}
+
+.interactive-area {
     display: flex;
-    flex-direction: column;
-    width: 45%;
     gap: 1rem;
 }
 
-.controls-and-visualizer {
+/* === Controls Panel Styles === */
+.controls-panel {
+    padding: 1rem;
+}
+.control-grid {
     display: flex;
     flex-direction: column;
-    width: 53%;
     gap: 1rem;
 }
 
-/* Button and input styling */
-.operation-buttons {
+.control-row {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
+    gap: 1rem;
+    align-items: center;
 }
 
-.controls-panel .control-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: bold;
+.control-group {
+    flex-grow: 1;
+    display: flex;
 }

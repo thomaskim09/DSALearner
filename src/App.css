@@ -1,4 +1,4 @@
-/* Import a nice font for the whole app */
+/* DSALearner_packaged/src/App.css */
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
 
 /* === DARK THEME COLOR PALETTE === */
@@ -14,6 +14,17 @@
     --node-primary: #757575;
     --node-highlight: #ffcc80; /* A soft orange for highlights */
     --code-bg: #212121;
+
+    /* New Button and Interactive Colors */
+    --button-bg: #64b5f6;
+    --button-hover-bg: #81c784;
+    --button-text: #ffffff;
+    --node-bg: #64b5f6;
+    --node-text: #ffffff;
+    --node-border: #90caf9;
+    --node-highlight-bg: #ffcc80;
+    --node-highlight-text: #000000;
+    --node-highlight-border: #ffa726;
 }
 
 /* Global Styles */

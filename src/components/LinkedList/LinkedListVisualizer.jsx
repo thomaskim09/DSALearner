@@ -1,70 +1,62 @@
 import React, { useState, useEffect } from 'react';
 
-const LinkedListVisualizer = ({ head, animationSteps, onAnimationComplete }) => {
+const LinkedListVisualizer = ({ head, animationSteps, onAnimationComplete, listType }) => {
     const [nodes, setNodes] = useState([]);
     const [highlightedNodeId, setHighlightedNodeId] = useState(null);
     const [message, setMessage] = useState('');
-    const [currentStep, setCurrentStep] = useState(0);
     const [isPlaying, setIsPlaying] = useState(false);
 
     useEffect(() => {
-        const generatedNodes = [];
         let current = head;
+        const newNodes = [];
         while (current) {
-            generatedNodes.push({ id: current.id, value: current.value, next: current.next ? current.next.id : null });
+            newNodes.push({ id: current.id, value: current.value });
             current = current.next;
         }
-        setNodes(generatedNodes);
+        setNodes(newNodes);
     }, [head]);
 
     useEffect(() => {
-        if (animationSteps && animationSteps.length > 0) {
-            setCurrentStep(0);
+        if (animationSteps.length > 0) {
             setIsPlaying(true);
+            let stepIndex = 0;
+            const interval = setInterval(() => {
+                const step = animationSteps[stepIndex];
+                setMessage(step.message);
+                if (step.type === 'highlight' || step.type === 'found' || step.type === 'delete') {
+                    setHighlightedNodeId(step.nodeId);
+                }
+                stepIndex++;
+                if (stepIndex >= animationSteps.length) {
+                    clearInterval(interval);
+                    setHighlightedNodeId(null);
+                    setTimeout(onAnimationComplete, 500);
+                }
+            }, 1000); // 1 second per step
+        } else {
+            setIsPlaying(false);
+            setMessage('');
         }
-    }, [animationSteps]);
-
-    useEffect(() => {
-        if (!isPlaying || !animationSteps || currentStep >= animationSteps.length) {
-            if (isPlaying) {
-                onAnimationComplete();
-                setIsPlaying(false);
-                setHighlightedNodeId(null);
-            }
-            return;
-        }
-
-        const step = animationSteps[currentStep];
-        const timer = setTimeout(() => {
-            if (step.type === 'highlight' || step.type === 'update-head') {
-                setHighlightedNodeId(step.nodeId);
-            }
-             if (step.type === 'create'){
-                setNodes(prev => [...prev, step.node]);
-                setHighlightedNodeId(step.node.id);
-            }
-            setMessage(step.message);
-            setCurrentStep(prev => prev + 1);
-        }, 800);
-
-        return () => clearTimeout(timer);
-    }, [isPlaying, currentStep, animationSteps, onAnimationComplete]);
-
+    }, [animationSteps, onAnimationComplete]);
 
     return (
         <div className="linked-list-visualizer">
+            {isPlaying && <div className="animation-message">{message}</div>}
             <div className="list-container">
                 {nodes.map((node, index) => (
                     <React.Fragment key={node.id}>
                         <div className={`list-node ${highlightedNodeId === node.id ? 'highlighted' : ''}`}>
-                            {node.value}
+                            {(listType === 'Doubly-Linked' || listType === 'Sorted') &&
+                                <div className="node-pointer prev">{index === 0 ? 'Null' : '•'}</div>
+                            }
+                            <div className="node-value">{node.value}</div>
+                            <div className="node-pointer next">{index === nodes.length - 1 ? 'Null' : '•'}</div>
                         </div>
-                        {index < nodes.length - 1 && <div className="list-arrow">→</div>}
+                        {index < nodes.length - 1 && <div className={`list-arrow ${listType === 'Doubly-Linked' ? 'double' : ''}`}></div>}
                     </React.Fragment>
                 ))}
                 {nodes.length === 0 && <div className="list-node empty">null</div>}
             </div>
-            {isPlaying && <div className="animation-message">{message}</div>}
         </div>
     );
 };
