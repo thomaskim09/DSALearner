@@ -1,0 +1,77 @@
+/* Specific styles for the visualizer container */
+.linked-list-visualizer {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background-color: var(--bg-content);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    min-height: 150px;
+}
+
+.list-container {
+    display: flex;
+    align-items: center;
+    min-height: 50px;
+}
+
+.list-node {
+    width: 50px;
+    height: 50px;
+    line-height: 50px;
+    text-align: center;
+    border: 2px solid var(--node-primary);
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    border-radius: 8px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.list-node.highlighted {
+    border-color: var(--node-highlight);
+    box-shadow: 0 0 15px var(--node-highlight);
+    transform: scale(1.1);
+}
+
+.list-node.empty {
+    border-style: dashed;
+    color: var(--text-secondary);
+}
+
+.list-arrow {
+    font-size: 2em;
+    color: var(--text-secondary);
+    margin: 0 15px;
+}
+
+/* Layout containers for the Linked List page */
+.code-and-controls-container {
+    display: flex;
+    flex-direction: column;
+    width: 45%;
+    gap: 1rem;
+}
+
+.controls-and-visualizer {
+    display: flex;
+    flex-direction: column;
+    width: 53%;
+    gap: 1rem;
+}
+
+/* Button and input styling */
+.operation-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.controls-panel .control-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+}

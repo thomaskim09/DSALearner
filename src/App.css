@@ -1,39 +1,103 @@
-#root {
-  text-align: center;
+/* Import a nice font for the whole app */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+/* === DARK THEME COLOR PALETTE === */
+:root {
+    --bg-main: #1a1a1a;
+    --bg-sidebar: #242424;
+    --bg-content: #2c2c2c;
+    --bg-interactive: #3a3a3a;
+    --border-color: #444444;
+    --text-primary: #e0e0e0;
+    --text-secondary: #b0b0b0;
+    --accent-color: #64b5f6; /* A pleasant light blue for accents */
+    --node-primary: #757575;
+    --node-highlight: #ffcc80; /* A soft orange for highlights */
+    --code-bg: #212121;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
-
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* Global Styles */
+body {
+    margin: 0;
+    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Oxygen',
+      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+      sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: var(--bg-main);
+    color: var(--text-primary);
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.app-container {
+    display: flex;
 }
 
-.card {
-  padding: 2em;
+/* Main Layout Fix */
+.content-area {
+    margin-left: 260px; /* This should match the sidebar width */
+    width: calc(100% - 260px);
+    padding: 2rem;
+    min-height: 100vh;
+    box-sizing: border-box;
 }
 
-.read-the-docs {
-  color: #888;
+/* General Chapter Page Styling */
+.chapter-page, .home-page-container {
+    animation: fadeIn 0.4s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.playground-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.playground-header h2 {
+    margin: 0;
+    font-size: 1.8rem;
+    color: var(--text-primary);
+}
+
+.interactive-area {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.controls-panel {
+    background-color: var(--bg-content);
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.code-display {
+    background-color: var(--code-bg);
+    color: #f8f8f2;
+    padding: 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.95em;
+    flex-grow: 1;
+}
+
+.code-display pre {
+    margin: 0;
 }

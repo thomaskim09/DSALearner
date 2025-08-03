@@ -1,17 +1,25 @@
 import React from 'react';
-import ChapterPage from './pages/ChapterPage';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Sidebar from './components/common/Sidebar';
-import './assets/styles/main.css'; // General styles
-import './assets/styles/Tree.css'; // Component-specific styles
+import HomePage from './pages/HomePage';
+import TreePage from './pages/TreePage'; 
+import LinkedListPage from './pages/LinkedListPage';
+import './App.css';
 
 function App() {
   return (
-    <div className="app-container">
-      <Sidebar />
-      <main className="main-content">
-        <ChapterPage />
-      </main>
-    </div>
+    <Router>
+      <div className="app-container">
+        <Sidebar />
+        <main className="content-area">
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/tree" element={<TreePage />} />
+            <Route path="/linked-list" element={<LinkedListPage />} />
+          </Routes>
+        </main>
+      </div>
+    </Router>
   );
 }
 
