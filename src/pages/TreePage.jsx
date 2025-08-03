@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import TreeVisualizer from '../components/Tree/TreeVisualizer';
-import CodeDisplay from '../components/Tree/CodeDisplay';
-import ControlsPanel from '../components/Tree/ControlsPanel';
+import CodeDisplay from '../components/Tree/TreeCodeDisplay';
+import ControlsPanel from '../components/Tree/TreeControls';
 import { useBinarySearchTree } from '../hooks/useBinarySearchTree';
 import '../assets/styles/Tree.css';
 
