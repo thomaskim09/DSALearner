@@ -26,7 +26,6 @@ const LinkedListPage = () => {
         }
         setIsAnimating(false);
         setAnimationSteps([]);
-        refreshList(); // Or update based on final state
     };
 
     // New: Handle hover to update code display
