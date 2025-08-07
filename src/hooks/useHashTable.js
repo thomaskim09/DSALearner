@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 
 const TABLE_SIZE = 10;
+const PRIME = 7; // A prime smaller than the table size for the second hash function
 
 // Helper to create a new table based on strategy
 const createTable = (strategy) => {
@@ -27,6 +28,7 @@ export const useHashTable = (strategy) => {
     }, [strategy]);
 
     const hash = (key) => key % TABLE_SIZE;
+    const hash2 = (key) => PRIME - (key % PRIME); // Second hash function
 
     const runAnimation = (steps) => {
         if (timeoutRef.current) clearTimeout(timeoutRef.current);
@@ -100,6 +102,123 @@ export const useHashTable = (strategy) => {
         runAnimation(steps);
     };
 
+    // --- Quadratic Probing Logic ---
+    const insertQuadraticProbing = (key) => {
+        let index = hash(key);
+        const steps = [{ index, message: `Hashing key ${key} to index ${index}.` }];
+
+        let i = 0;
+        let foundSpot = false;
+        while (i < TABLE_SIZE) {
+            const probeIndex = (index + i * i) % TABLE_SIZE;
+             if (i > 0) {
+                 steps.push({ index: probeIndex, message: `Index occupied. Probing ${i*i} elements away...` });
+            }
+            if (table[probeIndex] === null) {
+                const newTable = [...table];
+                newTable[probeIndex] = key;
+                steps.push({ index: probeIndex, message: `Inserted ${key} at index ${probeIndex}.`, tableState: newTable });
+                foundSpot = true;
+                break;
+            }
+            i++;
+        }
+
+        if (!foundSpot) {
+            steps.push({ index, message: `Could not insert ${key}.` });
+        }
+        runAnimation(steps);
+    };
+
+    const findQuadraticProbing = (key) => {
+        let index = hash(key);
+        const steps = [{ index, message: `Hashing key ${key} to index ${index}.` }];
+
+        let i = 0;
+        let found = false;
+        while (i < TABLE_SIZE) {
+            const probeIndex = (index + i * i) % TABLE_SIZE;
+            steps.push({ index: probeIndex, message: `Checking index ${probeIndex}...` });
+            if (table[probeIndex] === null) {
+                break;
+            }
+            if (table[probeIndex] === key) {
+                steps.push({ index: probeIndex, message: `Found key ${key} at index ${probeIndex}!` });
+                found = true;
+                break;
+            }
+            i++;
+        }
+        if (!found) {
+            steps.push({ index, message: `Key ${key} not found.` });
+        }
+        runAnimation(steps);
+    };
+    
+    // --- Double Hashing Logic ---
+    const insertDoubleHashing = (key) => {
+        const index = hash(key);
+        const stepSize = hash2(key);
+        const steps = [
+            { index, message: `Hashing key ${key} to index ${index}.` },
+            { index, message: `Second hash gives step size of ${stepSize}.`}
+        ];
+
+        let i = 0;
+        let foundSpot = false;
+        while(i < TABLE_SIZE) {
+            const probeIndex = (index + i * stepSize) % TABLE_SIZE;
+            if (i > 0) {
+                steps.push({ index: probeIndex, message: `Probing at index ${probeIndex}...` });
+            }
+            if (table[probeIndex] === null) {
+                const newTable = [...table];
+                newTable[probeIndex] = key;
+                steps.push({ index: probeIndex, message: `Inserted ${key} at index ${probeIndex}.`, tableState: newTable });
+                foundSpot = true;
+                break;
+            }
+            i++;
+        }
+        if (!foundSpot) {
+            steps.push({ index, message: `Could not insert ${key}.` });
+        }
+        runAnimation(steps);
+    };
+
+    const findDoubleHashing = (key) => {
+        const index = hash(key);
+        const stepSize = hash2(key);
+        const steps = [
+            { index, message: `Hashing key ${key} to index ${index}.` },
+            { index, message: `Second hash gives step size of ${stepSize}.`}
+        ];
+        
+        let i = 0;
+        let found = false;
+        while (i < TABLE_SIZE) {
+            const probeIndex = (index + i * stepSize) % TABLE_SIZE;
+             if (i > 0) {
+                steps.push({ index: probeIndex, message: `Probing at index ${probeIndex}...` });
+            }
+            if (table[probeIndex] === null) {
+                break;
+            }
+            if (table[probeIndex] === key) {
+                steps.push({ index: probeIndex, message: `Found key ${key} at index ${probeIndex}!` });
+                found = true;
+                break;
+            }
+            i++;
+        }
+
+        if (!found) {
+            steps.push({ index, message: `Key ${key} not found.` });
+        }
+        runAnimation(steps);
+    };
+
+
     // --- Separate Chaining Logic ---
     const insertSeparateChaining = (key) => {
         const index = hash(key);
@@ -127,11 +246,15 @@ export const useHashTable = (strategy) => {
 
     const insert = (key) => {
         if (strategy === 'linear-probing') insertLinearProbing(key);
+        else if (strategy === 'quadratic-probing') insertQuadraticProbing(key);
+        else if (strategy === 'double-hashing') insertDoubleHashing(key);
         else insertSeparateChaining(key);
     };
 
     const find = (key) => {
         if (strategy === 'linear-probing') findLinearProbing(key);
+        else if (strategy === 'quadratic-probing') findQuadraticProbing(key);
+        else if (strategy === 'double-hashing') findDoubleHashing(key);
         else findSeparateChaining(key);
     };
 

@@ -12,7 +12,7 @@
     --text-secondary: #b0b0b0;
     --accent-color: #007acc; /* Darker Blue */
     --node-primary: #757575;
-    --node-highlight: #ff8a46; /* A soft orange for highlights */
+    --node-highlight: #0ebd48; /* A soft orange for highlights */
     --code-bg: #212121;
 
     /* New Button and Interactive Colors */
@@ -22,9 +22,9 @@
     --node-bg: #007acc; /* Darker Blue */
     --node-text: #ffffff;
     --node-border: #90caf9;
-    --node-highlight-bg: #ff8a46;
+    --node-highlight-bg: #0ebd48;
     --node-highlight-text: #000000;
-    --node-highlight-border: #f86a18;
+    --node-highlight-border: #0b9e3c
 }
 /* Global Styles */
 body {

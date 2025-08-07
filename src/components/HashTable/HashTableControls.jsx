@@ -26,6 +26,8 @@ const HashTableControls = ({ onInsert, onFind, strategy, setStrategy, setOperati
                     <label htmlFor="strategy-select">Collision Strategy:</label>
                     <select id="strategy-select" value={strategy} onChange={(e) => setStrategy(e.target.value)}>
                         <option value="linear-probing">Linear Probing</option>
+                        <option value="quadratic-probing">Quadratic Probing</option>
+                        <option value="double-hashing">Double Hashing</option>
                         <option value="separate-chaining">Separate Chaining</option>
                     </select>
                 </div>
