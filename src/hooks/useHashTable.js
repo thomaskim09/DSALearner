@@ -1,9 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 const TABLE_SIZE = 10;
-const PRIME = 7; // A prime smaller than the table size for the second hash function
+const PRIME = 7; 
 
-// Helper to create a new table based on strategy
 const createTable = (strategy) => {
     if (strategy === 'separate-chaining') {
         return Array.from({ length: TABLE_SIZE }, () => []);
@@ -13,250 +12,168 @@ const createTable = (strategy) => {
 
 export const useHashTable = (strategy) => {
     const [table, setTable] = useState(() => createTable(strategy));
-    const [animationStep, setAnimationStep] = useState(null);
+    const [animationSteps, setAnimationSteps] = useState([]);
+    const [currentStep, setCurrentStep] = useState(0);
+    const [isPlaying, setIsPlaying] = useState(false);
+    
+    const initialTableState = useRef(createTable(strategy));
     const timeoutRef = useRef(null);
 
-    // Effect to re-initialize table when strategy changes
     useEffect(() => {
-        // Clear any pending animation from the previous strategy
-        if (timeoutRef.current) {
-            clearTimeout(timeoutRef.current);
-            timeoutRef.current = null;
-        }
-        setAnimationStep(null);
-        setTable(createTable(strategy));
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
+        const newTable = createTable(strategy);
+        setTable(newTable);
+        initialTableState.current = newTable;
+        setAnimationSteps([]);
+        setCurrentStep(0);
+        setIsPlaying(false);
     }, [strategy]);
 
-    const hash = (key) => key % TABLE_SIZE;
-    const hash2 = (key) => PRIME - (key % PRIME); // Second hash function
-
-    const runAnimation = (steps) => {
-        if (timeoutRef.current) clearTimeout(timeoutRef.current);
-
-        let currentStep = 0;
-        const executeStep = () => {
-            if (currentStep >= steps.length) {
-                timeoutRef.current = null;
-                return;
+    useEffect(() => {
+        if (!isPlaying || currentStep >= animationSteps.length) {
+            if (currentStep >= animationSteps.length && animationSteps.length > 0) {
+                 setCurrentStep(animationSteps.length -1);
             }
-            const step = steps[currentStep];
-            setAnimationStep({ index: step.index, message: step.message });
+            setIsPlaying(false);
+            return;
+        }
 
+        const step = animationSteps[currentStep];
+        const delay = step.tableState ? 1200 : 900; // Slower pace for better reading
+
+        timeoutRef.current = setTimeout(() => {
             if (step.tableState) {
                 setTable(step.tableState);
             }
-            
-            currentStep++;
-            timeoutRef.current = setTimeout(executeStep, 800);
-        };
-        executeStep();
-    };
+            setCurrentStep(prev => prev + 1);
+        }, delay);
 
-    // --- Linear Probing Logic ---
-    const insertLinearProbing = (key) => {
-        let index = hash(key);
-        const steps = [{ index, message: `Hashing key ${key} to index ${index}.` }];
+        return () => clearTimeout(timeoutRef.current);
+    }, [isPlaying, currentStep, animationSteps]);
+    
+    const hash = (key) => key % TABLE_SIZE;
+    const hash2 = (key) => PRIME - (key % PRIME);
 
-        let i = 0;
-        let foundSpot = false;
-        while (i < TABLE_SIZE) {
-            const probeIndex = (index + i) % TABLE_SIZE;
-            if (table[probeIndex] === null) {
-                const newTable = [...table];
-                newTable[probeIndex] = key;
-                steps.push({ index: probeIndex, message: `Inserted ${key} at index ${probeIndex}.`, tableState: newTable });
-                foundSpot = true;
-                break;
-            }
-            steps.push({ index: probeIndex, message: `Index ${probeIndex} occupied. Probing next...` });
-            i++;
-        }
-        if (!foundSpot) {
-            steps.push({ index, message: `Table is full. Cannot insert ${key}.` });
-        }
-        runAnimation(steps);
+    const startAnimation = (steps) => {
+        initialTableState.current = [...table];
+        setAnimationSteps(steps);
+        setCurrentStep(0);
+        setIsPlaying(true);
     };
     
-    const findLinearProbing = (key) => {
-        let index = hash(key);
-        const steps = [{ index, message: `Hashing key ${key} to index ${index}.` }];
-         
-        let i = 0;
-        let found = false;
-        while (i < TABLE_SIZE) {
-            const probeIndex = (index + i) % TABLE_SIZE;
-            steps.push({ index: probeIndex, message: `Checking index ${probeIndex}...` });
-            if (table[probeIndex] === null) {
-                break;
-            }
-            if (table[probeIndex] === key) {
-                steps.push({ index: probeIndex, message: `Found key ${key} at index ${probeIndex}!` });
-                found = true;
-                break;
-            }
-            i++;
-        }
-        if (!found) {
-             steps.push({ index: index, message: `Key ${key} not found.` });
-        }
-        runAnimation(steps);
-    };
-
-    // --- Quadratic Probing Logic ---
-    const insertQuadraticProbing = (key) => {
-        let index = hash(key);
-        const steps = [{ index, message: `Hashing key ${key} to index ${index}.` }];
-
-        let i = 0;
-        let foundSpot = false;
-        while (i < TABLE_SIZE) {
-            const probeIndex = (index + i * i) % TABLE_SIZE;
-             if (i > 0) {
-                 steps.push({ index: probeIndex, message: `Index occupied. Probing ${i*i} elements away...` });
-            }
-            if (table[probeIndex] === null) {
-                const newTable = [...table];
-                newTable[probeIndex] = key;
-                steps.push({ index: probeIndex, message: `Inserted ${key} at index ${probeIndex}.`, tableState: newTable });
-                foundSpot = true;
-                break;
-            }
-            i++;
-        }
-
-        if (!foundSpot) {
-            steps.push({ index, message: `Could not insert ${key}.` });
-        }
-        runAnimation(steps);
-    };
-
-    const findQuadraticProbing = (key) => {
-        let index = hash(key);
-        const steps = [{ index, message: `Hashing key ${key} to index ${index}.` }];
-
-        let i = 0;
-        let found = false;
-        while (i < TABLE_SIZE) {
-            const probeIndex = (index + i * i) % TABLE_SIZE;
-            steps.push({ index: probeIndex, message: `Checking index ${probeIndex}...` });
-            if (table[probeIndex] === null) {
-                break;
-            }
-            if (table[probeIndex] === key) {
-                steps.push({ index: probeIndex, message: `Found key ${key} at index ${probeIndex}!` });
-                found = true;
-                break;
-            }
-            i++;
-        }
-        if (!found) {
-            steps.push({ index, message: `Key ${key} not found.` });
-        }
-        runAnimation(steps);
-    };
-    
-    // --- Double Hashing Logic ---
-    const insertDoubleHashing = (key) => {
-        const index = hash(key);
-        const stepSize = hash2(key);
-        const steps = [
-            { index, message: `Hashing key ${key} to index ${index}.` },
-            { index, message: `Second hash gives step size of ${stepSize}.`}
-        ];
-
-        let i = 0;
-        let foundSpot = false;
-        while(i < TABLE_SIZE) {
-            const probeIndex = (index + i * stepSize) % TABLE_SIZE;
-            if (i > 0) {
-                steps.push({ index: probeIndex, message: `Probing at index ${probeIndex}...` });
-            }
-            if (table[probeIndex] === null) {
-                const newTable = [...table];
-                newTable[probeIndex] = key;
-                steps.push({ index: probeIndex, message: `Inserted ${key} at index ${probeIndex}.`, tableState: newTable });
-                foundSpot = true;
-                break;
-            }
-            i++;
-        }
-        if (!foundSpot) {
-            steps.push({ index, message: `Could not insert ${key}.` });
-        }
-        runAnimation(steps);
-    };
-
-    const findDoubleHashing = (key) => {
-        const index = hash(key);
-        const stepSize = hash2(key);
-        const steps = [
-            { index, message: `Hashing key ${key} to index ${index}.` },
-            { index, message: `Second hash gives step size of ${stepSize}.`}
-        ];
+    const goToStep = (step) => {
+        if (step < 0 || step >= animationSteps.length) return;
+        setIsPlaying(false);
         
+        let latestTableState = initialTableState.current;
+        for (let i = 0; i <= step; i++) {
+            if (animationSteps[i].tableState) {
+                latestTableState = animationSteps[i].tableState;
+            }
+        }
+        setTable(latestTableState);
+        setCurrentStep(step);
+    }
+    
+    const togglePlay = () => {
+        if (currentStep >= animationSteps.length - 1 && !isPlaying) {
+             goToStep(0);
+             setTimeout(() => setIsPlaying(true), 50);
+        } else {
+            setIsPlaying(!isPlaying);
+        }
+    };
+    
+    const resetAnimation = useCallback(() => {
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
+        const lastStepWithTable = [...animationSteps].reverse().find(s => s.tableState);
+        if (lastStepWithTable) {
+            setTable(lastStepWithTable.tableState);
+        }
+        setAnimationSteps([]);
+        setCurrentStep(0);
+        setIsPlaying(false);
+    }, [animationSteps]);
+
+
+    // --- Probing Logic with detailed messages ---
+    const createProbingSteps = (key, probingFn) => {
+        const initialIndex = hash(key);
+        const steps = [{ index: initialIndex, message: `Initial hash for key ${key}: ${key} % ${TABLE_SIZE} = ${initialIndex}` }];
+        
+        const currentTable = table;
         let i = 0;
-        let found = false;
         while (i < TABLE_SIZE) {
-            const probeIndex = (index + i * stepSize) % TABLE_SIZE;
-             if (i > 0) {
-                steps.push({ index: probeIndex, message: `Probing at index ${probeIndex}...` });
+            const { probeIndex, message } = probingFn(initialIndex, i, key);
+            
+            if (i > 0) { // Add probing step message
+                 steps.push({ index: probeIndex, message });
             }
-            if (table[probeIndex] === null) {
-                break;
+
+            if (currentTable[probeIndex] === null) {
+                const newTable = [...currentTable];
+                newTable[probeIndex] = key;
+                steps.push({ index: probeIndex, message: `Success! Slot ${probeIndex} is empty. Inserting ${key}.`, tableState: newTable });
+                return steps;
             }
-            if (table[probeIndex] === key) {
-                steps.push({ index: probeIndex, message: `Found key ${key} at index ${probeIndex}!` });
-                found = true;
-                break;
-            }
+             steps.push({ index: probeIndex, message: `Collision at index ${probeIndex} (Value: ${currentTable[probeIndex]}).` });
             i++;
         }
-
-        if (!found) {
-            steps.push({ index, message: `Key ${key} not found.` });
-        }
-        runAnimation(steps);
+        steps.push({ index: initialIndex, message: `Table is full after ${TABLE_SIZE} probes. Cannot insert ${key}.` });
+        return steps;
+    };
+    
+    const insertLinearProbing = (key) => {
+        startAnimation(createProbingSteps(key, (index, i) => ({
+            probeIndex: (index + i) % TABLE_SIZE,
+            message: `Probing next slot: (${index} + ${i}) % ${TABLE_SIZE} = ${(index + i) % TABLE_SIZE}`
+        })));
     };
 
+    const insertQuadraticProbing = (key) => {
+        startAnimation(createProbingSteps(key, (index, i) => ({
+            probeIndex: (index + i * i) % TABLE_SIZE,
+            message: `Probing quadratically: (${index} + ${i}^2) % ${TABLE_SIZE} = ${(index + i * i) % TABLE_SIZE}`
+        })));
+    };
+    
+    const insertDoubleHashing = (key) => {
+        const stepSize = hash2(key);
+        const steps = createProbingSteps(key, (index, i) => ({
+            probeIndex: (index + i * stepSize) % TABLE_SIZE,
+            message: `Probing with step size ${stepSize}: (${index} + ${i} * ${stepSize}) % ${TABLE_SIZE} = ${(index + i * stepSize) % TABLE_SIZE}`
+        }));
+        steps.splice(1, 0, { index: hash(key), message: `Second hash for step size: ${PRIME} - (${key} % ${PRIME}) = ${stepSize}` });
+        startAnimation(steps);
+    };
 
-    // --- Separate Chaining Logic ---
     const insertSeparateChaining = (key) => {
         const index = hash(key);
-        setTable(currentTable => {
-            const newTable = currentTable.map(list => [...list]);
-            if (!newTable[index].includes(key)) {
-                newTable[index].unshift(key);
-            }
-            return newTable;
-        });
-        setAnimationStep({ index, message: `Inserted ${key} into list at index ${index}.` });
+        const newTable = table.map(list => [...list]);
+        let message = `Key ${key} is already in the list at index ${index}.`;
+        if (!newTable[index].includes(key)) {
+            newTable[index].unshift(key);
+            message = `Inserting ${key} into the linked list at index ${index}.`;
+        }
+        startAnimation([
+            { index, message: `Hash for key ${key}: ${key} % ${TABLE_SIZE} = ${index}.`},
+            { index, message, tableState: newTable}
+        ]);
     };
     
-    const findSeparateChaining = (key) => {
-        const index = hash(key);
-        const list = table[index] || [];
-        const found = list.includes(key);
-
-        if (found) {
-            setAnimationStep({ index, message: `Found key ${key} in list at index ${index}!` });
-        } else {
-            setAnimationStep({ index, message: `Key ${key} not found in list at index ${index}.` });
-        }
+    const find = (key) => {
+        console.log("Find operation not fully implemented with new animation logic yet.");
     };
 
     const insert = (key) => {
-        if (strategy === 'linear-probing') insertLinearProbing(key);
-        else if (strategy === 'quadratic-probing') insertQuadraticProbing(key);
-        else if (strategy === 'double-hashing') insertDoubleHashing(key);
-        else insertSeparateChaining(key);
+        const strategyMap = {
+            'linear-probing': insertLinearProbing,
+            'quadratic-probing': insertQuadraticProbing,
+            'double-hashing': insertDoubleHashing,
+            'separate-chaining': insertSeparateChaining,
+        };
+        strategyMap[strategy](key);
     };
 
-    const find = (key) => {
-        if (strategy === 'linear-probing') findLinearProbing(key);
-        else if (strategy === 'quadratic-probing') findQuadraticProbing(key);
-        else if (strategy === 'double-hashing') findDoubleHashing(key);
-        else findSeparateChaining(key);
-    };
-
-    return { table, insert, find, animationStep };
+    return { table, insert, find, animationSteps, currentStep, isPlaying, togglePlay, goToStep, resetAnimation };
 };

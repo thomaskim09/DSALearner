@@ -7,8 +7,15 @@ import '../assets/styles/HashTable.css';
 
 const HashTablePage = () => {
     const [collisionStrategy, setCollisionStrategy] = useState('linear-probing');
-    const { table, insert, find, animationStep } = useHashTable(collisionStrategy);
+    const { 
+        table, insert, find, 
+        animationSteps, currentStep, 
+        isPlaying, togglePlay, goToStep, resetAnimation 
+    } = useHashTable(collisionStrategy);
     const [operation, setOperation] = useState('insert');
+
+    const isAnimating = animationSteps.length > 0 && currentStep < animationSteps.length -1;
+    const isAnimationActive = animationSteps.length > 0;
 
     return (
         <div className="chapter-page">
@@ -20,11 +27,20 @@ const HashTablePage = () => {
                         strategy={collisionStrategy}
                         setStrategy={setCollisionStrategy}
                         setOperation={setOperation}
+                        isAnimating={isAnimating}
+                        isAnimationActive={isAnimationActive}
+                        onReset={resetAnimation}
+                        animationSteps={animationSteps}
+                        currentStep={currentStep}
+                        isPlaying={isPlaying}
+                        togglePlay={togglePlay}
+                        goToStep={goToStep}
                     />
                     <HashTableVisualizer
                         table={table}
-                        animationStep={animationStep}
                         strategy={collisionStrategy}
+                        animationSteps={animationSteps}
+                        currentStep={currentStep}
                     />
                 </div>
                 <div className="code-display-container">

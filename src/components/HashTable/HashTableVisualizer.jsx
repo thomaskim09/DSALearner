@@ -1,18 +1,17 @@
 import React from 'react';
 
-const HashTableVisualizer = ({ table, animationStep, strategy }) => {
+const HashTableVisualizer = ({ table, animationSteps, currentStep, strategy }) => {
+    const currentAnimation = animationSteps[currentStep];
+
     return (
         <div className="hash-table-visualizer">
             <div className="hash-table-array">
-                {/* Ensure table is always an array before mapping */}
                 {Array.isArray(table) && table.map((entry, index) => {
-                    // This is the key fix: Ensure `entry` is an array when using separate chaining
                     const chain = strategy === 'separate-chaining' && Array.isArray(entry) ? entry : [];
-
                     return (
                         <div
                             key={index}
-                            className={`hash-table-cell ${animationStep?.index === index ? 'highlight' : ''}`}
+                            className={`hash-table-cell ${currentAnimation?.index === index ? 'highlight' : ''}`}
                         >
                             <div className="cell-index">{index}</div>
                             <div className="cell-content">
@@ -35,9 +34,9 @@ const HashTableVisualizer = ({ table, animationStep, strategy }) => {
                     );
                 })}
             </div>
-            {animationStep && (
-                <div className="animation-message hash-message">
-                    {animationStep.message}
+            {currentAnimation && (
+                <div className="animation-footer">
+                    <div className="animation-message">{currentAnimation.message}</div>
                 </div>
             )}
         </div>
