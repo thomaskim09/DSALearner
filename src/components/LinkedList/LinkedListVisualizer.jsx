@@ -27,7 +27,7 @@ const Connectors = ({ nodes, nodeRefs, listType, visualizerRect }) => {
         const firstLabelRect = getRelativeRect(nodeRefs.current.get('first-label'));
         const lastLabelRect = getRelativeRect(nodeRefs.current.get('last-label'));
         const firstNodeWrapperRect = getRelativeRect(nodeRefs.current.get(nodes[0].id));
-        const lastNodeWrapperRect = getRelativeRect(nodeRefs.current.get(nodes[nodes.length - 1].id));
+        const lastNodeWrapperRect = nodes.length > 0 ? getRelativeRect(nodeRefs.current.get(nodes[nodes.length - 1].id)) : null;
 
         // Arrow from "First" label with 90-degree turns
         if (firstLabelRect && firstNodeWrapperRect) {
@@ -40,7 +40,7 @@ const Connectors = ({ nodes, nodeRefs, listType, visualizerRect }) => {
         }
         
         // Arrow from "Last" label with 90-degree turns
-        if (lastLabelRect && lastNodeWrapperRect) {
+        if (lastLabelRect && lastNodeWrapperRect && (listType === 'Double-Ended' || listType === 'Doubly-Linked')) {
             const fromX = lastLabelRect.right;
             const fromY = lastLabelRect.top + lastLabelRect.height / 2;
             const toX = lastNodeWrapperRect.left + lastNodeWrapperRect.width / 2;
@@ -64,11 +64,11 @@ const Connectors = ({ nodes, nodeRefs, listType, visualizerRect }) => {
 
                 // Prev pointer for Doubly-Linked (Right-to-Left)
                 if (listType === 'Doubly-Linked') {
-                    const prevFromX = targetWrapperRect.left; // Start at target
+                    // Path is from the node on the right (target) to the node on the left (source)
+                    const prevFromX = targetWrapperRect.left; 
                     const prevFromY = targetWrapperRect.top + targetWrapperRect.height * 0.8;
-                    const prevToX = sourceWrapperRect.right; // End at source
+                    const prevToX = sourceWrapperRect.right; 
                     const prevToY = sourceWrapperRect.top + sourceWrapperRect.height * 0.8;
-                    // --- THIS LINE IS THE FIX ---
                     newPaths.push({ id: `path-prev-${nodes[i].id}`, d: `M ${prevFromX} ${prevFromY} L ${prevToX} ${prevToY}`, type: 'prev' });
                 }
             }
@@ -80,11 +80,11 @@ const Connectors = ({ nodes, nodeRefs, listType, visualizerRect }) => {
         <svg className="connector-svg">
             <defs>
                 {/* Arrowhead for NEXT pointers (points right) */}
-                <marker id="arrowhead-next" markerWidth="10" markerHeight="7" refX="8" refY="3.5" orient="auto">
+                <marker id="arrowhead-next" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
                     <polygon points="0 0, 10 3.5, 0 7" fill="var(--text-secondary)" />
                 </marker>
-                {/* Arrowhead for PREV pointers (points left) */}
-                <marker id="arrowhead-prev" markerWidth="10" markerHeight="7" refX="2" refY="3.5" orient="auto">
+                {/* Arrowhead for PREV pointers (points left). Removing orient="auto" fixes the direction issue. */}
+                <marker id="arrowhead-prev" markerWidth="10" markerHeight="7" refX="1" refY="3.5">
                     <polygon points="10 0, 0 3.5, 10 7" fill="var(--accent-color)" />
                 </marker>
             </defs>
@@ -166,7 +166,9 @@ const LinkedListVisualizer = ({ head, animationSteps, onAnimationComplete, listT
             <div className="visualizer-content">
                 <div className="list-info-box">
                     <div className="list-info-label" ref={el => nodeRefs.current.set('first-label', el)}>First</div>
-                    <div className="list-info-label" ref={el => nodeRefs.current.set('last-label', el)}>Last</div>
+                    {(listType === 'Double-Ended' || listType === 'Doubly-Linked') &&
+                        <div className="list-info-label" ref={el => nodeRefs.current.set('last-label', el)}>Last</div>
+                    }
                 </div>
 
                 <div className="list-container">
