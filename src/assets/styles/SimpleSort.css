@@ -1,0 +1,179 @@
+/* src/assets/styles/SimpleSort.css */
+.chapter-page-sort {
+    padding: 2rem;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.sort-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 1rem;
+}
+
+.sort-header h1 {
+    font-size: 2.5rem;
+    color: var(--accent-color);
+    margin-bottom: 0.5rem;
+}
+
+.sort-header p {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.sort-controls {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    justify-content: center;
+    align-items: center;
+}
+
+.sort-controls select, .sort-controls .array-input, .sort-controls button {
+    padding: 12px 15px;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-interactive);
+    color: var(--text-primary);
+    border-radius: 4px;
+    font-size: 1em;
+}
+
+.sort-controls .array-input {
+    flex-grow: 1;
+    max-width: 500px;
+}
+
+.sort-controls button {
+    background-color: var(--button-bg);
+    color: var(--button-text);
+    cursor: pointer;
+    font-weight: bold;
+}
+.sort-controls button:hover {
+    background-color: var(--button-hover-bg);
+}
+
+.sort-content-area {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+    align-items: flex-start;
+}
+
+.visualizer-container {
+    background-color: var(--bg-content);
+    border-radius: 8px;
+    padding: 1rem;
+    overflow-x: auto;
+}
+
+.visualizer-wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.visualizer-status-message {
+    margin-top: 1rem;
+    padding: 1rem;
+    background-color: var(--bg-main);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    text-align: center;
+    color: var(--text-primary);
+    font-size: 1rem;
+    min-height: 2.5em;
+    line-height: 1.5;
+    transition: all 0.2s ease-in-out;
+}
+
+.code-display-container-sort {
+    background-color: var(--bg-content);
+    border-radius: 8px;
+    padding: 1.5rem;
+}
+
+.code-display-sort h3 {
+    margin-top: 0;
+    color: var(--accent-color);
+}
+
+.code-display-sort .complexity-display {
+    background-color: var(--bg-interactive);
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+}
+
+.code-display-sort pre {
+    background-color: var(--code-bg);
+    padding: 1rem;
+    border-radius: 4px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.sorting-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 1em;
+}
+
+.sorting-table th, .sorting-table td {
+    border: 1px solid var(--border-color);
+    padding: 8px;
+    text-align: center;
+    min-width: 45px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.sorting-table th {
+    background-color: var(--bg-main);
+    color: var(--accent-color);
+    font-weight: bold;
+}
+
+.sorting-table td.cell {
+    background-color: var(--bg-interactive);
+    color: var(--text-primary);
+    font-weight: bold;
+}
+
+.sorting-table .cell.sorted-bubble {
+    background-color: var(--accent-color);
+}
+.sorting-table .cell.sorted-selection {
+    background-color: #4682b4;
+}
+.sorting-table .cell.sorted-insertion-section {
+    background-color: #6a5acd;
+}
+
+.sorting-table .cell.sorted-bubble,
+.sorting-table .cell.sorted-selection,
+.sorting-table .cell.sorted-insertion-section {
+    color: white;
+}
+
+.sorting-table .cell.action-min-found {
+    color: #FFD700 !important;
+}
+.sorting-table .cell.action-swap-target {
+    color: #90ee90 !important;
+}
+.sorting-table .cell.action-inserted {
+    color: #ff8c00 !important;
+}
+
+.visualizer-placeholder {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+    color: var(--text-secondary);
+    font-style: italic;
+    font-size: 1.2rem;
+}

@@ -5,6 +5,7 @@ import HomePage from './pages/HomePage';
 import TreePage from './pages/TreePage'; 
 import LinkedListPage from './pages/LinkedListPage';
 import HashTablePage from './pages/HashTablePage'; 
+import SimpleSortPage from './pages/SimpleSortPage'; 
 import './App.css';
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
         <main className="content-area">
           <Routes>
             <Route path="/" element={<HomePage />} />
+            <Route path="/simple-sort" element={<SimpleSortPage />} /> 
             <Route path="/tree" element={<TreePage />} />
             <Route path="/linked-list" element={<LinkedListPage />} />
             <Route path="/hash-table" element={<HashTablePage />} /> 
