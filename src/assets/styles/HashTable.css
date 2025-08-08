@@ -20,7 +20,6 @@
 .visualizer-container > *,
 .code-display-container > * {
     width: 100%;
-    height: 100%;
 }
 
 /* --- Styles for each panel --- */
@@ -83,8 +82,16 @@
 .trace-formula { margin: 0 1.5rem 1rem 1.5rem; }
 
 /* Visualizer Panel */
-.hash-table-visualizer { padding: 0; }
-.hash-table-array { flex-grow: 1; overflow-y: auto; padding: 0 1.5rem 1.5rem 1.5rem; }
+.hash-table-visualizer { 
+    padding: 0;
+    display: flex; 
+    flex-direction: column; 
+}
+.hash-table-array { 
+    flex-grow: 1; 
+    overflow-y: auto; 
+    padding: 1.5rem; 
+}
 
 /* Code Display Panel */
 .code-display { padding: 0; }
@@ -104,7 +111,7 @@
 .trace-table .empty-trace { color: var(--text-secondary); font-style: italic; padding: 2rem 0; }
 .hash-table-cell { display: flex; align-items: center; background-color: var(--bg-main); border: 1px solid var(--border-color); border-radius: 4px; transition: background-color 0.3s; min-height: 40px; }
 .hash-table-cell.highlight { background-color: var(--node-highlight-bg); border-color: var(--node-highlight-border); }
-.cell-index { padding: 10px 12px; font-weight: bold; background-color: var(--bg-interactive); border-right: 1px solid var(--border-color); color: var(--accent-color); }
+.cell-index { padding: 10px 12px; font-weight: bold; background-color: var(--bg-interactive); border-right: 1px solid var(--border-color); color: var(--accent-color); min-width: 30px; text-align: center; }
 .cell-content { padding: 10px; flex-grow: 1; }
 .cell-value.empty { color: var(--text-secondary); font-style: italic; }
 .cell-value.deleted { color: #ff6b6b; font-style: italic; }
@@ -114,15 +121,22 @@
 
 /* --- CORRECTED ANIMATION FOOTER --- */
 .animation-footer {
-    /* No longer absolutely positioned. It's now a standard flex item. */
-    flex-shrink: 0; /* Prevents the footer from shrinking */
-    background-color: rgba(0, 0, 0, 0.9);
+    flex-shrink: 0;
     color: white;
     padding: 12px 20px;
-    border-top: 1px solid var(--border-color);
     box-sizing: border-box;
+    position: relative;
 }
-.animation-message { font-size: 1.1em; line-height: 1.5; min-height: 50px; text-align: center; white-space: pre-wrap; }
+.animation-message { 
+    font-size: 1.1em; 
+    line-height: 1.5; 
+    min-height: 50px; 
+    text-align: center; 
+    white-space: pre-wrap; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 .step-navigator { width: 100%; display: flex; justify-content: center; align-items: center; gap: 10px; }
 .step-navigator button { background-color: var(--button-bg); border: none; color: white; padding: 8px 12px; border-radius: 4px; cursor: pointer; }
 .step-navigator button:disabled { background-color: #555; cursor: not-allowed; }
