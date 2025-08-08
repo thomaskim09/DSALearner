@@ -1,18 +1,18 @@
 import React from 'react';
 
-const codeSnippets = {
-    'hashFunc': `// Primary hash function
+const HashTableCodeDisplay = ({ operation, strategy, tableSize, prime }) => {
+    const getCodeSnippets = (size, p) => ({
+        'hashFunc': `// Primary hash function
 public int hashFunc(int key) {
-    return key % arraySize;
+    return key % ${size};
 }`,
-    'hashFunc2': `// Secondary hash function for double hashing
-// (must be non-zero, less than array size)
+        'hashFunc2': `// Secondary hash function for double hashing
+// (PRIME must be a prime number smaller than the table size)
 public int hashFunc2(int key) {
-    // a prime number smaller than the array size
-    return 5 - key % 5; 
+    return ${p} - key % ${p};
 }`,
-    'linear-probing': {
-        insert: `// Inserts an item using linear probing 
+        'linear-probing': {
+            insert: `// Inserts an item using linear probing
 public void insert(DataItem item) {
     int key = item.getKey();
     int hashVal = hashFunc(key);
@@ -20,11 +20,11 @@ public void insert(DataItem item) {
     // until empty cell or deleted item,
     while(hashArray[hashVal] != null && hashArray[hashVal].getKey() != -1) {
         ++hashVal; // go to next cell
-        hashVal %= arraySize; // wraparound
+        hashVal %= ${size}; // wraparound with table size
     }
     hashArray[hashVal] = item;
 }`,
-       find: `// Finds an item using linear probing 
+            find: `// Finds an item using linear probing
 public DataItem find(int key) {
     int hashVal = hashFunc(key);
 
@@ -33,13 +33,27 @@ public DataItem find(int key) {
             return hashArray[hashVal]; // yes, return item
         }
         ++hashVal; // go to next cell
-        hashVal %= arraySize; // wraparound
+        hashVal %= ${size}; // wraparound
     }
     return null; // can't find item
+}`,
+            delete: `// Deletes an item using linear probing
+public DataItem delete(int key) {
+    int hashVal = hashFunc(key);
+    while (hashArray[hashVal] != null) {
+        if (hashArray[hashVal].getKey() == key) {
+            DataItem temp = hashArray[hashVal];
+            hashArray[hashVal] = nonItem; // nonItem is a special marker for a deleted slot
+            return temp;
+        }
+        ++hashVal;
+        hashVal %= ${size};
+    }
+    return null;
 }`
-    },
-    'quadratic-probing': {
-        insert: `// Inserts an item using quadratic probing 
+        },
+        'quadratic-probing': {
+            insert: `// Inserts an item using quadratic probing
 public void insert(int key, DataItem item) {
     int hashVal = hashFunc(key);
     int step = 1;
@@ -47,11 +61,11 @@ public void insert(int key, DataItem item) {
     while(hashArray[hashVal] != null && hashArray[hashVal].getKey() != -1) {
         hashVal += step * step; // quadratic step
         step++;
-        hashVal %= arraySize; // wraparound
+        hashVal %= ${size}; // wraparound
     }
     hashArray[hashVal] = item;
 }`,
-        find: `// Finds an item using quadratic probing 
+            find: `// Finds an item using quadratic probing
 public DataItem find(int key) {
     int hashVal = hashFunc(key);
     int step = 1;
@@ -62,74 +76,97 @@ public DataItem find(int key) {
         }
         hashVal += step * step; // quadratic step
         step++;
-        hashVal %= arraySize; // wraparound
+        hashVal %= ${size}; // wraparound
     }
     return null; // can't find item
-}`
-    },
-    'double-hashing': {
-        insert: `// Inserts an item using double hashing
+}`,
+            delete: `// Deleting with quadratic probing is complex and often avoided
+// in favor of rehashing or using separate chaining. A simple
+// marker-based delete can lead to search failures if not
+// handled carefully during insertions. Standard library
+// implementations often rehash the table after several deletions.`
+        },
+        'double-hashing': {
+            insert: `// Inserts an item using double hashing
 public void insert(int key, DataItem item) {
-    int hashVal = hashFunc(key); // hash the key
+    int hashVal = hashFunc(key);   // hash the key
     int stepSize = hashFunc2(key); // get step size
     
     // until empty cell or -1
     while(hashArray[hashVal] != null && hashArray[hashVal].getKey() != -1) {
-        hashVal += stepSize; // add the step
-        hashVal %= arraySize; // for wraparound
+        hashVal += stepSize;   // add the step
+        hashVal %= ${size}; // for wraparound
     }
     hashArray[hashVal] = item; // insert item
 }`,
-        find: `// Finds an item using double hashing
+            find: `// Finds an item using double hashing
 public DataItem find(int key) {
-    int hashVal = hashFunc(key); // hash the key
+    int hashVal = hashFunc(key);   // hash the key
     int stepSize = hashFunc2(key); // get step size
 
     while(hashArray[hashVal] != null) {
         if(hashArray[hashVal].getKey() == key) {
-            return hashArray[hashVal]; // yes, return item
+            return hashArray[hashVal];
         }
-        hashVal += stepSize; // add the step
-        hashVal %= arraySize; // for wraparound
+        hashVal += stepSize;   // add the step
+        hashVal %= ${size}; // for wraparound
     }
     return null; // can't find item
+}`,
+            delete: `// Deletes an item using double hashing
+public DataItem delete(int key) {
+    int hashVal = hashFunc(key);
+    int stepSize = hashFunc2(key);
+    while(hashArray[hashVal] != null) {
+        if(hashArray[hashVal].getKey() == key) {
+            DataItem temp = hashArray[hashVal];
+            hashArray[hashVal] = nonItem;
+            return temp;
+        }
+        hashVal += stepSize;
+        hashVal %= ${size};
+    }
+    return null;
 }`
-    },
-    'separate-chaining': {
-       insert: `// Inserts a link into the correct list 
+        },
+        'separate-chaining': {
+            insert: `// Inserts a link into the correct list
 public void insert(Link theLink) {
     int key = theLink.getKey();
     int hashVal = hashFunc(key); // hash the key
     hashArray[hashVal].insert(theLink); // insert at hashVal
 }`,
-        find: `// Finds a link in the correct list (not shown in PDF, but implied)
+            find: `// Finds a link in the correct list
 public Link find(int key) {
     int hashVal = hashFunc(key); // hash the key
     Link theLink = hashArray[hashVal].find(key); // find in list
     return theLink;
+}`,
+            delete: `// Deletes a link from the correct list
+public void delete(int key) {
+    int hashVal = hashFunc(key);
+    hashArray[hashVal].delete(key); // delete from list
 }`
-    }
-};
+        }
+    });
 
-const HashTableCodeDisplay = ({ operation, strategy }) => {
-    const getCode = () => {
-        return codeSnippets[strategy]?.[operation] || "// Select an operation to see the code.";
-    };
+    const snippets = getCodeSnippets(tableSize, prime);
+    const getCode = () => snippets[strategy]?.[operation] || `// Select an operation to see the code.`;
 
     return (
         <div className="code-display">
-            <h3>Java Implementation</h3>
-            <h4>Hash Function:</h4>
-            <pre><code>{codeSnippets['hashFunc']}</code></pre>
+            <h3 className="visualizer-header">Java Implementation</h3>
+            <h4>Primary Hash Function:</h4>
+            <pre><code>{snippets['hashFunc']}</code></pre>
             
             {strategy === 'double-hashing' && (
                 <>
-                    <h4>Second Hash Function:</h4>
-                    <pre><code>{codeSnippets['hashFunc2']}</code></pre>
+                    <h4>Secondary Hash Function:</h4>
+                    <pre><code>{snippets['hashFunc2']}</code></pre>
                 </>
             )}
 
-            <h4>Operation Code:</h4>
+            <h4>Operation Code ({operation}):</h4>
             <pre><code>{getCode()}</code></pre>
         </div>
     );

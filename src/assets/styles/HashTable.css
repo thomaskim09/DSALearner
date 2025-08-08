@@ -1,166 +1,128 @@
-/* Styles for the Hash Table Visualizer */
-.hash-table-visualizer {
-    flex-grow: 1;
+/* Main 4-Column Layout */
+.hash-table-layout-container {
     display: flex;
-    flex-direction: column;
-    background-color: var(--bg-interactive);
-    min-height: 400px;
-    position: relative;
-    overflow: hidden;
+    flex-direction: row;
+    gap: 1.5rem;
+    width: 100%;
+    align-items: stretch; /* This makes all columns equal height */
+    height: calc(100vh - 8rem); /* Adjust height to fill viewport */
 }
 
-.hash-table-array {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    padding: 1.5rem;
-    flex-grow: 1;
-    overflow-y: auto;
+/* Column Wrappers */
+.controls-container { flex: 0 0 320px; display: flex; }
+.trace-container { flex: 0 0 240px; display: flex; }
+.visualizer-container { flex: 1; display: flex; min-width: 280px; }
+.code-display-container { flex: 1; display: flex; min-width: 400px; }
+
+/* Ensure direct children of containers fill the available space */
+.controls-container > *,
+.trace-container > *,
+.visualizer-container > *,
+.code-display-container > * {
+    width: 100%;
+    height: 100%;
 }
 
-.hash-table-cell {
-    display: flex;
-    align-items: center;
-    background-color: var(--bg-content);
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-    transition: background-color 0.3s;
-    min-height: 48px;
-}
-
-.hash-table-cell.highlight {
-    background-color: var(--node-highlight-bg);
-    border-color: var(--node-highlight-border);
-}
-
-.cell-index {
-    padding: 12px 15px;
-    font-weight: bold;
-    background-color: var(--bg-main);
-    border-right: 1px solid var(--border-color);
-    color: var(--accent-color);
-}
-
-.cell-content {
-    padding: 12px;
-    flex-grow: 1;
-    min-height: 24px;
-}
-
-.cell-value.empty {
-    color: var(--text-secondary);
-    font-style: italic;
-}
-
-/* Styles for Separate Chaining */
-.chain-list {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.chain-node {
-    background-color: var(--node-bg);
-    color: var(--node-text);
-    padding: 5px 10px;
-    border-radius: 4px;
-    border: 1px solid var(--node-border);
-}
-
-.chain-arrow {
-    color: var(--text-secondary);
-    font-weight: bold;
-}
-
-/* Updated styles for animation message footer */
-.animation-footer {
-    background-color: rgba(0, 0, 0, 0.9);
-    color: white;
-    padding: 12px 20px; /* Give it more vertical space */
-    border-top: 1px solid var(--border-color);
-    flex-shrink: 0;
-}
-
-.animation-message {
-    font-size: 1.1em;
-    line-height: 1.5; /* Improve readability for multi-line messages */
-    min-height: 50px; /* Ensure enough space for two lines */
-    text-align: center;
-    white-space: pre-wrap; /* Allow wrapping */
-}
-
-/* === Controls Panel Styles === */
-.controls-panel {
-    padding: 1.5rem;
+/* --- Styles for each panel --- */
+.controls-panel,
+.calculation-trace,
+.hash-table-visualizer,
+.code-display {
     background-color: var(--bg-content);
     border-radius: 8px;
     border: 1px solid var(--border-color);
-}
-
-.control-grid {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
-}
-
-.control-row {
-    display: flex;
-    gap: 1rem;
-    align-items: center;
-}
-
-.control-group {
-    flex-grow: 1;
-    display: flex;
-}
-
-.control-row input, .control-row select {
-  flex-grow: 1;
-  padding: 12px 15px;
-  border: 1px solid var(--border-color);
-  background-color: var(--bg-interactive);
-  color: var(--text-primary);
-  border-radius: 4px;
-  outline: none;
-  font-size: 1.1em;
-}
-
-.action-buttons {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
     width: 100%;
+    overflow: hidden;
 }
 
-.action-buttons button {
-    padding: 10px 15px;
-    border: none;
-    background-color: var(--button-bg);
-    color: var(--button-text);
-    cursor: pointer;
-    transition: background-color 0.2s;
+/* Titles for Trace and Visualizer */
+.trace-header,
+.visualizer-header {
+    margin: 0;
+    padding: 1.5rem 1.5rem 1rem 1.5rem;
+    text-align: center;
+    color: var(--accent-color);
+    flex-shrink: 0;
+}
+
+/* Controls Panel specific styles */
+.controls-panel { padding: 1.5rem; overflow-y: auto; }
+.control-grid { display: flex; flex-direction: column; gap: 1.5rem; }
+.control-group { display: flex; flex-direction: column; gap: 0.75rem; }
+.control-group label { font-weight: 500; color: var(--text-secondary); }
+.input-with-button { display: flex; }
+.input-with-button .action-btn {
+    flex-shrink: 0;
+    width: 80px; /* Set a fixed width for all action buttons */
+}
+
+/* Shared Input and Select Styling */
+.control-group input,
+.control-group select,
+.control-group textarea {
+    padding: 10px 12px;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-interactive);
+    color: var(--text-primary);
     border-radius: 4px;
-    font-weight: bold;
-}
-
-.step-navigator {
+    outline: none;
+    font-size: 1em;
+    font-family: inherit;
     width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
+    box-sizing: border-box;
 }
 
-.step-navigator button {
-    background-color: var(--button-bg);
-    border: none;
+.input-with-button input { border-radius: 4px 0 0 4px; }
+.input-with-button button { border-radius: 0 4px 4px 0; }
+
+/* Calculation Trace Panel */
+.calculation-trace { padding: 0; }
+.trace-table-container { flex-grow: 1; overflow-y: auto; padding: 0 1.5rem 1.5rem 1.5rem; }
+.trace-formula { margin: 0 1.5rem 1rem 1.5rem; }
+
+/* Visualizer Panel */
+.hash-table-visualizer { padding: 0; }
+.hash-table-array { flex-grow: 1; overflow-y: auto; padding: 0 1.5rem 1.5rem 1.5rem; }
+
+/* Code Display Panel */
+.code-display { padding: 0; }
+.code-display h3, .code-display h4 { padding: 1.5rem 1.5rem 0 1.5rem; margin-bottom: 1rem; }
+.code-display pre { flex-grow: 1; overflow: auto; margin: 0 1.5rem 1.5rem 1.5rem; background-color: var(--code-bg); padding: 1rem; border-radius: 4px; }
+
+/* --- Reusable Element Styles (Shared across panels) --- */
+.batch-input-textarea { resize: vertical; min-height: 80px; }
+.batch-insert-btn { padding: 10px 15px; border: none; cursor: pointer; transition: background-color 0.2s; border-radius: 4px; font-weight: bold; background-color: var(--node-highlight); color: var(--node-highlight-text); }
+.batch-insert-btn:hover { background-color: var(--node-highlight-border); }
+.code-display h4 { margin-top: 1rem; font-size: 1em; }
+.trace-formula { background-color: var(--bg-interactive); padding: 10px; border-radius: 4px; text-align: center; font-size: 1em; }
+.trace-formula span { font-family: 'Courier New', Courier, monospace; font-weight: bold; color: var(--node-highlight-bg); }
+.trace-table { width: 100%; border-collapse: collapse; }
+.trace-table th, .trace-table td { padding: 8px; text-align: center; border-bottom: 1px solid var(--border-color); }
+.trace-table th { background-color: var(--bg-main); position: sticky; top: 0; z-index: 1; }
+.trace-table .empty-trace { color: var(--text-secondary); font-style: italic; padding: 2rem 0; }
+.hash-table-cell { display: flex; align-items: center; background-color: var(--bg-main); border: 1px solid var(--border-color); border-radius: 4px; transition: background-color 0.3s; min-height: 40px; }
+.hash-table-cell.highlight { background-color: var(--node-highlight-bg); border-color: var(--node-highlight-border); }
+.cell-index { padding: 10px 12px; font-weight: bold; background-color: var(--bg-interactive); border-right: 1px solid var(--border-color); color: var(--accent-color); }
+.cell-content { padding: 10px; flex-grow: 1; }
+.cell-value.empty { color: var(--text-secondary); font-style: italic; }
+.cell-value.deleted { color: #ff6b6b; font-style: italic; }
+.chain-list { display: flex; align-items: center; gap: 8px; }
+.chain-node { background-color: var(--node-bg); color: var(--node-text); padding: 5px 10px; border-radius: 4px; border: 1px solid var(--node-border); }
+.chain-arrow { color: var(--text-secondary); font-weight: bold; }
+
+/* --- CORRECTED ANIMATION FOOTER --- */
+.animation-footer {
+    /* No longer absolutely positioned. It's now a standard flex item. */
+    flex-shrink: 0; /* Prevents the footer from shrinking */
+    background-color: rgba(0, 0, 0, 0.9);
     color: white;
-    padding: 8px 12px;
-    border-radius: 4px;
-    cursor: pointer;
+    padding: 12px 20px;
+    border-top: 1px solid var(--border-color);
+    box-sizing: border-box;
 }
-
-.step-navigator button:disabled {
-    background-color: #555;
-    cursor: not-allowed;
-}
+.animation-message { font-size: 1.1em; line-height: 1.5; min-height: 50px; text-align: center; white-space: pre-wrap; }
+.step-navigator { width: 100%; display: flex; justify-content: center; align-items: center; gap: 10px; }
+.step-navigator button { background-color: var(--button-bg); border: none; color: white; padding: 8px 12px; border-radius: 4px; cursor: pointer; }
+.step-navigator button:disabled { background-color: #555; cursor: not-allowed; }

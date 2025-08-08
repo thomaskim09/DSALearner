@@ -1,88 +1,85 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import HashTableControls from '../components/HashTable/HashTableControls';
 import HashTableVisualizer from '../components/HashTable/HashTableVisualizer';
 import HashTableCodeDisplay from '../components/HashTable/HashTableCodeDisplay';
+import CalculationTrace from '../components/HashTable/CalculationTrace';
 import { useHashTable } from '../hooks/useHashTable';
 import '../assets/styles/HashTable.css';
 
 const HashTablePage = () => {
+    const [tableSize, setTableSize] = useState(11);
+    const [prime, setPrime] = useState(7);
     const [collisionStrategy, setCollisionStrategy] = useState('linear-probing');
-    const [prime, setPrime] = useState(7); // Add state for the prime constant
-    const { 
-        table, insert, find, 
-        animationSteps, currentStep, 
-        isPlaying, togglePlay, goToStep, resetAnimation, setTable
-    } = useHashTable(collisionStrategy, prime); // Pass prime to the hook
+    const [batchInput, setBatchInput] = useState('148, 498, 224, 212, 156, 138, 36, 448, 669');
+    const [insertedData, setInsertedData] = useState([]);
+
+    const {
+        table, runOperation,
+        animationSteps, currentStep,
+        isPlaying, togglePlay, goToStep, resetAnimation, setTable,
+    } = useHashTable(collisionStrategy, tableSize, prime);
+
     const [operation, setOperation] = useState('insert');
-
-    const isAnimating = animationSteps.length > 0 && currentStep < animationSteps.length -1;
     const isAnimationActive = animationSteps.length > 0;
-    
-    // Handle strategy change to rehash data
-    const handleStrategyChange = (newStrategy) => {
-        const oldStrategy = collisionStrategy;
-        setCollisionStrategy(newStrategy);
 
-        // Don't re-hash if table is empty
-        if (table.every(item => item === null || item.length === 0)) {
-            return;
-        }
+    const populateTableFromValues = useCallback((values, strategy, size, p) => {
+        const newTable = strategy === 'separate-chaining'
+            ? Array.from({ length: size }, () => [])
+            : Array(size).fill(null);
 
-        let allValues = [];
-        // Extract values from old table
-        if (oldStrategy === 'separate-chaining') {
-            allValues = table.flat();
-        } else {
-            allValues = table.filter(val => val !== null);
-        }
+        const localHash = (k) => k % size;
+        const h2 = (primeConst) => (k) => primeConst - (k % primeConst);
+        const doubleHashStep = h2(p);
 
-        // Create a new table for the new strategy
-        const newTable = newStrategy === 'separate-chaining' 
-            ? Array.from({ length: 10 }, () => [])
-            : Array(10).fill(null);
-            
-        // Re-insert all values into the new table without animation
-        allValues.forEach(val => {
-             const hash = (key) => key % 10;
-             const hash2 = (p) => (k) => p - (k % p);
-             const h2 = hash2(prime);
-             let index = hash(val);
-
-             if (newStrategy === 'separate-chaining') {
-                 newTable[index].unshift(val);
-             } else {
-                 let i = 0;
-                 while(newTable[index] !== null) {
-                     i++;
-                     if(newStrategy === 'linear-probing') {
-                         index = (hash(val) + i) % 10;
-                     } else if (newStrategy === 'quadratic-probing') {
-                         index = (hash(val) + i * i) % 10;
-                     } else { // double-hashing
-                         index = (hash(val) + i * h2(val)) % 10;
-                     }
-                 }
-                 newTable[index] = val;
-             }
+        values.forEach(val => {
+            let index = localHash(val);
+            if (strategy === 'separate-chaining') {
+                if (!newTable[index].some(item => item.key === val)) newTable[index].unshift({key: val, isDeleted: false});
+            } else {
+                let i = 0;
+                while (newTable[index] !== null && i < size) {
+                    i++;
+                    if (strategy === 'linear-probing') index = (localHash(val) + i) % size;
+                    else if (strategy === 'quadratic-probing') index = (localHash(val) + i * i) % size;
+                    else index = (localHash(val) + i * doubleHashStep(val)) % size;
+                }
+                if (newTable[index] === null) newTable[index] = {key: val, isDeleted: false};
+            }
         });
-
         setTable(newTable);
-    };
+    }, [setTable]);
+
+    const handleBatchInsert = useCallback(() => {
+        resetAnimation();
+        const values = batchInput.split(',').map(n => parseInt(n.trim(), 10)).filter(n => !isNaN(n));
+        const traceData = values.map(key => ({ key, hash: key % tableSize }));
+        setInsertedData(traceData);
+        populateTableFromValues(values, collisionStrategy, tableSize, prime);
+    }, [batchInput, collisionStrategy, tableSize, prime, resetAnimation, populateTableFromValues]);
+
+    useEffect(() => {
+        handleBatchInsert();
+    }, [collisionStrategy, tableSize, prime]);
 
 
     return (
         <div className="chapter-page">
-            <div className="interactive-area">
-                <div className="controls-and-visualizer">
+            <div className="hash-table-layout-container">
+                <div className="controls-container">
                     <HashTableControls
-                        onInsert={insert}
-                        onFind={find}
+                        onInsert={(val) => runOperation(val, 'insert')}
+                        onFind={(val) => runOperation(val, 'find')}
+                        onDelete={(val) => runOperation(val, 'delete')}
+                        onBatchInsert={handleBatchInsert}
+                        batchInput={batchInput}
+                        setBatchInput={setBatchInput}
                         strategy={collisionStrategy}
-                        setStrategy={handleStrategyChange}
+                        setStrategy={setCollisionStrategy}
                         prime={prime}
                         setPrime={setPrime}
+                        tableSize={tableSize}
+                        setTableSize={setTableSize}
                         setOperation={setOperation}
-                        isAnimating={isAnimating}
                         isAnimationActive={isAnimationActive}
                         onReset={resetAnimation}
                         animationSteps={animationSteps}
@@ -91,15 +88,20 @@ const HashTablePage = () => {
                         togglePlay={togglePlay}
                         goToStep={goToStep}
                     />
-                    <HashTableVisualizer
-                        table={table}
-                        strategy={collisionStrategy}
-                        animationSteps={animationSteps}
-                        currentStep={currentStep}
-                    />
+                </div>
+                <div className="trace-container">
+                    <CalculationTrace insertedData={insertedData} tableSize={tableSize}/>
+                </div>
+                <div className="visualizer-container">
+                    <HashTableVisualizer table={table} animationSteps={animationSteps} currentStep={currentStep}/>
                 </div>
                 <div className="code-display-container">
-                    <HashTableCodeDisplay operation={operation} strategy={collisionStrategy} />
+                    <HashTableCodeDisplay
+                        operation={operation}
+                        strategy={collisionStrategy}
+                        tableSize={tableSize}
+                        prime={prime}
+                    />
                 </div>
             </div>
         </div>
