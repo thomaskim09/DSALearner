@@ -12,9 +12,8 @@ const StepNavigator = ({ steps, current, isPlaying, onStep, onPlayPause, onReset
     )
 };
 
-
 const HashTableControls = ({ 
-    onInsert, onFind, strategy, setStrategy, setOperation, 
+    onInsert, onFind, strategy, setStrategy, prime, setPrime, setOperation, 
     isAnimating, isAnimationActive, onReset,
     animationSteps, currentStep, isPlaying, togglePlay, goToStep
 }) => {
@@ -40,6 +39,16 @@ const HashTableControls = ({
                         <option value="double-hashing">Double Hashing</option>
                         <option value="separate-chaining">Separate Chaining</option>
                     </select>
+                </div>
+                <div className="control-row">
+                     <label htmlFor="prime-input">Double Hash Prime:</label>
+                    <input
+                        id="prime-input"
+                        type="number"
+                        value={prime}
+                        onChange={(e) => setPrime(parseInt(e.target.value, 10) || 1)}
+                        disabled={isAnimationActive || strategy !== 'double-hashing'}
+                    />
                 </div>
                 <div className="control-row">
                     <input

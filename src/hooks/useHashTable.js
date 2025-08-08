@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 
 const TABLE_SIZE = 10;
-const PRIME = 7; 
 
 const createTable = (strategy) => {
     if (strategy === 'separate-chaining') {
@@ -10,7 +9,7 @@ const createTable = (strategy) => {
     return Array(TABLE_SIZE).fill(null);
 };
 
-export const useHashTable = (strategy) => {
+export const useHashTable = (strategy, prime) => { // Accept prime as an argument
     const [table, setTable] = useState(() => createTable(strategy));
     const [animationSteps, setAnimationSteps] = useState([]);
     const [currentStep, setCurrentStep] = useState(0);
@@ -19,15 +18,13 @@ export const useHashTable = (strategy) => {
     const initialTableState = useRef(createTable(strategy));
     const timeoutRef = useRef(null);
 
+    // This effect now only resets animations, not the table itself.
     useEffect(() => {
         if (timeoutRef.current) clearTimeout(timeoutRef.current);
-        const newTable = createTable(strategy);
-        setTable(newTable);
-        initialTableState.current = newTable;
         setAnimationSteps([]);
         setCurrentStep(0);
         setIsPlaying(false);
-    }, [strategy]);
+    }, [strategy, prime]);
 
     useEffect(() => {
         if (!isPlaying || currentStep >= animationSteps.length) {
@@ -39,7 +36,7 @@ export const useHashTable = (strategy) => {
         }
 
         const step = animationSteps[currentStep];
-        const delay = step.tableState ? 1200 : 900; // Slower pace for better reading
+        const delay = step.tableState ? 1200 : 900;
 
         timeoutRef.current = setTimeout(() => {
             if (step.tableState) {
@@ -52,10 +49,10 @@ export const useHashTable = (strategy) => {
     }, [isPlaying, currentStep, animationSteps]);
     
     const hash = (key) => key % TABLE_SIZE;
-    const hash2 = (key) => PRIME - (key % PRIME);
+    const hash2 = (key) => prime - (key % prime); // Use the prime from props
 
     const startAnimation = (steps) => {
-        initialTableState.current = [...table];
+        initialTableState.current = JSON.parse(JSON.stringify(table)); // Deep copy
         setAnimationSteps(steps);
         setCurrentStep(0);
         setIsPlaying(true);
@@ -96,7 +93,6 @@ export const useHashTable = (strategy) => {
     }, [animationSteps]);
 
 
-    // --- Probing Logic with detailed messages ---
     const createProbingSteps = (key, probingFn) => {
         const initialIndex = hash(key);
         const steps = [{ index: initialIndex, message: `Initial hash for key ${key}: ${key} % ${TABLE_SIZE} = ${initialIndex}` }];
@@ -106,7 +102,7 @@ export const useHashTable = (strategy) => {
         while (i < TABLE_SIZE) {
             const { probeIndex, message } = probingFn(initialIndex, i, key);
             
-            if (i > 0) { // Add probing step message
+            if (i > 0) {
                  steps.push({ index: probeIndex, message });
             }
 
@@ -143,7 +139,7 @@ export const useHashTable = (strategy) => {
             probeIndex: (index + i * stepSize) % TABLE_SIZE,
             message: `Probing with step size ${stepSize}: (${index} + ${i} * ${stepSize}) % ${TABLE_SIZE} = ${(index + i * stepSize) % TABLE_SIZE}`
         }));
-        steps.splice(1, 0, { index: hash(key), message: `Second hash for step size: ${PRIME} - (${key} % ${PRIME}) = ${stepSize}` });
+        steps.splice(1, 0, { index: hash(key), message: `Second hash for step size: ${prime} - (${key} % ${prime}) = ${stepSize}` });
         startAnimation(steps);
     };
 
@@ -175,5 +171,5 @@ export const useHashTable = (strategy) => {
         strategyMap[strategy](key);
     };
 
-    return { table, insert, find, animationSteps, currentStep, isPlaying, togglePlay, goToStep, resetAnimation };
+    return { table, setTable, insert, find, animationSteps, currentStep, isPlaying, togglePlay, goToStep, resetAnimation };
 };

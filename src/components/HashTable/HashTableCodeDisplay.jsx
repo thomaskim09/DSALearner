@@ -1,6 +1,16 @@
 import React from 'react';
 
 const codeSnippets = {
+    'hashFunc': `// Primary hash function
+public int hashFunc(int key) {
+    return key % arraySize;
+}`,
+    'hashFunc2': `// Secondary hash function for double hashing
+// (must be non-zero, less than array size)
+public int hashFunc2(int key) {
+    // a prime number smaller than the array size
+    return 5 - key % 5; 
+}`,
     'linear-probing': {
         insert: `// Inserts an item using linear probing 
 public void insert(DataItem item) {
@@ -109,6 +119,17 @@ const HashTableCodeDisplay = ({ operation, strategy }) => {
     return (
         <div className="code-display">
             <h3>Java Implementation</h3>
+            <h4>Hash Function:</h4>
+            <pre><code>{codeSnippets['hashFunc']}</code></pre>
+            
+            {strategy === 'double-hashing' && (
+                <>
+                    <h4>Second Hash Function:</h4>
+                    <pre><code>{codeSnippets['hashFunc2']}</code></pre>
+                </>
+            )}
+
+            <h4>Operation Code:</h4>
             <pre><code>{getCode()}</code></pre>
         </div>
     );
