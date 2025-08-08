@@ -4,10 +4,10 @@ const SortingVisualizer = ({ history, sortType }) => {
     const [activeMessage, setActiveMessage] = useState('');
 
     useEffect(() => {
-        // When the history prop changes (e.g., a new sort starts),
-        // reset the active message to the first step's message.
+        // When the history prop changes (a new sort starts),
+        // set the default message to the message from the final step.
         if (history && history.length > 0) {
-            setActiveMessage(history[0].message);
+            setActiveMessage(history[history.length - 1].message);
         } else {
             setActiveMessage('');
         }
@@ -16,6 +16,9 @@ const SortingVisualizer = ({ history, sortType }) => {
     if (!history || history.length === 0) {
         return <div className="visualizer-placeholder">Click "Sort" to begin visualization.</div>;
     }
+
+    // This will be the message displayed when not hovering over a specific row.
+    const finalMessage = history.length > 0 ? history[history.length - 1].message : 'Hover over a pass to see details.';
 
     return (
         <div className="visualizer-wrapper">
@@ -28,7 +31,7 @@ const SortingVisualizer = ({ history, sortType }) => {
                         ))}
                     </tr>
                 </thead>
-                <tbody onMouseLeave={() => history.length > 0 && setActiveMessage(history[history.length - 1].message)}>
+                <tbody onMouseLeave={() => setActiveMessage(finalMessage)}>
                     {history.map((step, passIndex) => {
                         const { array, highlights, message } = step;
                         return (
@@ -61,7 +64,7 @@ const SortingVisualizer = ({ history, sortType }) => {
                 </tbody>
             </table>
             <div className="visualizer-status-message">
-                {activeMessage || 'Hover over a pass to see details.'}
+                {activeMessage}
             </div>
         </div>
     );

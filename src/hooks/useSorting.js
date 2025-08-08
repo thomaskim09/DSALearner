@@ -1,29 +1,31 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 
 export const useSorting = () => {
     const [history, setHistory] = useState([]);
 
-    const sort = (array, type) => {
+    const sort = useCallback((array, type) => {
         setHistory([]); 
+        let sortedHistory = [];
         switch (type) {
             case 'bubble':
-                setHistory(bubbleSort(array));
+                sortedHistory = bubbleSort(array);
                 break;
             case 'selection':
-                setHistory(selectionSort(array));
+                sortedHistory = selectionSort(array);
                 break;
             case 'insertion':
-                setHistory(insertionSort(array));
+                sortedHistory = insertionSort(array);
                 break;
             default:
-                setHistory([]);
+                sortedHistory = [];
         }
-    };
+        setHistory(sortedHistory);
+    }, []); // Empty dependency array makes this function stable
 
     return { history, sort };
 };
 
-// --- Sorting Algorithms ---
+// --- Sorting Algorithms (no changes needed below) ---
 
 function bubbleSort(inputArray) {
     const arr = [...inputArray];
@@ -117,7 +119,7 @@ function insertionSort(inputArray) {
                 insertedIndex: j + 1,
                 sortedEndIndex: i
             },
-            message: `Pass ${i}: Inserted value ${current} into its correct sorted position at index ${i}.`
+            message: `Pass ${i}: Inserted value ${current} into its correct sorted position.`
         });
     }
      history.push({
