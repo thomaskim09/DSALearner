@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 
-const HeapVisualizer = ({ heap, getHeapHeight, animation, onAnimationComplete }) => {
+const HeapVisualizer = ({ heap, getHeapHeight, animation, onAnimationComplete, currentStep }) => {
     const [positions, setPositions] = useState(new Map());
     const [viewMatrix, setViewMatrix] = useState({ x: 0, y: 50, zoom: 1 });
     const [highlightedNode, setHighlightedNode] = useState(null);
@@ -36,24 +36,21 @@ const HeapVisualizer = ({ heap, getHeapHeight, animation, onAnimationComplete })
     }, [layout]);
 
     useEffect(() => {
-        if (animation) {
-            let stepIndex = 0;
-            const animateStep = () => {
-                if (stepIndex >= animation.steps.length) {
-                    onAnimationComplete();
-                    setHighlightedNode(null);
-                    setMessage('');
-                    return;
-                }
-                const step = animation.steps[stepIndex];
+        if (animation && animation.steps.length > 0) {
+            const step = animation.steps[currentStep];
+            if (step) {
                 setHighlightedNode(step.nodeIndex);
                 setMessage(step.message);
-                stepIndex++;
-                setTimeout(animateStep, 800);
-            };
-            animateStep();
+            }
+             if (currentStep >= animation.steps.length) {
+                onAnimationComplete();
+            }
+        } else {
+            setHighlightedNode(null);
+            setMessage('');
         }
-    }, [animation, onAnimationComplete]);
+    }, [animation, currentStep, onAnimationComplete]);
+
 
     const renderNode = (index) => {
         if (index >= heap.length) return null;

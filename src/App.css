@@ -87,6 +87,31 @@ body {
     gap: 1.5rem;
 }
 
+.controls-and-visualizer,
+.code-display-container {
+    min-width: 0; /* Prevents flex items from overflowing their container */
+    display: flex;
+}
+
+.controls-and-visualizer {
+    flex-direction: column;
+    gap: 1.5rem; /* Adds space between controls and visualizer */
+    flex: 2; /* Default size ratio */
+}
+
+.code-display-container {
+   flex: 1; /* Default size ratio */
+}
+
+/* Overrides for pages that need more visualizer space */
+.controls-and-visualizer.large-visualizer {
+    flex: 3;
+}
+.code-display-container.large-code {
+    flex: 2;
+}
+
+
 .controls-panel {
     background-color: var(--bg-content);
     padding: 1.5rem;

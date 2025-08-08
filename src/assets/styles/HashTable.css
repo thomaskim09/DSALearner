@@ -14,14 +14,6 @@
 .visualizer-container { flex: 1; display: flex; min-width: 280px; }
 .code-display-container { flex: 1; display: flex; min-width: 400px; }
 
-/* Ensure direct children of containers fill the available space */
-.controls-container > *,
-.trace-container > *,
-.visualizer-container > *,
-.code-display-container > * {
-    width: 100%;
-}
-
 /* --- Styles for each panel --- */
 .controls-panel,
 .calculation-trace,
@@ -32,7 +24,6 @@
     border: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
-    width: 100%;
     overflow: hidden;
 }
 

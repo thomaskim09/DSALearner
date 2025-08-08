@@ -8,7 +8,7 @@ const CalculationTrace = ({ insertedData, tableSize }) => {
         <div className="calculation-trace">
             <h3 className="trace-header">Insertion Trace</h3>
             <div className="trace-formula">
-                Hash Formula: <span>key % {tableSize}</span>
+                Hash Formula: <br/><span>key % {tableSize}</span>
             </div>
             <div className="trace-table-container">
                 <table className="trace-table">
