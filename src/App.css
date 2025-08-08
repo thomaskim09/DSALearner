@@ -3,6 +3,8 @@
 
 /* === DARK THEME COLOR PALETTE === */
 :root {
+    --sidebar-width: 260px;
+    --sidebar-width-collapsed: 80px;
     --bg-main: #1a1a1a;
     --bg-sidebar: #242424;
     --bg-content: #2c2c2c;
@@ -36,20 +38,26 @@ body {
     -moz-osx-font-smoothing: grayscale;
     background-color: var(--bg-main);
     color: var(--text-primary);
+    overflow-x: auto; /* Enable horizontal scrolling */
 }
 
 .app-container {
     display: flex;
+    min-width: 100vw;
 }
 
 /* Main Layout Fix */
 .content-area {
-    margin-left: 260px; /* This should match the sidebar width */
-    width: calc(100% - 260px);
+    margin-left: var(--sidebar-width);
     padding: 2rem;
-    min-height: 100vh;
-    box-sizing: border-box;
+    flex-grow: 1;
+    transition: margin-left 0.3s ease;
 }
+
+.app-container.sidebar-collapsed .content-area {
+    margin-left: var(--sidebar-width-collapsed);
+}
+
 
 /* General Chapter Page Styling */
 .chapter-page, .home-page-container {
@@ -100,7 +108,7 @@ body {
 }
 
 .code-display-container {
-   flex: 1; /* Default size ratio */
+   flex: 0 0 450px; /* Fixed width */
 }
 
 /* Overrides for pages that need more visualizer space */

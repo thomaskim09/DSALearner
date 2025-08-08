@@ -1,48 +1,43 @@
 /* DSALearner_packaged/src/assets/styles/Heap.css */
+
+.heap-page .interactive-area {
+    display: grid;
+    /* Updated column widths: Increased left column, fixed tracelog */
+    grid-template-columns: 600px 450px 450px; 
+    gap: 1.5rem;
+    align-items: stretch;
+    min-width: 1500px; /* Adjusted min-width for new layout */
+}
+
+.heap-left-column {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.heap-controls-container,
+.heap-tracelog-container,
+.heap-code-container {
+    display: flex; /* Ensure children fill the height */
+}
+
+.heap-controls-container .controls-panel,
+.heap-tracelog-container .tracelog-container,
+.heap-code-container .code-display {
+    width: 100%; /* Make sure the components fill their containers */
+}
+
 .heap-visualizer-container {
-    flex-grow: 1;
+    flex-grow: 1; /* Allows visualizer to take remaining space in the left column */
     display: flex;
     flex-direction: column;
     background-color: var(--bg-interactive);
     position: relative;
     overflow: hidden;
     cursor: grab;
-    min-height: 60vh;
-}
-
-.animation-message {
-    position: absolute;
-    bottom: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: rgba(0,0,0,0.8);
-    color: white;
-    padding: 10px 20px;
-    border-radius: 5px;
-    z-index: 10;
-    text-align: center;
-}
-
-.step-navigator {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    justify-content: center;
-    margin-top: 10px;
-}
-
-.step-navigator button {
-    background-color: var(--button-bg);
-    border: none;
-    color: white;
-    padding: 8px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.step-navigator button:disabled {
-    background-color: #555;
-    cursor: not-allowed;
+    min-height: 450px; /* Give the visualizer a good minimum height */
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
 }
 
 .utility-buttons {

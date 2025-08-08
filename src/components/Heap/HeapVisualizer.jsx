@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 
-const HeapVisualizer = ({ heap, getHeapHeight, animation, onAnimationComplete, currentStep }) => {
+const HeapVisualizer = ({ heap, getHeapHeight, animation, currentStep }) => {
     const [positions, setPositions] = useState(new Map());
     const [viewMatrix, setViewMatrix] = useState({ x: 0, y: 50, zoom: 1 });
     const [highlightedNode, setHighlightedNode] = useState(null);
-    const [message, setMessage] = useState('');
     const viewportRef = useRef(null);
 
     const NODE_RADIUS = 25;
@@ -36,20 +35,12 @@ const HeapVisualizer = ({ heap, getHeapHeight, animation, onAnimationComplete, c
     }, [layout]);
 
     useEffect(() => {
-        if (animation && animation.steps.length > 0) {
-            const step = animation.steps[currentStep];
-            if (step) {
-                setHighlightedNode(step.nodeIndex);
-                setMessage(step.message);
-            }
-             if (currentStep >= animation.steps.length) {
-                onAnimationComplete();
-            }
+        if (animation && animation.steps.length > 0 && animation.steps[currentStep]) {
+            setHighlightedNode(animation.steps[currentStep].nodeIndex);
         } else {
             setHighlightedNode(null);
-            setMessage('');
         }
-    }, [animation, currentStep, onAnimationComplete]);
+    }, [animation, currentStep]);
 
 
     const renderNode = (index) => {
@@ -83,7 +74,6 @@ const HeapVisualizer = ({ heap, getHeapHeight, animation, onAnimationComplete, c
                     {heap.length > 0 && renderNode(0)}
                 </g>
             </svg>
-            {message && <div className="animation-message">{message}</div>}
         </div>
     );
 };

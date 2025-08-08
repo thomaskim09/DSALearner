@@ -1,12 +1,12 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import '../../assets/styles/Sidebar.css'; 
+import '../../assets/styles/Sidebar.css';
 
-const Sidebar = () => {
+const Sidebar = ({ isCollapsed, onToggle }) => {
     return (
-        <aside className="sidebar">
+        <aside className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
             <div className="sidebar-header">
-                <h2>DSALearner</h2>
+                <h2>{isCollapsed ? 'DS' : 'DSALearner'}</h2>
             </div>
             <nav className="sidebar-nav">
                 <NavLink to="/" end className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Home</NavLink>
@@ -16,6 +16,9 @@ const Sidebar = () => {
                 <NavLink to="/hash-table" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Chapter 10: Hash Tables</NavLink>
                 <NavLink to="/heap" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Chapter 11: Heaps</NavLink>
             </nav>
+            <button onClick={onToggle} className="sidebar-toggle">
+                {isCollapsed ? '»' : '«'}
+            </button>
         </aside>
     );
 };
