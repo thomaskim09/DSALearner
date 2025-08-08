@@ -22,7 +22,10 @@ export const useHashTable = (strategy, tableSize, prime) => {
     // This effect now correctly resets the table state only when parameters change.
     useEffect(() => {
         setTable(createTable(strategy, tableSize));
-        resetAnimation();
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
+        setAnimationSteps([]);
+        setCurrentStep(0);
+        setIsPlaying(false);
     }, [strategy, tableSize]);
 
     // Animation player effect
@@ -74,12 +77,10 @@ export const useHashTable = (strategy, tableSize, prime) => {
     
     const resetAnimation = useCallback(() => {
         if (timeoutRef.current) clearTimeout(timeoutRef.current);
-        const lastStepWithTable = [...animationSteps].reverse().find(s => s.tableState);
-        if (lastStepWithTable) setTable(lastStepWithTable.tableState);
         setAnimationSteps([]);
         setCurrentStep(0);
         setIsPlaying(false);
-    }, [animationSteps]);
+    }, []);
 
     // --- Generic Probing Logic ---
     const probe = (key, probingFn, action) => {

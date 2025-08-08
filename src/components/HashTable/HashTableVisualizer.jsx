@@ -36,11 +36,6 @@ const HashTableVisualizer = ({ table, animationSteps, currentStep, strategy }) =
                     </div>
                 ))}
             </div>
-            {currentAnimation && (
-                <div className="animation-footer">
-                    <div className="animation-message">{currentAnimation.message}</div>
-                </div>
-            )}
         </div>
     );
 };

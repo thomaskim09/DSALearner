@@ -3,6 +3,7 @@ import HashTableControls from '../components/HashTable/HashTableControls';
 import HashTableVisualizer from '../components/HashTable/HashTableVisualizer';
 import HashTableCodeDisplay from '../components/HashTable/HashTableCodeDisplay';
 import CalculationTrace from '../components/HashTable/CalculationTrace';
+import TraceLog from '../components/common/TraceLog';
 import { useHashTable } from '../hooks/useHashTable';
 import '../assets/styles/HashTable.css';
 
@@ -20,7 +21,7 @@ const HashTablePage = () => {
     } = useHashTable(collisionStrategy, tableSize, prime);
 
     const [operation, setOperation] = useState('insert');
-    const isAnimationActive = animationSteps.length > 0;
+    const isAnimationPlaying = isPlaying;
 
     const populateTableFromValues = useCallback((values, strategy, size, p) => {
         const newTable = strategy === 'separate-chaining'
@@ -57,15 +58,21 @@ const HashTablePage = () => {
         populateTableFromValues(values, collisionStrategy, tableSize, prime);
     }, [batchInput, collisionStrategy, tableSize, prime, resetAnimation, populateTableFromValues]);
 
+    const handleStepHover = (index) => {
+        if (animationSteps.length > 0) {
+            goToStep(index);
+        }
+    };
+    
     useEffect(() => {
         handleBatchInsert();
-    }, [collisionStrategy, tableSize, prime]);
+    }, [collisionStrategy, tableSize, prime, handleBatchInsert]);
 
 
     return (
-        <div className="chapter-page">
-            <div className="hash-table-layout-container">
-                <div className="controls-container">
+        <div className="chapter-page hash-table-page">
+            <div className="interactive-area">
+                <div className="hash-table-control-container">
                     <HashTableControls
                         onInsert={(val) => runOperation(val, 'insert')}
                         onFind={(val) => runOperation(val, 'find')}
@@ -80,22 +87,27 @@ const HashTablePage = () => {
                         tableSize={tableSize}
                         setTableSize={setTableSize}
                         setOperation={setOperation}
-                        isAnimationActive={isAnimationActive}
+                        isAnimationActive={isAnimationPlaying}
                         onReset={resetAnimation}
-                        animationSteps={animationSteps}
-                        currentStep={currentStep}
-                        isPlaying={isPlaying}
-                        togglePlay={togglePlay}
-                        goToStep={goToStep}
                     />
                 </div>
-                <div className="trace-container">
+                <div className="hash-table-calculation-container">
                     <CalculationTrace insertedData={insertedData} tableSize={tableSize}/>
                 </div>
-                <div className="visualizer-container">
+
+                <div className="hash-table-visualizer-container">
                     <HashTableVisualizer table={table} animationSteps={animationSteps} currentStep={currentStep}/>
                 </div>
-                <div className="code-display-container">
+                
+                <div className="hash-table-tracelog-container">
+                    <TraceLog 
+                        steps={animationSteps} 
+                        onHover={handleStepHover} 
+                        currentStep={currentStep}
+                    />
+                </div>
+
+                <div className="hash-table-code-container">
                     <HashTableCodeDisplay
                         operation={operation}
                         strategy={collisionStrategy}

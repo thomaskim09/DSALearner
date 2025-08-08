@@ -1,22 +1,9 @@
 import React, { useState } from 'react';
 
-const StepNavigator = ({ steps, current, isPlaying, onStep, onPlayPause, onReset }) => {
-    return (
-        <div className="step-navigator">
-            <button onClick={() => onStep(current - 1)} disabled={current === 0}>{"<"}</button>
-            <span>{current + 1} / {steps.length}</span>
-            <button onClick={() => onStep(current + 1)} disabled={current >= steps.length - 1}>{">"}</button>
-            <button onClick={onPlayPause}>{isPlaying ? 'Pause' : 'Play'}</button>
-            <button onClick={onReset}>Done</button>
-        </div>
-    )
-};
-
 const HashTableControls = ({ 
     onInsert, onFind, onDelete, onBatchInsert, batchInput, setBatchInput, strategy, setStrategy, 
     prime, setPrime, tableSize, setTableSize, setOperation, 
-    isAnimationActive, onReset,
-    animationSteps, currentStep, isPlaying, togglePlay, goToStep
+    isAnimationActive, onReset
 }) => {
     const [insertValue, setInsertValue] = useState('');
     const [findValue, setFindValue] = useState('');
@@ -54,7 +41,7 @@ const HashTableControls = ({
                 <div className="control-group">
                     <label htmlFor="batch-input">Batch Insert:</label>
                     <textarea id="batch-input" className="batch-input-textarea" value={batchInput} onChange={(e) => setBatchInput(e.target.value)} rows="3" disabled={isAnimationActive}/>
-                    <button onClick={onBatchInsert} disabled={isAnimationActive} className="batch-insert-btn">Build Table</button>
+                    <button onClick={onBatchInsert} disabled={isAnimationActive} className="batch-insert-btn">Insert All</button>
                 </div>
 
                 <div className="control-group">
@@ -72,17 +59,6 @@ const HashTableControls = ({
                         <button className="action-btn" onClick={() => handleAction(onDelete, deleteValue, setDeleteValue)} disabled={deleteValue === '' || isAnimationActive}>Delete</button>
                     </div>
                 </div>
-                
-                 {isAnimationActive && (
-                    <div className="control-group">
-                        <label>Animation Controls:</label>
-                        <StepNavigator 
-                            steps={animationSteps} current={currentStep}
-                            isPlaying={isPlaying} onStep={goToStep} 
-                            onPlayPause={togglePlay} onReset={onReset}
-                        />
-                    </div>
-                )}
             </div>
         </div>
     );
