@@ -22,12 +22,16 @@ const HashTableVisualizer = ({ table, animationSteps, currentStep, strategy }) =
                         <div className="cell-content">
                             {strategy === 'separate-chaining' ? (
                                 <div className="chain-list">
-                                    {entry.map((node, nodeIndex) => (
-                                        <React.Fragment key={node.key}>
-                                            <div className="chain-node">{node.key}</div>
-                                            {nodeIndex < entry.length - 1 && <div className="chain-arrow">→</div>}
-                                        </React.Fragment>
-                                    ))}
+                                    {(!Array.isArray(entry) || entry.length === 0) ? (
+                                        <div className="cell-value empty">empty</div>
+                                    ) : (
+                                        entry.map((node, nodeIndex) => (
+                                            <React.Fragment key={`${node.key}-${nodeIndex}`}>
+                                                <div className="chain-node">{node.key}</div>
+                                                {nodeIndex < entry.length - 1 && <div className="chain-arrow">-&gt;</div>}
+                                            </React.Fragment>
+                                        ))
+                                    )}
                                 </div>
                             ) : (
                                 renderCellContent(entry)

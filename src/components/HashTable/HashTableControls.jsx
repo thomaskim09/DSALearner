@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 const HashTableControls = ({ 
     onInsert, onFind, onDelete, onBatchInsert, batchInput, setBatchInput, strategy, setStrategy, 
     prime, setPrime, tableSize, setTableSize, setOperation, 
-    isAnimationActive, onReset
+    isAnimationActive, onReset, chainOrder, setChainOrder
 }) => {
     const [insertValue, setInsertValue] = useState('');
     const [findValue, setFindValue] = useState('');
@@ -34,10 +34,21 @@ const HashTableControls = ({
                     <label htmlFor="tablesize-input">Table Size (Modulus):</label>
                     <input id="tablesize-input" type="number" min="1" value={tableSize} onChange={(e) => setTableSize(Math.max(1, parseInt(e.target.value, 10) || 1))} disabled={isAnimationActive}/>
                 </div>
-                <div className="control-group">
-                    <label htmlFor="prime-input">Double Hash Prime:</label>
-                    <input id="prime-input" type="number" min="1" value={prime} onChange={(e) => setPrime(parseInt(e.target.value, 10) || 1)} disabled={isAnimationActive || strategy !== 'double-hashing'}/>
-                </div>
+                {strategy === 'double-hashing' && (
+                    <div className="control-group">
+                        <label htmlFor="prime-input">Double Hash Prime:</label>
+                        <input id="prime-input" type="number" min="1" value={prime} onChange={(e) => setPrime(parseInt(e.target.value, 10) || 1)} disabled={isAnimationActive}/>
+                    </div>
+                )}
+                {strategy === 'separate-chaining' && (
+                    <div className="control-group">
+                        <label htmlFor="order-select">Chain Order:</label>
+                        <select id="order-select" value={chainOrder} onChange={(e) => setChainOrder(e.target.value)} disabled={isAnimationActive}>
+                            <option value="ascending">Ascending</option>
+                            <option value="descending">Descending</option>
+                        </select>
+                    </div>
+                )}
                 <div className="control-group">
                     <label htmlFor="batch-input">Batch Insert:</label>
                     <textarea id="batch-input" className="batch-input-textarea" value={batchInput} onChange={(e) => setBatchInput(e.target.value)} rows="3" disabled={isAnimationActive}/>

@@ -10,7 +10,7 @@ const createTable = (strategy, size) => {
     return Array(size).fill(null);
 };
 
-export const useHashTable = (strategy, tableSize, prime) => {
+export const useHashTable = (strategy, tableSize, prime, chainOrder = 'ascending') => {
     const [table, setTable] = useState(() => createTable(strategy, tableSize));
     const [animationSteps, setAnimationSteps] = useState([]);
     const [currentStep, setCurrentStep] = useState(0);
@@ -153,30 +153,33 @@ export const useHashTable = (strategy, tableSize, prime) => {
                 steps.splice(1, 0, { index: hash(key), message: `Second hash for step size: ${prime} - (${key} % ${prime}) = ${hash2(key)}` });
                 break;
             case 'separate-chaining':
-                const index = hash(key);
-                const chain = table[index];
-                const newTable = table.map(list => [...list]);
-                const itemIndex = chain.findIndex(item => item.key === key);
+                {
+                    const index = hash(key);
+                    const chain = table[index];
+                    const newTable = table.map(list => [...list]);
+                    const itemIndex = chain.findIndex(item => item.key === key);
 
-                if (action === 'insert') {
-                    if (itemIndex !== -1) {
-                         steps.push({ index, message: `Key ${key} already exists at index ${index}.` });
-                    } else {
-                        newTable[index].unshift({ key, isDeleted: false });
-                        steps.push({ index, message: `Hash for key ${key} is ${index}. Inserting at head of list.` , tableState: newTable });
+                    if (action === 'insert') {
+                        if (itemIndex !== -1) {
+                            steps.push({ index, message: `Key ${key} already exists at index ${index}.` });
+                        } else {
+                            newTable[index].push({ key, isDeleted: false });
+                            newTable[index].sort((a, b) => chainOrder === 'ascending' ? a.key - b.key : b.key - a.key);
+                            steps.push({ index, message: `Hash for key ${key} is ${index}. Inserting into list (${chainOrder}).` , tableState: newTable });
+                        }
+                    } else if (action === 'find') {
+                        steps.push({ index, message: `Hashing to index ${index}. Searching list.` });
+                        if(itemIndex !== -1) steps.push({ index, message: `Found key ${key} in the list at index ${index}.` });
+                        else steps.push({ index, message: `Key ${key} not found in the list.` });
+                    } else { // delete
+                        steps.push({ index, message: `Hashing to index ${index}. Searching list.` });
+                        if (itemIndex !== -1) {
+                            newTable[index].splice(itemIndex, 1);
+                            steps.push({ index, message: `Found and removed key ${key}.`, tableState: newTable });
+                        } else {
+                            steps.push({ index, message: `Key ${key} not found for deletion.` });
+                        }
                     }
-                } else if (action === 'find') {
-                    steps.push({ index, message: `Hashing to index ${index}. Searching list.` });
-                    if(itemIndex !== -1) steps.push({ index, message: `Found key ${key} in the list at index ${index}.` });
-                    else steps.push({ index, message: `Key ${key} not found in the list.` });
-                } else { // delete
-                     steps.push({ index, message: `Hashing to index ${index}. Searching list.` });
-                     if (itemIndex !== -1) {
-                         newTable[index].splice(itemIndex, 1);
-                         steps.push({ index, message: `Found and removed key ${key}.`, tableState: newTable });
-                     } else {
-                         steps.push({ index, message: `Key ${key} not found for deletion.` });
-                     }
                 }
                 break;
             default: break;

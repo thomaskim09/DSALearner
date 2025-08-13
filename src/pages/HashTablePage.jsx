@@ -12,18 +12,19 @@ const HashTablePage = () => {
     const [prime, setPrime] = useState(7);
     const [collisionStrategy, setCollisionStrategy] = useState('linear-probing');
     const [batchInput, setBatchInput] = useState('148, 498, 224, 212, 156, 138, 36, 448, 669');
+    const [chainOrder, setChainOrder] = useState('ascending');
     const [insertedData, setInsertedData] = useState([]);
 
     const {
         table, runOperation,
         animationSteps, currentStep,
         isPlaying, togglePlay, goToStep, resetAnimation, setTable,
-    } = useHashTable(collisionStrategy, tableSize, prime);
+    } = useHashTable(collisionStrategy, tableSize, prime, chainOrder);
 
     const [operation, setOperation] = useState('insert');
     const isAnimationPlaying = isPlaying;
 
-    const populateTableFromValues = useCallback((values, strategy, size, p) => {
+    const populateTableFromValues = useCallback((values, strategy, size, p, order = 'ascending') => {
         const newTable = strategy === 'separate-chaining'
             ? Array.from({ length: size }, () => [])
             : Array(size).fill(null);
@@ -35,7 +36,10 @@ const HashTablePage = () => {
         values.forEach(val => {
             let index = localHash(val);
             if (strategy === 'separate-chaining') {
-                if (!newTable[index].some(item => item.key === val)) newTable[index].unshift({key: val, isDeleted: false});
+                if (!newTable[index].some(item => item.key === val)) {
+                    newTable[index].push({key: val, isDeleted: false});
+                    newTable[index].sort((a, b) => order === 'ascending' ? a.key - b.key : b.key - a.key);
+                }
             } else {
                 let i = 0;
                 while (newTable[index] !== null && i < size) {
@@ -55,8 +59,8 @@ const HashTablePage = () => {
         const values = batchInput.split(',').map(n => parseInt(n.trim(), 10)).filter(n => !isNaN(n));
         const traceData = values.map(key => ({ key, hash: key % tableSize }));
         setInsertedData(traceData);
-        populateTableFromValues(values, collisionStrategy, tableSize, prime);
-    }, [batchInput, collisionStrategy, tableSize, prime, resetAnimation, populateTableFromValues]);
+        populateTableFromValues(values, collisionStrategy, tableSize, prime, chainOrder);
+    }, [batchInput, collisionStrategy, tableSize, prime, chainOrder, resetAnimation, populateTableFromValues]);
 
     const handleStepHover = (index) => {
         if (animationSteps.length > 0) {
@@ -66,7 +70,7 @@ const HashTablePage = () => {
     
     useEffect(() => {
         handleBatchInsert();
-    }, [collisionStrategy, tableSize, prime, handleBatchInsert]);
+    }, [collisionStrategy, tableSize, prime, chainOrder, handleBatchInsert]);
 
 
     return (
@@ -89,14 +93,23 @@ const HashTablePage = () => {
                         setOperation={setOperation}
                         isAnimationActive={isAnimationPlaying}
                         onReset={resetAnimation}
+                        chainOrder={chainOrder}
+                        setChainOrder={setChainOrder}
                     />
                 </div>
-                <div className="hash-table-calculation-container">
-                    <CalculationTrace insertedData={insertedData} tableSize={tableSize}/>
-                </div>
+                {collisionStrategy === 'double-hashing' && (
+                    <div className="hash-table-calculation-container">
+                        <CalculationTrace insertedData={insertedData} tableSize={tableSize}/>
+                    </div>
+                )}
 
                 <div className="hash-table-visualizer-container">
-                    <HashTableVisualizer table={table} animationSteps={animationSteps} currentStep={currentStep}/>
+                    <HashTableVisualizer 
+                        table={table} 
+                        animationSteps={animationSteps} 
+                        currentStep={currentStep}
+                        strategy={collisionStrategy}
+                    />
                 </div>
                 
                 <div className="hash-table-tracelog-container">
