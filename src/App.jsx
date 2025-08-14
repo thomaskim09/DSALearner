@@ -10,6 +10,7 @@ import HeapPage from './pages/HeapPage';
 import AsymptoticNotationPage from './pages/AsymptoticNotationPage';
 import MergeSortPage from './pages/MergeSortPage'; 
 import AdvancedSortPage from './pages/AdvancedSortPage'; 
+import MultiplicationPage from './pages/MultiplicationPage'; // 1. IMPORT THE NEW PAGE
 import './App.css';
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
         <main className="content-area">
           <Routes>
             <Route path="/" element={<HomePage />} />
+            <Route path="/multiplication" element={<MultiplicationPage />} /> {/* 2. ADD THE ROUTE */}
             <Route path="/asymptotic-notation" element={<AsymptoticNotationPage />} />
             <Route path="/simple-sort" element={<SimpleSortPage />} />
             <Route path="/merge-sort" element={<MergeSortPage />} /> 

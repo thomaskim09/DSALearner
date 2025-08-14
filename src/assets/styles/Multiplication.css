@@ -1,0 +1,136 @@
+/* Styles for Multiplication Visualizers */
+
+.visualizer-container {
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.final-result {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background-color: var(--bg-main);
+    border: 1px solid var(--accent-color);
+    border-radius: 4px;
+    text-align: center;
+    color: var(--text-primary);
+    font-size: 1.2rem;
+    word-break: break-all;
+}
+.final-result.large {
+    font-size: 1.4rem;
+}
+
+/* À La Russe Styles */
+.ala-russe-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.algo-explanation {
+    margin-bottom: 1.5rem;
+    padding: 0.75rem;
+    background-color: var(--bg-main);
+    border-radius: 4px;
+    text-align: center;
+    max-width: 80%;
+}
+
+.multiplication-table {
+    width: 80%;
+    border-collapse: collapse;
+    font-size: 1.1em;
+}
+
+.multiplication-table th, .multiplication-table td {
+    border: 1px solid var(--border-color);
+    padding: 10px;
+    text-align: right;
+}
+
+.multiplication-table th {
+    background-color: var(--bg-main);
+    color: var(--accent-color);
+    text-align: center;
+}
+
+.multiplication-table tr.odd-row {
+    background-color: #007acc33; /* Faded accent color */
+    font-weight: bold;
+}
+
+.multiplication-table tr.odd-row td:last-child {
+    text-align: center;
+    color: var(--node-highlight-bg);
+}
+
+.sum-equation {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background-color: var(--bg-interactive);
+    border-radius: 4px;
+    text-align: center;
+    font-size: 1.1em;
+    word-break: break-all;
+    max-width: 80%;
+}
+
+/* Divide and Conquer Styles */
+.divide-conquer-container {
+    font-size: 1.1em;
+    line-height: 1.6;
+}
+
+.dc-step-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end; /* <-- THE FIX IS HERE */
+    gap: 2rem;
+    padding-bottom: 1.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid var(--border-color);
+}
+.divide-conquer-container > .dc-step-container:last-of-type {
+    border-bottom: none;
+}
+
+.dc-left-column {
+    flex: 1;
+    min-width: 0;
+}
+.dc-right-column {
+    flex: 1;
+    min-width: 0;
+}
+
+.dc-main-problem {
+    font-weight: bold;
+    color: var(--accent-color);
+    font-size: 1.1em;
+    margin-bottom: 1rem;
+    word-break: break-all;
+}
+
+.dc-sub-problems {
+    padding-left: 1.5rem;
+    color: var(--text-secondary);
+    font-size: 0.95em;
+    word-break: break-all;
+}
+
+.dc-sub-problems p {
+    margin: 0.25rem 0;
+}
+
+.dc-adding-equation {
+    text-align: right;
+    white-space: pre;
+    overflow-x: auto;
+}
+
+.dc-hr {
+    border: none;
+    border-top: 1px solid var(--text-primary);
+    margin: 0.5rem 0 0.5rem auto;
+    width: 100%;
+}
