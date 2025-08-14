@@ -51,7 +51,7 @@ const HashTableControls = ({
                 )}
                 <div className="control-group">
                     <label htmlFor="batch-input">Batch Insert:</label>
-                    <textarea id="batch-input" className="batch-input-textarea" value={batchInput} onChange={(e) => setBatchInput(e.target.value)} rows="3" disabled={isAnimationActive}/>
+                    <textarea id="batch-input" className="batch-input-textarea" value={batchInput} onChange={(e) => setBatchInput(e.target.value)} rows="3" disabled={isAnimationActive} placeholder="e.g., 88 67 99 22 or 88, 67, 99, 22"/>
                     <button onClick={onBatchInsert} disabled={isAnimationActive} className="batch-insert-btn">Insert All</button>
                 </div>
 

@@ -56,7 +56,7 @@ const HashTablePage = () => {
 
     const handleBatchInsert = useCallback(() => {
         resetAnimation();
-        const values = batchInput.split(',').map(n => parseInt(n.trim(), 10)).filter(n => !isNaN(n));
+        const values = batchInput.split(/[,\s]+/).map(n => parseInt(n.trim(), 10)).filter(n => !isNaN(n));
         const traceData = values.map(key => ({ key, hash: key % tableSize }));
         setInsertedData(traceData);
         populateTableFromValues(values, collisionStrategy, tableSize, prime, chainOrder);

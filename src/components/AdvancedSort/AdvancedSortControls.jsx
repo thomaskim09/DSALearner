@@ -23,7 +23,7 @@ const AdvancedSortControls = ({
                 className="array-input"
                 value={arrayInput}
                 onChange={(e) => setArrayInput(e.target.value)}
-                placeholder="e.g., 88, 67, 99, 22"
+                placeholder="e.g., 88 67 99 22 or 88, 67, 99, 22"
             />
             <button onClick={handleSort}>Sort</button>
         </div>

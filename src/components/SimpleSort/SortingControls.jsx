@@ -13,7 +13,7 @@ const SortingControls = ({ sortType, setSortType, arrayInput, setArrayInput, han
                 className="array-input"
                 value={arrayInput}
                 onChange={(e) => setArrayInput(e.target.value)}
-                placeholder="e.g., 5, 3, 8, 1"
+                placeholder="e.g., 5, 3, 8, 1 or 5 3 8 1"
             />
             <button onClick={handleSort}>Sort</button>
         </div>

@@ -13,7 +13,7 @@ const AdvancedSortPage = () => {
     const { history, sort } = useAdvancedSort();
 
     const handleSort = useCallback(() => {
-        const array = arrayInput.split(/[,\\s]+/).map(n => parseInt(n.trim(), 10)).filter(n => !isNaN(n));
+        const array = arrayInput.split(/[,\s]+/).map(n => parseInt(n.trim(), 10)).filter(n => !isNaN(n));
         if (array.length > 0) {
             sort(array, sortType, { shellSequence });
         }
