@@ -2,7 +2,7 @@
 
 .heap-page .interactive-area {
     display: grid;
-    grid-template-columns: 600px 320px 450px;
+    grid-template-columns: 600px 400px 450px;
     gap: 1.5rem;
     align-items: stretch;
     min-width: 1500px;
