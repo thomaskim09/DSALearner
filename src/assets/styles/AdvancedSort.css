@@ -1,0 +1,37 @@
+/* src/assets/styles/AdvancedSort.css */
+
+/* Existing styles */
+.sorting-table .cell.highlight-pivot {
+    background-color: #ffc107; /* Amber */
+    color: black;
+    font-weight: bold;
+}
+
+.sorting-table .cell.highlight-left-ptr {
+    border-bottom: 3px solid #2196F3; /* Blue */
+}
+
+.sorting-table .cell.highlight-right-ptr {
+    border-bottom: 3px solid #f44336; /* Red */
+}
+
+.sorting-table .cell.highlight-swap {
+    background-color: #9c27b0; /* Purple */
+    color: white;
+}
+
+.sorting-table .cell.highlight-shell-gap {
+    background-color: #80cbc4; /* Teal Lighten-3 */
+    color: black;
+}
+
+/* NEW: permanent sorted cell style */
+.sorting-table .cell.sorted-bubble {
+    background-color: #4caf50; /* Green */
+    color: white;
+}
+
+/* NEW: extra highlight for the most recently sorted cell */
+.sorting-table .cell.highlight-new-sorted {
+    box-shadow: inset 0 0 5px 2px yellow;
+}
