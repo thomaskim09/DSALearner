@@ -1,14 +1,5 @@
+// DSALearner_packaged/src/utils/asymptoticNotation.js
 // Utilities for parsing, simplifying, and classifying asymptotic growth of t(n)
-// Supported constructs:
-// - Numbers: 2, 10, 1000
-// - Variable: n
-// - Powers: n^k, 2^n, (expr)^k
-// - Multiplication: *, ×, implicit (e.g., 2n, nlog(n))
-// - Addition/Subtraction: +, -
-// - Parentheses: ( ... )
-// - Logarithms: log(n), log_2(n), log2(n), ln(n), log_b(n^k), log_b(b^x)
-// - Up to 10 top-level additive terms (after expansion)
-
 const MULTIPLY_SIGNS = /[×·]/g;
 
 export function analyzeAsymptotic(inputRaw) {
@@ -20,15 +11,19 @@ export function analyzeAsymptotic(inputRaw) {
         };
     }
 
-    const input = normalizeInput(inputRaw);
     steps.push(`Original input: ${sanitizeForMarkdown(inputRaw)}`);
 
-    // Strip optional leading t(n)=
-    const exprString = stripFunctionLhs(input);
+    const exprString = stripFunctionLhs(inputRaw);
+    if (exprString !== inputRaw) {
+        steps.push(`After stripping t(n)=: ${sanitizeForMarkdown(exprString)}`);
+    }
+
+    const input = normalizeInput(exprString);
+    steps.push(`After normalization: ${sanitizeForMarkdown(input)}`);
 
     let tokens;
     try {
-        tokens = tokenize(exprString);
+        tokens = tokenize(input);
     } catch (e) {
         return { ok: false, error: 'Tokenization error: ' + e.message };
     }
@@ -40,21 +35,17 @@ export function analyzeAsymptotic(inputRaw) {
         return { ok: false, error: 'Parse error: ' + e.message };
     }
 
-    // Expand to a flat sum of term products
     const expanded = expandAstToTerms(ast);
 
-    if (expanded.length > 10) {
-        return { ok: false, error: 'Too many terms after expansion (more than 10). Please simplify the input.' };
+    if (expanded.length > 20) { // Increased limit slightly
+        return { ok: false, error: 'Too many terms after expansion (more than 20). Please simplify the input.' };
     }
 
-    // Simplify each term into canonical growth components
     const simplified = expanded.map(simplifyTermProduct);
-
     const simplifiedTermStrings = simplified.map(formatCanonicalTerm);
     steps.push('Simplified terms:');
     simplifiedTermStrings.forEach((s, i) => steps.push(`  ${i + 1}. ${s}`));
 
-    // Determine dominant term
     const { dominant, reason } = pickDominantTerm(simplified);
     steps.push(`Dominant term: ${formatCanonicalTerm(dominant)}${reason ? ` — ${reason}` : ''}`);
 
@@ -74,47 +65,63 @@ function sanitizeForMarkdown(s) {
     return String(s).replace(/\*/g, '\\*').replace(/_/g, '\\_');
 }
 
-export function normalizeInput(s) {
-    if (!s) return '';
-    let out = s.trim();
-    
-    // Convert "n" followed by a number to "n^number"
-    out = out.replace(/n(\d+)/g, 'n^$1');
+function normalizeSuperscripts(s) {
+    const map = {
+        '⁰': '0', '¹': '1', '²': '2', '³': '3', '⁴': '4', '⁵': '5', '⁶': '6', '⁷': '7', '⁸': '8', '⁹': '9', 'ⁿ': 'n',
+    };
+    return s.replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹ⁿ]/g, (ch) => map[ch] || ch);
+}
 
-    // Treat 'x' as a multiplication sign
-    out = out.replace(/(\d+)\s*x\s*(\d+)/g, '$1*$2');
-    out = out.replace(/(\d+)\s*x\s*n/g, '$1*n');
-    out = out.replace(/n\s*x\s*(\d+)/g, 'n*$1');
-    
+export function normalizeInput(s) {
+    if (!s || typeof s !== 'string') return '';
+    let out = s.trim();
+
+    // Step 1: Pre-processing and token separation
+    out = out.replace(/\s*x\s*/gi, '*');
     out = out.replace(MULTIPLY_SIGNS, '*');
     out = normalizeSuperscripts(out);
+    out = out.replace(/([*+^()/-])/g, ' $1 ');
+    out = out.replace(/(\d)([a-zA-Z])/g, '$1 $2');
+    out = out.replace(/([a-zA-Z])(\d)/g, '$1 $2');
 
-    // Insert implicit multiplication before log, n, or parens
-    out = out.replace(/(\d+|n|\))([a-zA-Z(])/g, '$1*$2');
+    // Step 2: Normalize shorthands on spaced tokens
+    out = out.replace(/\s+/g, ' ').trim();
+    
+    // This regex order is important
+    out = out.replace(/\b(logn) (\d+)\b/g, '( log ( n ) ) ^ $2');
+    out = out.replace(/\b(n) (\d+)\b/g, 'n ^ $2');
+    out = out.replace(/\b(log) (\d+)\b/g, 'log_$2');
+    out = out.replace(/\b(ln)\b/g, 'log_e');
+    out = out.replace(/\b(logn)\b/g, 'log ( n )');
+    
+    out = out.replace(/\s+/g, ' ').trim();
 
-    out = out.replace(/\s+/g, '');
-    out = out.replace(/log(\d+)\(/g, 'log_$1(');
-    out = out.replace(/\bln\(/g, 'log_e(');
+    // Step 3: Insert implicit multiplication and finalize
+    const parts = out.split(' ');
+    const newParts = [];
+    for (let i = 0; i < parts.length; i++) {
+        const current = parts[i];
+        if (current) { newParts.push(current); }
+        if (i < parts.length - 1) {
+            const next = parts[i + 1];
+            if (!current || !next) continue;
+            const isCurrentFactor = !['+', '-', '*', '/', '^', '('].includes(current);
+            const isNextFactor = !['+', '-', '*', '/', '^', ')'].includes(next);
+            if (isCurrentFactor && isNextFactor) { newParts.push('*'); }
+        }
+    }
+    out = newParts.join('');
     out = out.replace(/\*\*+/g, '*');
+
     return out;
 }
 
-function normalizeSuperscripts(s) {
-    // Handle common superscript digits and n
-    const map = {
-        '⁰': '0', '¹': '1', '²': '2', '³': '3', '⁴': '4', '⁵': '5', '⁶': '6', '⁷': '7', '⁸': '8', '⁹': '9',
-        'ⁿ': 'n',
-    };
-    return s.replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹ⁿ]/g, (ch) => map[ch] || ch)
-        .replace(/\)\s*\^\s*\(/g, ')^(');
+export function stripFunctionLhs(s) {
+    const m = s.match(/^[tT]\s*\(\s*[nN]\s*\)\s*=\s*(.*)$/);
+    return m ? m[1].trim() : s;
 }
 
-function stripFunctionLhs(s) {
-    const m = s.match(/^t\s*\(\s*n\s*\)\s*=\s*(.*)$/i);
-    return m ? m[1] : s;
-}
-
-// Tokenizer
+// Tokenizer (no changes needed from original)
 function tokenize(s) {
     const tokens = [];
     let i = 0;
@@ -137,7 +144,6 @@ function tokenize(s) {
             } else if (ident === 'n') {
                 push('n');
             } else if (ident === 'e') {
-                // Euler's number as constant
                 push('number', Math.E);
             } else {
                 throw new Error(`Unknown identifier: ${ident}`);
@@ -153,25 +159,11 @@ function tokenize(s) {
         if (ch === ')') { push('rparen'); i++; continue; }
         throw new Error(`Unexpected character: ${ch}`);
     }
-    // Insert implicit multiplications: number n, n log, ) n, ) log, n n (rare), number ( ...
-    const withImplicit = [];
-    for (let k = 0; k < tokens.length; k++) {
-        withImplicit.push(tokens[k]);
-        if (k < tokens.length - 1) {
-            const a = tokens[k], b = tokens[k + 1];
-            const aType = a.type, bType = b.type;
-            const implicit = (
-                (aType === 'number' && (bType === 'n' || bType === 'log' || bType === 'lparen')) ||
-                (aType === 'n' && (bType === 'n' || bType === 'log' || bType === 'lparen' || bType === 'number')) ||
-                (aType === 'rparen' && (bType === 'n' || bType === 'log' || bType === 'lparen' || bType === 'number')) ||
-                (aType === 'log' && (bType === 'n' || bType === 'log' || bType === 'lparen' || bType === 'number'))
-            );
-            if (implicit) withImplicit.push({ type: 'mul' });
-        }
-    }
-    return withImplicit;
+    return tokens;
 }
 
+
+// --- The rest of the file remains the same ---
 // Parser (recursive descent)
 function parseExpressionFromTokens(tokens) {
     let idx = 0;
@@ -258,7 +250,6 @@ function parseLogBase(ident) {
 
 // Expand AST into sum of products (array of arrays of factors)
 function expandAstToTerms(ast) {
-    // Returns array of FactorNodes[] where a FactorNode is AST node for multiplication
     function expand(node) {
         if (node.kind === 'add') {
             return [...expand(node.left), ...expand(node.right)];
@@ -300,7 +291,6 @@ function simplifyTermProduct(factors) {
     }
 
     function handlePower(baseNode, expNode) {
-        // Cases: n^k, const^n, (const)^const etc.
         if (baseNode.kind === 'n' && isNumberNode(expNode)) {
             term.nExponent += expNode.value;
             return;
@@ -318,21 +308,16 @@ function simplifyTermProduct(factors) {
             addExponential(base, factor);
             return;
         }
-        // log simplifications: log_b(a^x) = x*log_b(a)
         if (isLogNode(baseNode) && baseNode.arg.kind === 'pow' && isNumberNode(baseNode.arg.base)) {
             const a = baseNode.arg.base.value;
             const x = baseNode.arg.exp;
-            // log_b(a^x) => x * log_b(a)
             multiplyCoefficient(Math.log(a) / Math.log(baseNode.base));
             applyFactor(x);
             return;
         }
-        // Fallback: if exponent is number -> evaluate base growth approximately if possible
         if (isNumberNode(expNode)) {
-            // (anything)^constant — treat via multiplication of log/power where possible
             const simplifiedBase = simplifySingleFactor(baseNode);
             if (!simplifiedBase.valid) { term.valid = false; return; }
-            // Multiply base simplified exp times
             term.coefficient *= simplifiedBase.coefficient;
             term.nExponent += simplifiedBase.nExponent * expNode.value;
             term.logExponent += simplifiedBase.logExponent * expNode.value;
@@ -341,7 +326,6 @@ function simplifyTermProduct(factors) {
             }
             return;
         }
-        // If base is number and exponent is log(n) like k*log(n): base^{k*log(n)} = n^{k*log_base(e)} but this is advanced; skip for now
         term.valid = false;
     }
 
@@ -350,7 +334,6 @@ function simplifyTermProduct(factors) {
             term.exponential = { base, nMultiplier };
             return;
         }
-        // Combine: (a^{k1 n})*(b^{k2 n}) = (a^{k1} * b^{k2})^{n}
         const effectiveBase = Math.pow(term.exponential.base, term.exponential.nMultiplier) * Math.pow(base, nMultiplier);
         term.exponential = { base: effectiveBase, nMultiplier: 1 };
     }
@@ -397,29 +380,23 @@ function simplifyTermProduct(factors) {
                 handlePower(node.base, node.exp);
                 break;
             case 'log': {
-                // Simplify common forms: log_b(n^k) = k*log_b(n); log_b(b^x) = x
                 const base = node.base;
                 const arg = node.arg;
                 if (arg.kind === 'pow' && arg.base.kind === 'n' && isNumberNode(arg.exp)) {
-                    // k * log_b(n)
                     multiplyCoefficient(arg.exp.value);
                     target.logExponent += 1;
                 } else if (arg.kind === 'pow' && isNumberNode(arg.base)) {
-                    // log_b(a^x) = x * log_b(a) -> constant * x
                     const c = Math.log(arg.base.value) / Math.log(base);
                     multiplyCoefficient(c);
                     applyFactor(arg.exp);
                 } else if (arg.kind === 'n') {
                     target.logExponent += 1;
                 } else {
-                    // log of something else: treat as O(log n) if arg grows with n, otherwise constant
-                    // Very conservative: assume log(arg) contributes at most log n
                     target.logExponent += 1;
                 }
                 break;
             }
             case 'add':
-                // Should not happen inside a factor in product because we expand first
                 target.valid = false;
                 break;
             default:
@@ -431,7 +408,6 @@ function simplifyTermProduct(factors) {
         if (!term.valid) break;
         applyFactor(f);
     }
-
     return term;
 }
 
@@ -445,7 +421,8 @@ function formatCanonicalTerm(t) {
     }
     if (t.nExponent !== 0) parts.push(`n${formatPower(t.nExponent)}`);
     if (t.logExponent !== 0) parts.push(`(log n)${formatPower(t.logExponent)}`);
-    if (parts.length === 0) return '1';
+    if (parts.length === 0 && t.coefficient === 1) return '1';
+    if (parts.length === 0) return `${formatNumber(t.coefficient)}`;
     return parts.join(' * ');
 }
 
@@ -476,18 +453,19 @@ function formatNumber(x) {
 
 function pickDominantTerm(terms) {
     if (terms.length === 0) return { dominant: makeCanonical(), reason: '' };
-    // Compare terms with the following precedence:
-    // 1) Exponential with base^(k n) dominates non-exponential. Among exponentials, compare base^k.
-    // 2) Higher n exponent dominates.
-    // 3) Higher log exponent dominates.
     let best = null;
     let why = '';
     for (const t of terms) {
+        if (!t.valid) continue;
         if (!best) { best = t; continue; }
         const cmp = compareTerms(t, best);
         if (cmp > 0) best = t;
     }
-    // Reasoning
+
+    if (!best) {
+        return { dominant: { ...makeCanonical(), valid: false }, reason: 'Could not determine dominant term from invalid terms.'}
+    }
+
     if (best.exponential) {
         const eff = Math.pow(best.exponential.base, best.exponential.nMultiplier);
         why = `exponential growth with effective base ${formatNumber(eff)} per n dominates polynomial/logarithmic terms`;
@@ -498,13 +476,13 @@ function pickDominantTerm(terms) {
 }
 
 function compareTerms(a, b) {
-    // return positive if a > b
     const aExp = a.exponential ? Math.pow(a.exponential.base, a.exponential.nMultiplier) : 1;
     const bExp = b.exponential ? Math.pow(b.exponential.base, b.exponential.nMultiplier) : 1;
+    if (aExp > 1 && bExp === 1) return 1;
+    if (bExp > 1 && aExp === 1) return -1;
     if (aExp !== bExp) return aExp > bExp ? 1 : -1;
-    if (!!a.exponential !== !!b.exponential) return a.exponential ? 1 : -1;
+    
     if (a.nExponent !== b.nExponent) return a.nExponent > b.nExponent ? 1 : -1;
     if (a.logExponent !== b.logExponent) return a.logExponent > b.logExponent ? 1 : -1;
-    // Coefficients ignored in Big O
     return 0;
 }
