@@ -38,7 +38,7 @@ const HeapControls = ({
                     <textarea
                         value={heapsortInput}
                         onChange={(e) => setHeapsortInput(e.target.value)}
-                        placeholder="Enter comma-separated values for heapsort"
+                        placeholder="e.g., 88 67 99 22 or 88, 67, 99, 22"
                         rows="3"
                         disabled={isAnimating}
                     />

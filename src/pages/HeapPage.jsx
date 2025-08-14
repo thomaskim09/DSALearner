@@ -27,7 +27,7 @@ const HeapPage = () => {
 
     const handleHeapsort = useCallback(() => {
         if (isAnimationPlaying) return;
-        const array = heapsortInput.split(',').map(n => parseInt(n.trim(), 10)).filter(n => !isNaN(n));
+        const array = heapsortInput.split(/[,\s]+/).map(n => parseInt(n.trim(), 10)).filter(n => !isNaN(n));
         if (array.length > 0) {
             const steps = heapSort(array);
             setAnimation({ type: 'heapSort', steps });
