@@ -25,11 +25,6 @@ const AdvancedSortPage = () => {
 
     return (
         <div className="chapter-page-sort">
-            <header className="sort-header">
-                <h1>Chapter 8: Advanced Sorting</h1>
-                <p>Visualize Shell Sort and Quick Sort. See how different gap sequences affect Shell Sort and how partitioning works in Quick Sort.</p>
-            </header>
-            
             <AdvancedSortControls 
                 sortType={sortType}
                 setSortType={setSortType}

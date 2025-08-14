@@ -26,11 +26,6 @@ const SimpleSortPage = () => {
 
     return (
         <div className="chapter-page-sort">
-            <header className="sort-header">
-                <h1>Chapter 4: Simple Sorting</h1>
-                <p>Visualize classic O(N²) sorting algorithms. Enter a comma-separated list of numbers and press "Sort" to see how they work step by step.</p>
-            </header>
-            
             <SortingControls 
                 sortType={sortType}
                 setSortType={setSortType}

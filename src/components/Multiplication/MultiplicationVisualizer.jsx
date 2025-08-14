@@ -24,7 +24,10 @@ const AlaRusseVisualizer = ({ steps, result, keptValues }) => (
             </tbody>
         </table>
         <div className="sum-equation">
-            {keptValues.map(v => new Intl.NumberFormat().format(BigInt(v))).join(' + ')} = <strong>{new Intl.NumberFormat().format(BigInt(result))}</strong>
+            {keptValues && keptValues.length > 0 
+                ? keptValues.map(v => new Intl.NumberFormat().format(BigInt(v))).join(' + ')
+                : '0'
+            } = <strong>{new Intl.NumberFormat().format(BigInt(result))}</strong>
         </div>
     </div>
 );
@@ -85,8 +88,15 @@ const MultiplicationVisualizer = ({ history, algoType }) => {
         return <div className="visualizer-placeholder">Click "Calculate" to see the steps.</div>;
     }
 
+    // Ensure result exists before proceeding
+    if (!history.result) {
+        return <div className="visualizer-placeholder">Calculation result not available.</div>;
+    }
+
     if (algoType === 'aLaRusse') {
-        return <AlaRusseVisualizer steps={history.steps} result={history.result} keptValues={history.keptValues} />;
+        // Ensure keptValues exists for aLaRusse algorithm
+        const safeKeptValues = history.keptValues || [];
+        return <AlaRusseVisualizer steps={history.steps} result={history.result} keptValues={safeKeptValues} />;
     }
 
     if (algoType === 'divideAndConquer') {

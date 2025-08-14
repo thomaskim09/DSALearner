@@ -64,6 +64,96 @@ body {
     animation: fadeIn 0.4s ease-in-out;
 }
 
+/* Generic Layout Classes - moved from Tree.css */
+.chapter-page {
+    height: calc(100vh - 4rem);
+    display: flex;
+    flex-direction: column;
+}
+
+.interactive-area {
+    display: flex;
+    flex-grow: 1;
+    overflow: hidden;
+    min-height: 0;
+}
+
+.controls-and-visualizer {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--border-color);
+    min-width: 0;
+    min-height: 400px; /* Ensures a minimum height */
+}
+
+.code-display-container {
+    flex: 0 0 450px;
+    background-color: var(--bg-main);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.code-display {
+    background-color: var(--code-bg);
+    color: #f8f8f2;
+    padding: 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.95em;
+    flex-grow: 1;
+}
+
+/* Generic Control Classes - moved from Tree.css */
+.control-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.control-row {
+    display: flex;
+    justify-content: space-around;
+    gap: 10px;
+}
+
+.control-group {
+    display: flex;
+    flex-grow: 1;
+}
+
+.control-group input {
+    flex-grow: 1;
+    padding: 8px 10px;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-interactive);
+    color: var(--text-primary);
+    border-radius: 4px 0 0 4px;
+    outline: none;
+}
+
+.control-group button {
+    padding: 8px 15px;
+    border: none;
+    background-color: var(--button-bg);
+    color: var(--button-text);
+    cursor: pointer;
+    transition: background-color 0.2s;
+    border-radius: 0 4px 4px 0;
+}
+
+.controls-panel {
+    background-color: var(--bg-content);
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -88,57 +178,6 @@ body {
     margin: 0;
     font-size: 1.8rem;
     color: var(--text-primary);
-}
-
-.interactive-area {
-    display: flex;
-    gap: 1.5rem;
-}
-
-.controls-and-visualizer,
-.code-display-container {
-    min-width: 0; /* Prevents flex items from overflowing their container */
-    display: flex;
-}
-
-.controls-and-visualizer {
-    flex-direction: column;
-    gap: 1.5rem; /* Adds space between controls and visualizer */
-    flex: 2; /* Default size ratio */
-}
-
-.code-display-container {
-   flex: 0 0 450px; /* Fixed width */
-}
-
-/* Overrides for pages that need more visualizer space */
-.controls-and-visualizer.large-visualizer {
-    flex: 3;
-}
-.code-display-container.large-code {
-    flex: 2;
-}
-
-
-.controls-panel {
-    background-color: var(--bg-content);
-    padding: 1.5rem;
-    border-radius: 8px;
-    border: 1px solid var(--border-color);
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.code-display {
-    background-color: var(--code-bg);
-    color: #f8f8f2;
-    padding: 1rem;
-    border-radius: 8px;
-    overflow-x: auto;
-    font-family: 'Courier New', Courier, monospace;
-    font-size: 0.95em;
-    flex-grow: 1;
 }
 
 .code-display pre {
