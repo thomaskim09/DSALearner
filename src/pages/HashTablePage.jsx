@@ -2,36 +2,52 @@ import React, { useState, useEffect, useCallback } from 'react';
 import HashTableControls from '../components/HashTable/HashTableControls';
 import HashTableVisualizer from '../components/HashTable/HashTableVisualizer';
 import HashTableCodeDisplay from '../components/HashTable/HashTableCodeDisplay';
-import CalculationTrace from '../components/HashTable/CalculationTrace';
+import HashTableCalculationTrace from '../components/HashTable/HashTableCalculationTrace';
 import TraceLog from '../components/common/TraceLog';
 import { useHashTable } from '../hooks/useHashTable';
 import '../assets/styles/HashTable.css';
+import { isHash2FormulaValid } from '../utils/formulaValidator'; // Import the validator
 
 const HashTablePage = () => {
     const [tableSize, setTableSize] = useState(11);
     const [prime, setPrime] = useState(7);
-    const [collisionStrategy, setCollisionStrategy] = useState('linear-probing');
+    const [collisionStrategy, setCollisionStrategy] = useState('double-hashing');
     const [batchInput, setBatchInput] = useState('148, 498, 224, 212, 156, 138, 36, 448, 669');
     const [chainOrder, setChainOrder] = useState('ascending');
     const [insertedData, setInsertedData] = useState([]);
+    const [hash2Formula, setHash2Formula] = useState('prime - (key % prime)');
 
     const {
         table, runOperation,
         animationSteps, currentStep,
         isPlaying, togglePlay, goToStep, resetAnimation, setTable,
-    } = useHashTable(collisionStrategy, tableSize, prime, chainOrder);
+    } = useHashTable(collisionStrategy, tableSize, prime, chainOrder, hash2Formula);
 
     const [operation, setOperation] = useState('insert');
     const isAnimationPlaying = isPlaying;
 
-    const populateTableFromValues = useCallback((values, strategy, size, p, order = 'ascending') => {
+    // This is the single, safe evaluator function.
+    const evaluateSafeFormula = useCallback((formula, key, p) => {
+        if (!isHash2FormulaValid(formula)) return 1; // Safeguard
+        try {
+            // This is the correct and safe way to evaluate the expression.
+            const result = new Function('key', 'prime', `return ${formula}`)(key, p);
+            const step = Math.abs(Math.floor(result));
+            return step > 0 ? step : 1; // Prevent zero step size, which causes infinite loops.
+        } catch (e) {
+            console.error("Formula evaluation error:", e);
+            return 1; // Default to 1 on any error.
+        }
+    }, []);
+
+    const populateTableFromValues = useCallback((values, strategy, size, p, order, formula) => {
         const newTable = strategy === 'separate-chaining'
             ? Array.from({ length: size }, () => [])
             : Array(size).fill(null);
 
         const localHash = (k) => k % size;
-        const h2 = (primeConst) => (k) => primeConst - (k % primeConst);
-        const doubleHashStep = h2(p);
+        // Use the safe, useCallback-wrapped evaluator here.
+        const h2 = (key, primeValue) => evaluateSafeFormula(formula, key, primeValue);
 
         values.forEach(val => {
             let index = localHash(val);
@@ -46,31 +62,42 @@ const HashTablePage = () => {
                     i++;
                     if (strategy === 'linear-probing') index = (localHash(val) + i) % size;
                     else if (strategy === 'quadratic-probing') index = (localHash(val) + i * i) % size;
-                    else index = (localHash(val) + i * doubleHashStep(val)) % size;
+                    else index = (localHash(val) + i * h2(val, p)) % size; // Correctly call h2
                 }
                 if (newTable[index] === null) newTable[index] = {key: val, isDeleted: false};
             }
         });
         setTable(newTable);
-    }, [setTable]);
+    }, [setTable, evaluateSafeFormula]);
 
     const handleBatchInsert = useCallback(() => {
+        // Prevent batch insert if the formula is invalid.
+        if (collisionStrategy === 'double-hashing' && !isHash2FormulaValid(hash2Formula)) {
+            return;
+        }
         resetAnimation();
         const values = batchInput.split(/[,\s]+/).map(n => parseInt(n.trim(), 10)).filter(n => !isNaN(n));
-        const traceData = values.map(key => ({ key, hash: key % tableSize }));
+        
+        const traceData = values.map(key => ({
+            key,
+            hash: key % tableSize,
+            hash2: collisionStrategy === 'double-hashing' ? evaluateSafeFormula(hash2Formula, key, prime) : null
+        }));
+        
         setInsertedData(traceData);
-        populateTableFromValues(values, collisionStrategy, tableSize, prime, chainOrder);
-    }, [batchInput, collisionStrategy, tableSize, prime, chainOrder, resetAnimation, populateTableFromValues]);
+        populateTableFromValues(values, collisionStrategy, tableSize, prime, chainOrder, hash2Formula);
+    }, [batchInput, collisionStrategy, tableSize, prime, chainOrder, hash2Formula, resetAnimation, populateTableFromValues, evaluateSafeFormula]);
 
     const handleStepHover = (index) => {
         if (animationSteps.length > 0) {
             goToStep(index);
         }
     };
-    
+
+    // This effect runs the batch insert automatically when parameters change.
     useEffect(() => {
         handleBatchInsert();
-    }, [collisionStrategy, tableSize, prime, chainOrder, handleBatchInsert]);
+    }, [collisionStrategy, tableSize, prime, chainOrder, hash2Formula, handleBatchInsert]);
 
 
     return (
@@ -95,27 +122,29 @@ const HashTablePage = () => {
                         onReset={resetAnimation}
                         chainOrder={chainOrder}
                         setChainOrder={setChainOrder}
+                        hash2Formula={hash2Formula}
+                        setHash2Formula={setHash2Formula}
                     />
                 </div>
                 {collisionStrategy === 'double-hashing' && (
-                    <div className="hash-table-calculation-container">
-                        <CalculationTrace insertedData={insertedData} tableSize={tableSize}/>
+                     <div className="hash-table-calculation-container">
+                        <HashTableCalculationTrace insertedData={insertedData} tableSize={tableSize} hash2Formula={hash2Formula} prime={prime} />
                     </div>
                 )}
 
                 <div className="hash-table-visualizer-container">
-                    <HashTableVisualizer 
-                        table={table} 
-                        animationSteps={animationSteps} 
+                    <HashTableVisualizer
+                        table={table}
+                        animationSteps={animationSteps}
                         currentStep={currentStep}
                         strategy={collisionStrategy}
                     />
                 </div>
-                
+
                 <div className="hash-table-tracelog-container">
-                    <TraceLog 
-                        steps={animationSteps} 
-                        onHover={handleStepHover} 
+                    <TraceLog
+                        steps={animationSteps}
+                        onHover={handleStepHover}
                         currentStep={currentStep}
                     />
                 </div>
@@ -126,6 +155,7 @@ const HashTablePage = () => {
                         strategy={collisionStrategy}
                         tableSize={tableSize}
                         prime={prime}
+                        hash2Formula={hash2Formula}
                     />
                 </div>
             </div>

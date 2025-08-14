@@ -10,10 +10,10 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
             </div>
             <nav className="sidebar-nav">
                 <NavLink to="/" end className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Home</NavLink>
-                {/* ADDED THIS LINE FOR CHAPTER 1 */}
                 <NavLink to="/multiplication" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Chapter 1: Multiplication</NavLink>
-                <NavLink to="/asymptotic-notation" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Chapter 2: Asymptotic</NavLink>
+                <NavLink to="/asymptotic-notation" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Chapter 2 - 3: Asymptotic</NavLink>
                 <NavLink to="/simple-sort" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Chapter 4: Simple Sorting</NavLink>
+                <NavLink to="/stack-queue" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Chapter 5: Stacks & Queues</NavLink>
                 <NavLink to="/linked-list" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Chapter 6: Linked Lists</NavLink>
                 <NavLink to="/merge-sort" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Chapter 7: Merge Sort</NavLink>
                 <NavLink to="/advanced-sort" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Chapter 8: Advanced Sort</NavLink>

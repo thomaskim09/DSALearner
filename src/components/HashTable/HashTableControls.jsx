@@ -1,23 +1,39 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { isHash2FormulaValid } from '../../utils/formulaValidator';
 
-const HashTableControls = ({ 
-    onInsert, onFind, onDelete, onBatchInsert, batchInput, setBatchInput, strategy, setStrategy, 
-    prime, setPrime, tableSize, setTableSize, setOperation, 
-    isAnimationActive, onReset, chainOrder, setChainOrder
+const HashTableControls = ({
+    onInsert, onFind, onDelete, onBatchInsert, batchInput, setBatchInput, strategy, setStrategy,
+    prime, setPrime, tableSize, setTableSize, setOperation,
+    isAnimationActive, onReset, chainOrder, setChainOrder,
+    hash2Formula, setHash2Formula
 }) => {
     const [insertValue, setInsertValue] = useState('');
     const [findValue, setFindValue] = useState('');
     const [deleteValue, setDeleteValue] = useState('');
+    const [isFormulaValid, setIsFormulaValid] = useState(true);
+
+    useEffect(() => {
+        if (strategy === 'double-hashing') {
+            setIsFormulaValid(isHash2FormulaValid(hash2Formula));
+        } else {
+            setIsFormulaValid(true);
+        }
+    }, [hash2Formula, strategy]);
 
     const handleAction = (action, value, setValue) => {
-        if (isAnimationActive) onReset();
+        if (isAnimationActive || !isFormulaValid) return;
         const numValue = parseInt(value, 10);
         if (!isNaN(numValue)) {
             action(numValue);
             setValue('');
         }
     };
-    
+
+    const handleBatchInsert = () => {
+        if (!isFormulaValid) return;
+        onBatchInsert();
+    }
+
     return (
         <div className="controls-panel">
             <div className="control-grid">
@@ -35,10 +51,24 @@ const HashTableControls = ({
                     <input id="tablesize-input" type="number" min="1" value={tableSize} onChange={(e) => setTableSize(Math.max(1, parseInt(e.target.value, 10) || 1))} disabled={isAnimationActive}/>
                 </div>
                 {strategy === 'double-hashing' && (
-                    <div className="control-group">
-                        <label htmlFor="prime-input">Double Hash Prime:</label>
-                        <input id="prime-input" type="number" min="1" value={prime} onChange={(e) => setPrime(parseInt(e.target.value, 10) || 1)} disabled={isAnimationActive}/>
-                    </div>
+                    <>
+                        <div className="control-group">
+                            <label htmlFor="prime-input">Double Hash Prime:</label>
+                            <input id="prime-input" type="number" min="1" value={prime} onChange={(e) => setPrime(parseInt(e.target.value, 10) || 1)} disabled={isAnimationActive}/>
+                        </div>
+                        <div className="control-group">
+                            <label htmlFor="hash2-formula-input">Hash Function 2 (hashFunc2):</label>
+                            <input
+                                id="hash2-formula-input"
+                                type="text"
+                                value={hash2Formula}
+                                onChange={(e) => setHash2Formula(e.target.value)}
+                                disabled={isAnimationActive}
+                                placeholder="e.g., prime - (key % prime)"
+                                className={isFormulaValid ? 'valid-formula' : 'invalid-formula'}
+                            />
+                        </div>
+                    </>
                 )}
                 {strategy === 'separate-chaining' && (
                     <div className="control-group">
@@ -52,22 +82,22 @@ const HashTableControls = ({
                 <div className="control-group">
                     <label htmlFor="batch-input">Batch Insert:</label>
                     <textarea id="batch-input" className="batch-input-textarea" value={batchInput} onChange={(e) => setBatchInput(e.target.value)} rows="3" disabled={isAnimationActive} placeholder="e.g., 88 67 99 22 or 88, 67, 99, 22"/>
-                    <button onClick={onBatchInsert} disabled={isAnimationActive} className="batch-insert-btn">Insert All</button>
+                    <button onClick={handleBatchInsert} disabled={isAnimationActive || !isFormulaValid} className="batch-insert-btn">Insert All</button>
                 </div>
 
                 <div className="control-group">
                     <label>Animate Operations:</label>
                     <div className="input-with-button" onFocus={() => setOperation('insert')}>
                         <input id="insert-input" type="number" value={insertValue} onChange={(e) => setInsertValue(e.target.value)} placeholder="Enter value..." disabled={isAnimationActive}/>
-                        <button className="action-btn" onClick={() => handleAction(onInsert, insertValue, setInsertValue)} disabled={insertValue === '' || isAnimationActive}>Insert</button>
+                        <button className="action-btn" onClick={() => handleAction(onInsert, insertValue, setInsertValue)} disabled={insertValue === '' || isAnimationActive || !isFormulaValid}>Insert</button>
                     </div>
                      <div className="input-with-button" onFocus={() => setOperation('find')}>
                         <input id="find-input" type="number" value={findValue} onChange={(e) => setFindValue(e.target.value)} placeholder="Enter value..." disabled={isAnimationActive}/>
-                        <button className="action-btn" onClick={() => handleAction(onFind, findValue, setFindValue)} disabled={findValue === '' || isAnimationActive}>Find</button>
+                        <button className="action-btn" onClick={() => handleAction(onFind, findValue, setFindValue)} disabled={findValue === '' || isAnimationActive || !isFormulaValid}>Find</button>
                     </div>
                      <div className="input-with-button" onFocus={() => setOperation('delete')}>
                         <input id="delete-input" type="number" value={deleteValue} onChange={(e) => setDeleteValue(e.target.value)} placeholder="Enter value..." disabled={isAnimationActive}/>
-                        <button className="action-btn" onClick={() => handleAction(onDelete, deleteValue, setDeleteValue)} disabled={deleteValue === '' || isAnimationActive}>Delete</button>
+                        <button className="action-btn" onClick={() => handleAction(onDelete, deleteValue, setDeleteValue)} disabled={deleteValue === '' || isAnimationActive || !isFormulaValid}>Delete</button>
                     </div>
                 </div>
             </div>

@@ -1,15 +1,16 @@
 import React from 'react';
 
-const HashTableCodeDisplay = ({ operation, strategy, tableSize, prime }) => {
-    const getCodeSnippets = (size, p) => ({
+const HashTableCodeDisplay = ({ operation, strategy, tableSize, prime, hash2Formula }) => { // --- Receive new prop ---
+    const getCodeSnippets = (size, p, formula) => ({ // --- Receive formula ---
         'hashFunc': `// Primary hash function
 public int hashFunc(int key) {
     return key % ${size};
 }`,
+        // --- Updated to be dynamic ---
         'hashFunc2': `// Secondary hash function for double hashing
-// (PRIME must be a prime number smaller than the table size)
 public int hashFunc2(int key) {
-    return ${p} - key % ${p};
+    // Using user-defined formula: ${formula}
+    return ${formula.replace(/\bkey\b/g, 'key').replace(/\bprime\b/g, String(p))};
 }`,
         'linear-probing': {
             insert: `// Inserts an item using linear probing
@@ -69,7 +70,7 @@ public void insert(int key, DataItem item) {
 public DataItem find(int key) {
     int hashVal = hashFunc(key);
     int step = 1;
-    
+
     while(hashArray[hashVal] != null) {
         if(hashArray[hashVal].getKey() == key) {
             return hashArray[hashVal]; // yes, return item
@@ -91,7 +92,7 @@ public DataItem find(int key) {
 public void insert(int key, DataItem item) {
     int hashVal = hashFunc(key);   // hash the key
     int stepSize = hashFunc2(key); // get step size
-    
+
     // until empty cell or -1
     while(hashArray[hashVal] != null && hashArray[hashVal].getKey() != -1) {
         hashVal += stepSize;   // add the step
@@ -150,7 +151,7 @@ public void delete(int key) {
         }
     });
 
-    const snippets = getCodeSnippets(tableSize, prime);
+    const snippets = getCodeSnippets(tableSize, prime, hash2Formula); // Pass formula
     const getCode = () => snippets[strategy]?.[operation] || `// Select an operation to see the code.`;
 
     return (
@@ -158,7 +159,7 @@ public void delete(int key) {
             <h3 className="visualizer-header">Java Implementation</h3>
             <h4>Primary Hash Function:</h4>
             <pre><code>{snippets['hashFunc']}</code></pre>
-            
+
             {strategy === 'double-hashing' && (
                 <>
                     <h4>Secondary Hash Function:</h4>

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { isHash2FormulaValid } from '../utils/formulaValidator';
 
 // A constant representing a deleted item in the hash table
 const DELETED_ITEM = { key: -1, isDeleted: true };
@@ -10,25 +11,50 @@ const createTable = (strategy, size) => {
     return Array(size).fill(null);
 };
 
-export const useHashTable = (strategy, tableSize, prime, chainOrder = 'ascending') => {
+/**
+ * Safely evaluates the user-defined hash formula.
+ * @param {string} formula - The formula to evaluate.
+ * @param {number} key - The key value to use in the formula.
+ * @param {number} prime - The prime number to use in the formula.
+ * @returns {number} The calculated step size, defaulting to 1 on any error.
+ */
+const evaluateHash2 = (formula, key, prime) => {
+    // Final safeguard check, though the UI should prevent invalid formulas.
+    if (!isHash2FormulaValid(formula)) {
+        return 1;
+    }
+    try {
+        const expression = formula.replace(/\bkey\b/g, key).replace(/\bprime\b/g, prime);
+        // Use the Function constructor for safer evaluation than direct eval().
+        const result = new Function(`return ${expression}`)();
+        // Ensure the result is a non-negative integer and at least 1.
+        const step = Math.abs(Math.floor(result));
+        return step > 0 ? step : 1; // A step size of 0 would cause an infinite loop.
+    } catch (error) {
+        console.error("Error evaluating hash formula:", error);
+        return 1; // Default to 1 on any evaluation error.
+    }
+};
+
+export const useHashTable = (strategy, tableSize, prime, chainOrder = 'ascending', hash2Formula = 'prime - (key % prime)') => {
     const [table, setTable] = useState(() => createTable(strategy, tableSize));
     const [animationSteps, setAnimationSteps] = useState([]);
     const [currentStep, setCurrentStep] = useState(0);
     const [isPlaying, setIsPlaying] = useState(false);
-    
+
     const initialTableState = useRef(createTable(strategy, tableSize));
     const timeoutRef = useRef(null);
 
-    // This effect now correctly resets the table state only when parameters change.
+    // Effect to reset the table state when parameters change.
     useEffect(() => {
         setTable(createTable(strategy, tableSize));
         if (timeoutRef.current) clearTimeout(timeoutRef.current);
         setAnimationSteps([]);
         setCurrentStep(0);
         setIsPlaying(false);
-    }, [strategy, tableSize]);
+    }, [strategy, tableSize, prime, hash2Formula]);
 
-    // Animation player effect
+    // Effect to handle the animation playback.
     useEffect(() => {
         if (!isPlaying || currentStep >= animationSteps.length) {
             setIsPlaying(false);
@@ -44,9 +70,9 @@ export const useHashTable = (strategy, tableSize, prime, chainOrder = 'ascending
         }, delay);
         return () => clearTimeout(timeoutRef.current);
     }, [isPlaying, currentStep, animationSteps]);
-    
+
     const hash = (key) => key % tableSize;
-    const hash2 = (key) => prime - (key % prime);
+    const hash2 = (key) => evaluateHash2(hash2Formula, key, prime);
 
     const startAnimation = (steps) => {
         initialTableState.current = JSON.parse(JSON.stringify(table));
@@ -54,7 +80,7 @@ export const useHashTable = (strategy, tableSize, prime, chainOrder = 'ascending
         setCurrentStep(0);
         setIsPlaying(true);
     };
-    
+
     const goToStep = (step) => {
         if (step < 0 || step >= animationSteps.length) return;
         setIsPlaying(false);
@@ -65,7 +91,7 @@ export const useHashTable = (strategy, tableSize, prime, chainOrder = 'ascending
         setTable(latestTableState);
         setCurrentStep(step);
     }
-    
+
     const togglePlay = () => {
         if (currentStep >= animationSteps.length && !isPlaying) {
              goToStep(0);
@@ -74,7 +100,7 @@ export const useHashTable = (strategy, tableSize, prime, chainOrder = 'ascending
             setIsPlaying(!isPlaying);
         }
     };
-    
+
     const resetAnimation = useCallback(() => {
         if (timeoutRef.current) clearTimeout(timeoutRef.current);
         setAnimationSteps([]);
@@ -82,11 +108,11 @@ export const useHashTable = (strategy, tableSize, prime, chainOrder = 'ascending
         setIsPlaying(false);
     }, []);
 
-    // --- Generic Probing Logic ---
+    // Generic probing logic for open addressing.
     const probe = (key, probingFn, action) => {
         const initialIndex = hash(key);
         const steps = [{ index: initialIndex, message: `Initial hash for key ${key}: ${key} % ${tableSize} = ${initialIndex}` }];
-        
+
         const currentTable = table;
         let i = 0;
         while (i < tableSize) {
@@ -125,7 +151,7 @@ export const useHashTable = (strategy, tableSize, prime, chainOrder = 'ascending
         return steps;
     };
 
-    // --- Operation Implementations ---
+    // Main function to run operations based on the selected strategy.
     const runOperation = (key, action) => {
         let steps = [];
         const linearProbeFn = (index, i) => ({
@@ -140,7 +166,7 @@ export const useHashTable = (strategy, tableSize, prime, chainOrder = 'ascending
             probeIndex: (index + i * hash2(k)) % tableSize,
             message: `Probing with step size ${hash2(k)}: (${index} + ${i} * ${hash2(k)}) % ${tableSize} = ${(index + i * hash2(k)) % tableSize}`
         });
-        
+
         switch (strategy) {
             case 'linear-probing':
                 steps = probe(key, linearProbeFn, action);
@@ -150,7 +176,7 @@ export const useHashTable = (strategy, tableSize, prime, chainOrder = 'ascending
                 break;
             case 'double-hashing':
                 steps = probe(key, doubleHashFn, action);
-                steps.splice(1, 0, { index: hash(key), message: `Second hash for step size: ${prime} - (${key} % ${prime}) = ${hash2(key)}` });
+                steps.splice(1, 0, { index: hash(key), message: `Step size from formula "${hash2Formula}": ${hash2(key)}` });
                 break;
             case 'separate-chaining':
                 {
@@ -188,4 +214,4 @@ export const useHashTable = (strategy, tableSize, prime, chainOrder = 'ascending
     };
 
     return { table, setTable, runOperation, animationSteps, currentStep, isPlaying, togglePlay, goToStep, resetAnimation };
-};
+};  

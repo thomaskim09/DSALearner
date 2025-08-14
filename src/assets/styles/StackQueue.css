@@ -1,0 +1,115 @@
+.stack-queue-page .interactive-area-sq {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 1.5rem;
+    height: 100%;
+}
+
+.controls-and-visualizer-sq {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    min-height: 0;
+}
+
+.tracelog-and-code-sq {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    min-height: 0;
+}
+
+.tracelog-and-code-sq .tracelog-container {
+    height: 50%;
+}
+
+.tracelog-and-code-sq .code-display {
+    height: 50%;
+}
+
+.stack-queue-visualizer {
+    flex-grow: 1;
+    background-color: var(--bg-content);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+}
+
+.sq-array {
+    display: flex;
+    width: 100%;
+    height: 80px;
+    border: 2px solid var(--border-color);
+}
+
+.sq-cell {
+    width: 10%; /* 10 cells for 100% width */
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    background-color: var(--bg-main);
+    transition: background-color 0.3s ease;
+}
+
+.sq-cell:last-child {
+    border-right: none;
+}
+
+.sq-cell-value {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5em;
+    font-weight: bold;
+    color: var(--text-primary);
+}
+
+.sq-cell-index {
+    text-align: center;
+    padding: 4px;
+    font-size: 0.8em;
+    background-color: var(--bg-interactive);
+    color: var(--text-secondary);
+    border-top: 1px solid var(--border-color);
+}
+
+.sq-pointers {
+    position: relative;
+    height: 40px;
+    margin-top: 10px;
+}
+
+.sq-pointer {
+    position: absolute;
+    bottom: 0;
+    transform: translateX(-50%);
+    background-color: var(--accent-color);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    font-weight: bold;
+    transition: left 0.4s ease-in-out;
+}
+
+.sq-pointer::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 6px;
+    border-style: solid;
+    border-color: var(--accent-color) transparent transparent transparent;
+}
+
+/* Highlight styles */
+.sq-cell.comparing { background-color: #ffc107; } /* Amber */
+.sq-cell.shifting { background-color: #2196F3; } /* Blue */
+.sq-cell.inserting { background-color: #4caf50; } /* Green */
+.sq-cell.removing { background-color: #f44336; } /* Red */
