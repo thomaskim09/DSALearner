@@ -10,6 +10,7 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
             </div>
             <nav className="sidebar-nav">
                 <NavLink to="/" end className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Home</NavLink>
+                <NavLink to="/asymptotic-notation" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Chapter 2: Asymptotic</NavLink>
                 <NavLink to="/simple-sort" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Chapter 4: Simple Sorting</NavLink>
                 <NavLink to="/linked-list" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Chapter 6: Linked Lists</NavLink>
                 <NavLink to="/tree" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Chapter 9: Trees</NavLink>

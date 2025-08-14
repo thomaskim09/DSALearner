@@ -7,6 +7,7 @@ import LinkedListPage from './pages/LinkedListPage';
 import HashTablePage from './pages/HashTablePage';
 import SimpleSortPage from './pages/SimpleSortPage';
 import HeapPage from './pages/HeapPage';
+import AsymptoticNotationPage from './pages/AsymptoticNotationPage';
 import './App.css';
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
         <main className="content-area">
           <Routes>
             <Route path="/" element={<HomePage />} />
+            <Route path="/asymptotic-notation" element={<AsymptoticNotationPage />} />
             <Route path="/simple-sort" element={<SimpleSortPage />} />
             <Route path="/tree" element={<TreePage />} />
             <Route path="/linked-list" element={<LinkedListPage />} />
