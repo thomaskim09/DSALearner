@@ -13,6 +13,7 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
                 <NavLink to="/asymptotic-notation" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Chapter 2: Asymptotic</NavLink>
                 <NavLink to="/simple-sort" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Chapter 4: Simple Sorting</NavLink>
                 <NavLink to="/linked-list" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Chapter 6: Linked Lists</NavLink>
+                <NavLink to="/merge-sort" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Chapter 7: Merge Sort</NavLink> {/* Added link */}
                 <NavLink to="/tree" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Chapter 9: Trees</NavLink>
                 <NavLink to="/hash-table" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Chapter 10: Hash Tables</NavLink>
                 <NavLink to="/heap" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Chapter 11: Heaps</NavLink>

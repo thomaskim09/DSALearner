@@ -152,6 +152,11 @@
     background-color: #6a5acd;
 }
 
+.highlight-third {
+    background-color: #6a5acd !important; 
+    font-weight: bold;
+}
+
 .sorting-table .cell.sorted-bubble,
 .sorting-table .cell.sorted-selection,
 .sorting-table .cell.sorted-insertion-section {
