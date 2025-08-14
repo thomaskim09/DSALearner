@@ -26,17 +26,24 @@ const TreeVisualizer = ({ root, getTreeHeight, animationSteps, animationType, st
     const NODE_RADIUS = 25;
     const FONT_SIZE = 14;
     const LEVEL_HEIGHT = 90;
-    const HORIZONTAL_GAP_MULTIPLIER = 30;
+    const HORIZONTAL_GAP_MULTIPLIER = 22; // Increased from 30 to 80 for better spacing
 
     const layout = useMemo(() => {
         const positions = new Map();
+        
         function calcPos(node, x, y, level) {
             if (!node) return;
             positions.set(node.id, { x, y });
-            const dynamicGap = Math.pow(1.6, getTreeHeight(root) - level - 1) * HORIZONTAL_GAP_MULTIPLIER;
+            
+            // Calculate dynamic gap based on tree depth and level
+            const depth = getTreeHeight(root);
+            const levelFactor = Math.max(1, depth - level);
+            const dynamicGap = Math.pow(1.8, levelFactor) * HORIZONTAL_GAP_MULTIPLIER;
+            
             if (node.left) calcPos(node.left, x - dynamicGap, y + LEVEL_HEIGHT, level + 1);
             if (node.right) calcPos(node.right, x + dynamicGap, y + LEVEL_HEIGHT, level + 1);
         }
+        
         if (root) calcPos(root, 0, 0, 0);
         return { positions };
     }, [root, getTreeHeight]);
@@ -44,11 +51,33 @@ const TreeVisualizer = ({ root, getTreeHeight, animationSteps, animationType, st
     // ✨ FIX: Center tree on initial load
     useEffect(() => {
         const viewport = viewportRef.current;
-        if (viewport) {
+        if (viewport && root) {
             const { width, height } = viewport.getBoundingClientRect();
-            setViewMatrix({ x: width / 2, y: height * 0.1, zoom: 1 });
+            
+            // Calculate tree bounds to center it properly
+            let minX = Infinity, maxX = -Infinity;
+            layout.positions.forEach(pos => {
+                minX = Math.min(minX, pos.x);
+                maxX = Math.max(maxX, pos.x);
+            });
+            
+            const treeWidth = maxX - minX;
+            const centerX = width / 2 - (minX + maxX) / 2;
+            const centerY = height * 0.2; // Start a bit lower from top
+            
+            // Calculate appropriate zoom level to fit the tree
+            const padding = 100; // Extra space around the tree
+            const scaleX = (width - padding) / Math.max(treeWidth, 100);
+            const scaleY = (height - padding) / (getTreeHeight(root) * LEVEL_HEIGHT);
+            const autoZoom = Math.min(scaleX, scaleY, 1); // Don't zoom in beyond 1x
+            
+            setViewMatrix({ 
+                x: centerX, 
+                y: centerY, 
+                zoom: Math.max(0.3, autoZoom) // Minimum zoom of 0.3x
+            });
         }
-    }, []);
+    }, [root, layout.positions]);
 
     const handleMouseDown = (e) => {
         setIsPanning(true);
