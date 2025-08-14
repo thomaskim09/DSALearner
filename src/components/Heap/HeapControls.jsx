@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { RefreshIcon, TrashIcon } from '../common/Icons';
 
 const HeapControls = ({
-    onInsert, onRemove, onClear, onRefresh, isAnimating, setOperation
+    onInsert, onRemove, onClear, onRefresh, isAnimating, setOperation,
+    heapsortInput, setHeapsortInput, onHeapsort
 }) => {
     const [insertValue, setInsertValue] = useState('');
 
@@ -32,6 +33,16 @@ const HeapControls = ({
                 </div>
                 <div className="control-group" onMouseEnter={() => setOperation('remove')}>
                     <button onClick={onRemove} disabled={isAnimating}>Remove Max</button>
+                </div>
+                <div className="control-group" onMouseEnter={() => setOperation('heapSort')}>
+                    <textarea
+                        value={heapsortInput}
+                        onChange={(e) => setHeapsortInput(e.target.value)}
+                        placeholder="Enter comma-separated values for heapsort"
+                        rows="3"
+                        disabled={isAnimating}
+                    />
+                    <button onClick={onHeapsort} disabled={isAnimating || heapsortInput.trim() === ''}>Heapsort</button>
                 </div>
             </div>
         </div>

@@ -3,7 +3,7 @@ import React from 'react';
 const HeapCodeDisplay = ({ operation }) => {
     const codeSnippets = {
         insert: `// Inserts a new node into the heap.
-[cite_start]// Complexity: O(log n) [cite: 234]
+// Complexity: O(log n) [cite: 234]
 public boolean insert(int key) {
     if(currentSize == maxSize)
         return false;
@@ -24,7 +24,7 @@ public void trickleUp(int index) {
     heapArray[index] = bottom;
 }`,
         remove: `// Removes the maximum node (the root).
-[cite_start]// Complexity: O(log n) [cite: 234]
+// Complexity: O(log n) [cite: 234]
 public Node remove() {
     Node root = heapArray[0];
     heapArray[0] = heapArray[--currentSize];
@@ -52,6 +52,27 @@ public void trickleDown(int index) {
     }
     heapArray[index] = top;
 }`,
+        heapSort: `// Sorts an array using heapsort.
+// Complexity: O(n log n) [cite: 259]
+public void heapSort(int[] array) {
+    int n = array.length;
+
+    // Build heap (rearrange array)
+    for (int i = n / 2 - 1; i >= 0; i--) {
+        trickleDown(i, n);
+    }
+
+    // One by one extract an element from heap
+    for (int i = n - 1; i > 0; i--) {
+        // Move current root to end
+        int temp = array[0];
+        array[0] = array[i];
+        array[i] = temp;
+
+        // call max heapify on the reduced heap
+        trickleDown(0, i);
+    }
+}`
     };
 
     return (
