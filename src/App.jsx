@@ -11,7 +11,8 @@ import AsymptoticNotationPage from './pages/AsymptoticNotationPage';
 import MergeSortPage from './pages/MergeSortPage';
 import AdvancedSortPage from './pages/AdvancedSortPage';
 import MultiplicationPage from './pages/MultiplicationPage';
-import StackQueuePage from './pages/StackQueuePage'; // 1. IMPORT THE NEW PAGE
+import StackQueuePage from './pages/StackQueuePage';
+import GraphsPage from './pages/GraphsPage'; 
 import './App.css';
 
 function App() {
@@ -31,13 +32,14 @@ function App() {
             <Route path="/multiplication" element={<MultiplicationPage />} />
             <Route path="/asymptotic-notation" element={<AsymptoticNotationPage />} />
             <Route path="/simple-sort" element={<SimpleSortPage />} />
-            <Route path="/stack-queue" element={<StackQueuePage />} /> {/* 2. ADD THE ROUTE */}
+            <Route path="/stack-queue" element={<StackQueuePage />} />
             <Route path="/linked-list" element={<LinkedListPage />} />
             <Route path="/merge-sort" element={<MergeSortPage />} />
             <Route path="/advanced-sort" element={<AdvancedSortPage />} />
             <Route path="/tree" element={<TreePage />} />
             <Route path="/hash-table" element={<HashTablePage />} />
             <Route path="/heap" element={<HeapPage />} />
+            <Route path="/graphs" element={<GraphsPage />} /> 
           </Routes>
         </main>
       </div>

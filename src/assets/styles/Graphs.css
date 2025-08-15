@@ -1,0 +1,144 @@
+.graphs-page .interactive-area {
+    display: grid;
+    grid-template-columns: 3fr 1fr;
+    gap: 1.5rem;
+    height: 100%;
+}
+
+.graphs-main-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    min-height: 0;
+    min-width: 0; 
+}
+
+.graphs-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    min-height: 0;
+}
+
+.graphs-visualizer-container {
+    flex-grow: 1;
+    background-color: var(--bg-content);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    position: relative;
+    overflow: auto; /* Allow this container to scroll if content overflows */
+    cursor: grab;
+}
+
+.graphs-visualizer-container.is-panning {
+    cursor: grabbing;
+}
+
+.graphs-sidebar .tracelog-container,
+.graphs-sidebar .code-display {
+    height: 50%;
+}
+
+.graphs-sidebar .code-display {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.graphs-sidebar .code-display pre {
+    flex-grow: 1;
+    overflow-y: auto;
+    margin: 0;
+    padding: 0 1.5rem 1.5rem 1.5rem;
+}
+
+.graph-vertex {
+    fill: var(--node-primary);
+    stroke: var(--bg-content);
+    stroke-width: 2;
+    transition: fill 0.3s ease;
+}
+
+.graph-vertex.visited {
+    fill: var(--accent-color);
+}
+
+.graph-vertex.current {
+    stroke: yellow;
+    stroke-width: 3;
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0% { r: 20; }
+  50% { r: 22; }
+  100% { r: 20; }
+}
+
+
+.graph-vertex-label {
+    text-anchor: middle;
+    fill: white;
+    font-weight: bold;
+    pointer-events: none;
+    user-select: none;
+}
+
+.graph-edge {
+    stroke: var(--border-color);
+    stroke-width: 2;
+    transition: stroke 0.3s ease, stroke-width 0.3s ease;
+}
+
+.graph-edge.active {
+    stroke: yellow;
+    stroke-width: 4;
+}
+
+.graph-edge.mst-edge {
+    stroke: var(--node-highlight-bg); /* Green */
+    stroke-width: 5;
+}
+
+/* Adjacency Matrix Styles */
+.adjacency-matrix-container {
+    overflow: auto;
+}
+
+.adjacency-matrix {
+    width: 100%;
+    border-collapse: collapse;
+    color: var(--text-primary);
+}
+
+.adjacency-matrix th,
+.adjacency-matrix td {
+    border: 1px solid var(--border-color);
+    padding: 0.75rem;
+    text-align: center;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1.2rem;
+    transition: background-color 0.3s ease;
+}
+
+.adjacency-matrix th {
+    background-color: var(--bg-main);
+    color: var(--accent-color);
+}
+
+/* --- NEW styles for matrix highlighting --- */
+.adjacency-matrix .highlight-row > th,
+.adjacency-matrix .highlight-header {
+    background-color: var(--accent-color);
+    color: white;
+}
+
+.adjacency-matrix .highlight-cell {
+    background-color: var(--node-highlight-bg); /* Green */
+    color: black;
+    font-weight: bold;
+}
+
+.adjacency-matrix tr.highlight-row > td {
+    background-color: #3a3a3a; /* A subtle highlight for the row being checked */
+}
