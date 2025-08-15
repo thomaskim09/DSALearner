@@ -7,7 +7,7 @@ import { useHeap } from '../hooks/useHeap';
 import '../assets/styles/Heap.css';
 
 const HeapPage = () => {
-    const { heap, setHeap, insert, remove, clear, refreshHeap, getHeapHeight, heapSort, change, reheap } = useHeap();
+    const { heap, setHeap, insert, remove, clear, refreshHeap, getHeapHeight, heapSort, change, heapifyAndGetSteps } = useHeap();
     const [operation, setOperation] = useState('insert');
     const [animation, setAnimation] = useState(null);
     const [currentStep, setCurrentStep] = useState(0);
@@ -51,7 +51,7 @@ const HeapPage = () => {
 
         setHistory(prevHistory => [...prevHistory, {
             heap: finalHeapState,
-            message: `${op.name} operation complete.`,
+            message: `${op.name.replace('AndGetSteps', '')} operation complete.`,
             sortedCount: 0,
         }]);
 
@@ -60,7 +60,7 @@ const HeapPage = () => {
         setIsPlaying(true);
         setOperation(op.name);
 
-    }, [isAnimationPlaying, insert, remove, change, reheap]);
+    }, [isAnimationPlaying, insert, remove, change, heapifyAndGetSteps]);
 
     const handleHeapsort = useCallback(() => {
         if (isAnimationPlaying) return;
@@ -110,7 +110,7 @@ const HeapPage = () => {
                         onInsert={(val) => handleOperation(insert, val)}
                         onRemove={() => handleOperation(remove)}
                         onChange={(oldVal, newVal) => handleOperation(change, oldVal, newVal)}
-                        onReheap={() => handleOperation(reheap)}
+                        onHeapify={() => handleOperation(heapifyAndGetSteps)}
                         onClear={clear}
                         onRefresh={refreshHeap}
                         isAnimating={isAnimationPlaying}
