@@ -7,26 +7,65 @@ import { useHeap } from '../hooks/useHeap';
 import '../assets/styles/Heap.css';
 
 const HeapPage = () => {
-    const { heap, insert, remove, clear, refreshHeap, getHeapHeight, heapSort } = useHeap();
+    const { heap, setHeap, insert, remove, clear, refreshHeap, getHeapHeight, heapSort, change } = useHeap();
     const [operation, setOperation] = useState('insert');
     const [animation, setAnimation] = useState(null);
     const [currentStep, setCurrentStep] = useState(0);
     const [isPlaying, setIsPlaying] = useState(false);
-    const [heapsortInput, setHeapsortInput] = useState('35, 22, 40, 10, 8, 60, 50');
+    const [heapsortInput, setHeapsortInput] = useState('');
+    const [visualizationMode, setVisualizationMode] = useState('tree');
+    const [history, setHistory] = useState([]);
 
     const isAnimationPlaying = isPlaying;
 
-    const handleOperation = useCallback((op, value) => {
+    // This effect syncs the UI (input field, history) with the hook's state.
+    // It runs on initial load and when the heap is refreshed via the hook.
+    useEffect(() => {
+        if (heap && heap.length > 0) {
+            setHistory([{
+                heap: [...heap],
+                message: 'Initial State',
+                sortedCount: 0
+            }]);
+            setHeapsortInput(heap.join(', '));
+        } else {
+            setHistory([]);
+            setHeapsortInput('');
+        }
+    }, [heap]);
+
+    const handleInputChange = (newInput) => {
+        setHeapsortInput(newInput);
+        const array = newInput.split(/[,\s]+/).map(n => parseInt(n.trim(), 10)).filter(n => !isNaN(n));
+        setHeap(array); // Directly update the hook's state. The useEffect above handles the rest.
+    };
+
+    const handleOperation = useCallback((op, ...args) => {
         if (isAnimationPlaying) return;
-        const steps = value !== undefined ? op(value) : op();
+        setAnimation(null);
+
+        const steps = op(...args);
+        
+        if (!steps || steps.length === 0) return;
+        
+        const finalHeapState = steps[steps.length - 1].heap;
+
+        setHistory(prevHistory => [...prevHistory, {
+            heap: finalHeapState,
+            message: `${op.name} operation complete.`,
+            sortedCount: 0,
+        }]);
+
         setAnimation({ type: op.name, steps });
         setCurrentStep(0);
         setIsPlaying(true);
         setOperation(op.name);
-    }, [isAnimationPlaying]);
+
+    }, [isAnimationPlaying, insert, remove, change]);
 
     const handleHeapsort = useCallback(() => {
         if (isAnimationPlaying) return;
+        setAnimation(null);
         const array = heapsortInput.split(/[,\s]+/).map(n => parseInt(n.trim(), 10)).filter(n => !isNaN(n));
         if (array.length > 0) {
             const steps = heapSort(array);
@@ -34,6 +73,7 @@ const HeapPage = () => {
             setCurrentStep(0);
             setIsPlaying(true);
             setOperation('heapSort');
+            setHistory(steps);
         }
     }, [isAnimationPlaying, heapsortInput, heapSort]);
 
@@ -66,31 +106,34 @@ const HeapPage = () => {
     return (
         <div className="chapter-page heap-page">
             <div className="interactive-area">
-                <div className="heap-left-column">
-                    <div className="heap-controls-container">
-                        <HeapControls
-                            onInsert={(val) => handleOperation(insert, val)}
-                            onRemove={() => handleOperation(remove)}
-                            onClear={clear}
-                            onRefresh={refreshHeap}
-                            isAnimating={isAnimationPlaying}
-                            setOperation={setOperation}
-                            heapsortInput={heapsortInput}
-                            setHeapsortInput={setHeapsortInput}
-                            onHeapsort={handleHeapsort}
-                        />
-                    </div>
-                    <div className="heap-visualizer-container">
-                        <HeapVisualizer
-                            heap={animation?.steps[currentStep]?.heap || heap}
-                            getHeapHeight={getHeapHeight}
-                            animation={animation}
-                            currentStep={currentStep}
-                            sortedCount={animation?.steps[currentStep]?.sortedCount || 0}
-                            operationType={animation?.type}
-                            highlights={animation?.steps[currentStep]?.highlights}
-                        />
-                    </div>
+                <div className="heap-controls-container">
+                    <HeapControls
+                        onInsert={(val) => handleOperation(insert, val)}
+                        onRemove={() => handleOperation(remove)}
+                        onChange={(oldVal, newVal) => handleOperation(change, oldVal, newVal)}
+                        onClear={clear}
+                        onRefresh={refreshHeap}
+                        isAnimating={isAnimationPlaying}
+                        setOperation={setOperation}
+                        heapsortInput={heapsortInput}
+                        setHeapsortInput={handleInputChange}
+                        onHeapsort={handleHeapsort}
+                        visualizationMode={visualizationMode}
+                        setVisualizationMode={setVisualizationMode}
+                    />
+                </div>
+                <div className="heap-visualizer-container">
+                    <HeapVisualizer
+                        heap={animation?.steps[currentStep]?.heap || heap}
+                        getHeapHeight={getHeapHeight}
+                        animation={animation}
+                        currentStep={currentStep}
+                        sortedCount={animation?.steps[currentStep]?.sortedCount || 0}
+                        operationType={animation?.type}
+                        highlights={animation?.steps[currentStep]?.highlights}
+                        visualizationMode={visualizationMode}
+                        history={history}
+                    />
                 </div>
                 <div className="heap-tracelog-container">
                      <TraceLog

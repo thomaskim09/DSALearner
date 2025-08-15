@@ -4,109 +4,147 @@ export const useHeap = () => {
     const [heap, setHeap] = useState([]);
 
     const loadDummyData = useCallback(() => {
-        // Creates a valid heap from the start
-        setHeap([80, 50, 70, 20, 40, 60, 25]);
+        // Use the specified default array
+        const initialArray = [8, 56, 44, 89, 32, 69, 98, 10, 20, 100, 80, 77];
+        const n = initialArray.length;
+
+        // Heapify the array to ensure it's a valid max heap
+        for (let i = Math.floor(n / 2) - 1; i >= 0; i--) {
+            heapify(initialArray, n, i);
+        }
+        setHeap(initialArray);
     }, []);
+
+    // Helper function for heapifying, used internally
+    const heapify = (arr, n, i) => {
+        let largest = i;
+        const left = 2 * i + 1;
+        const right = 2 * i + 2;
+
+        if (left < n && arr[left] > arr[largest]) {
+            largest = left;
+        }
+
+        if (right < n && arr[right] > arr[largest]) {
+            largest = right;
+        }
+
+        if (largest !== i) {
+            [arr[i], arr[largest]] = [arr[largest], arr[i]];
+            heapify(arr, n, largest);
+        }
+    };
+
 
     useEffect(() => {
         loadDummyData();
     }, [loadDummyData]);
 
-    const insert = (value) => {
+    const insert = useCallback((value) => {
         const steps = [];
         const newHeap = [...heap, value];
         let currentIndex = newHeap.length - 1;
-        let parentIndex = Math.floor((currentIndex - 1) / 2);
-
-        steps.push({ heap: [...newHeap], highlights: { inserted: currentIndex }, message: `Inserting ${value} at the end of the heap.` });
-
-        while (currentIndex > 0 && newHeap[currentIndex] > newHeap[parentIndex]) {
-            steps.push({ heap: [...newHeap], highlights: { comparing: [currentIndex, parentIndex] }, message: `${newHeap[currentIndex]} is greater than parent ${newHeap[parentIndex]}. Swapping.` });
-            [newHeap[currentIndex], newHeap[parentIndex]] = [newHeap[parentIndex], newHeap[currentIndex]];
-            steps.push({ heap: [...newHeap], highlights: { swapped: [currentIndex, parentIndex] }, message: `Swapped.` });
-            currentIndex = parentIndex;
-            parentIndex = Math.floor((currentIndex - 1) / 2);
-        }
-        steps.push({ heap: [...newHeap], highlights: { final: currentIndex }, message: `Node ${value} is in its correct position.` });
-        setHeap(newHeap);
+        steps.push({ heap: [...newHeap], highlights: { inserted: currentIndex }, message: `Inserting ${value}.` });
+        trickleUp(newHeap, currentIndex, steps);
+        setHeap(newHeap); // Update the hook's own state
         return steps;
-    };
+    }, [heap]); // Depend on heap
 
-    const remove = () => {
-        if (heap.length === 0) return [];
+    const remove = useCallback(() => {
+        if (heap.length === 0) return [{ heap: [], message: 'Heap is empty.' }];
         const steps = [];
-        const newHeap = [...heap];
+        let newHeap = [...heap];
         const removedValue = newHeap[0];
+        
         steps.push({ heap: [...newHeap], highlights: { removing: 0 }, message: `Removing root ${removedValue}.` });
+        
         const lastValue = newHeap.pop();
-
+        
         if (newHeap.length > 0) {
             newHeap[0] = lastValue;
-            steps.push({ heap: [...newHeap], highlights: { swapped: [0, newHeap.length] }, message: `Replacing with last element ${lastValue}.` });
-
             trickleDown(newHeap, 0, newHeap.length, steps);
         }
-        setHeap(newHeap);
+        
+        setHeap(newHeap); // Update the hook's own state
+        steps.push({ heap: [...newHeap], message: `Removal of ${removedValue} complete.` });
         return steps;
-    };
+    }, [heap]);
+    
+    const change = useCallback((oldValue, newValue) => {
+        const steps = [];
+        const index = heap.indexOf(oldValue);
+        if (index === -1) {
+            steps.push({ heap: [...heap], message: `Value ${oldValue} not found.` });
+            return steps;
+        }
+        const newHeap = [...heap];
+        newHeap[index] = newValue;
+        steps.push({ heap: [...newHeap], message: `Changed ${oldValue} to ${newValue}. Re-heapifying.` });
+        if (newValue > oldValue) {
+            trickleUp(newHeap, index, steps);
+        } else {
+            trickleDown(newHeap, index, newHeap.length, steps);
+        }
+        setHeap(newHeap); // Update the hook's own state
+        return steps;
+    }, [heap]);
 
     const heapSort = (inputArray) => {
-        const steps = [];
         const arr = [...inputArray];
-        const n = arr.length;
+        let n = arr.length;
+        const history = [];
 
-        // Build heap
-        steps.push({ heap: [...arr], sortedCount: 0, message: 'Initial array. Building max heap.' });
+        history.push({ heap: [...inputArray], sortedCount: 0, message: 'Original unsorted array.' });
+
         for (let i = Math.floor(n / 2) - 1; i >= 0; i--) {
-            trickleDown(arr, i, n, steps, true);
+            heapify(arr, n, i);
         }
-        steps.push({ heap: [...arr], sortedCount: 0, message: 'Heap built. Now starting sort.' });
 
-        // Sort
         for (let i = n - 1; i > 0; i--) {
-            steps.push({ heap: [...arr], sortedCount: n - 1 - i, highlights: { swapping: [0, i] }, message: `Swapping max element ${arr[0]} with end of heap.` });
             [arr[0], arr[i]] = [arr[i], arr[0]];
-            steps.push({ heap: [...arr], sortedCount: n - i, highlights: { swapped: [0, i] }, message: `Max element moved to sorted position. Re-heapifying.` });
-            trickleDown(arr, 0, i, steps);
+            heapify(arr, i, 0);
+            history.push({ 
+                heap: [...arr], 
+                sortedCount: n - i, 
+                message: `Pass ${n - i}: Max element ${arr[i]} moved to sorted position.`
+            });
         }
-
-        steps.push({ heap: [...arr], sortedCount: n, message: 'Array is sorted.' });
-        return steps;
+         history.push({ heap: [...arr], sortedCount: n, message: 'Array is fully sorted.' });
+        return history;
     };
-
 
     const clear = () => setHeap([]);
     const refreshHeap = () => loadDummyData();
     const getHeapHeight = (index) => index < heap.length ? 1 + Math.max(getHeapHeight(2 * index + 1), getHeapHeight(2 * index + 2)) : 0;
 
-    return { heap, insert, remove, clear, refreshHeap, getHeapHeight, heapSort };
+    return { heap, setHeap, insert, remove, clear, refreshHeap, getHeapHeight, heapSort, change };
 };
 
-function trickleDown(heap, index, heapSize, steps, isBuilding = false) {
+function trickleUp(heap, index, steps) {
     let currentIndex = index;
-    const top = heap[currentIndex];
-    if (!isBuilding) {
-        steps.push({ heap: [...heap], sortedCount: heap.length - heapSize, highlights: { processing: currentIndex }, message: `Trickling down ${top}.` });
+    let parentIndex = Math.floor((currentIndex - 1) / 2);
+    while (currentIndex > 0 && heap[currentIndex] > heap[parentIndex]) {
+        [heap[currentIndex], heap[parentIndex]] = [heap[parentIndex], heap[currentIndex]];
+        steps.push({ heap: [...heap], highlights: { swapped: [currentIndex, parentIndex] }, message: `Trickling up ${heap[parentIndex]}.` });
+        currentIndex = parentIndex;
+        parentIndex = Math.floor((currentIndex - 1) / 2);
     }
+}
 
+function trickleDown(heap, index, heapSize, steps) {
+    let currentIndex = index;
     while (currentIndex < Math.floor(heapSize / 2)) {
         let leftChildIndex = 2 * currentIndex + 1;
         let rightChildIndex = 2 * currentIndex + 2;
         let largerChildIndex = leftChildIndex;
-
         if (rightChildIndex < heapSize && heap[rightChildIndex] > heap[leftChildIndex]) {
             largerChildIndex = rightChildIndex;
         }
-
-        steps.push({ heap: [...heap], sortedCount: heap.length - heapSize, highlights: { comparing: [currentIndex, largerChildIndex] }, message: `Comparing ${heap[currentIndex]} with larger child ${heap[largerChildIndex]}.` });
-
         if (heap[currentIndex] >= heap[largerChildIndex]) {
-            steps.push({ heap: [...heap], sortedCount: heap.length - heapSize, highlights: { final: currentIndex }, message: `${heap[currentIndex]} is in correct position.` });
             break;
         }
-
         [heap[currentIndex], heap[largerChildIndex]] = [heap[largerChildIndex], heap[currentIndex]];
-        steps.push({ heap: [...heap], sortedCount: heap.length - heapSize, highlights: { swapped: [currentIndex, largerChildIndex] }, message: 'Swapped.' });
+        steps.push({ heap: [...heap], highlights: { swapped: [currentIndex, largerChildIndex] }, message: `Trickling down ${heap[largerChildIndex]}.` });
         currentIndex = largerChildIndex;
     }
 }

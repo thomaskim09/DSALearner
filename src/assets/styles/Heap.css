@@ -2,37 +2,32 @@
 
 .heap-page .interactive-area {
     display: grid;
-    grid-template-columns: 600px 400px 450px;
+    grid-template-columns: 300px 700px 350px 450px; /* 4-column layout */
     gap: 1.5rem;
     align-items: stretch;
-    min-width: 1500px;
+    min-width: 1700px; /* Adjusted min-width for the new layout */
     height: 100%;
-}
-
-.heap-left-column {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    min-height: 0;
 }
 
 .heap-controls-container,
 .heap-tracelog-container,
-.heap-code-container {
+.heap-code-container,
+.heap-visualizer-container {
     display: flex;
     flex-direction: column;
+    min-height: 0; /* Prevent flex children from overflowing */
 }
 
-.heap-tracelog-container {
-    flex-grow: 1;
+.heap-tracelog-container,
+.heap-code-container {
     overflow: hidden; /* This will contain the scrolling of the child */
 }
 
-.heap-tracelog-container .tracelog-container {
+.heap-tracelog-container .tracelog-container,
+.heap-code-container .code-display {
     width: 100%;
     height: 100%;
 }
-
 
 .heap-visualizer-container {
     flex-grow: 1;
@@ -95,4 +90,24 @@
   color: var(--text-primary);
   border-radius: 4px;
   cursor: pointer;
+}
+
+/* Styles for the table visualization */
+.heap-visualizer-container .visualizer-wrapper {
+    overflow-x: auto;
+    width: 100%;
+    height: 100%;
+}
+
+.heap-visualizer-container .sorting-table {
+    table-layout: auto;
+    width: 100%;
+}
+
+.heap-visualizer-container .sorting-table th,
+.heap-visualizer-container .sorting-table td {
+    padding: 4px 6px; /* Reduced padding */
+    min-width: 35px;
+    font-size: 0.9em;
+    text-align: center;
 }
