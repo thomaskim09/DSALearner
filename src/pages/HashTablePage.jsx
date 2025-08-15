@@ -126,11 +126,9 @@ const HashTablePage = () => {
                         setHash2Formula={setHash2Formula}
                     />
                 </div>
-                {collisionStrategy === 'double-hashing' && (
-                     <div className="hash-table-calculation-container">
-                        <HashTableCalculationTrace insertedData={insertedData} tableSize={tableSize} hash2Formula={hash2Formula} prime={prime} />
-                    </div>
-                )}
+                <div className="hash-table-calculation-container">
+                    <HashTableCalculationTrace insertedData={insertedData} tableSize={tableSize} hash2Formula={hash2Formula} prime={prime} />
+                </div>
 
                 <div className="hash-table-visualizer-container">
                     <HashTableVisualizer
