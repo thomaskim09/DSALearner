@@ -35,3 +35,37 @@
 .sorting-table .cell.highlight-new-sorted {
     box-shadow: inset 0 0 5px 2px yellow;
 }
+
+/* NEW styles for pivot table layout */
+.sort-tables-container {
+    display: flex;
+    gap: 1.5rem; /* Creates space between the tables */
+    align-items: flex-start;
+}
+
+.sorting-table {
+    flex-grow: 1; /* Allows the main table to take available space */
+}
+
+.pivot-table {
+    border-collapse: collapse;
+    font-size: 1em;
+}
+
+.pivot-table th, .pivot-table td {
+    border: 1px solid var(--border-color);
+    padding: 8px;
+    text-align: center;
+}
+
+.pivot-table th {
+    background-color: var(--bg-main);
+    color: var(--accent-color);
+    font-weight: bold;
+}
+
+.pivot-cell {
+    background-color: var(--bg-interactive);
+    color: var(--text-primary);
+    font-weight: bold;
+}

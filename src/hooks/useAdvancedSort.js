@@ -21,7 +21,7 @@ export const useAdvancedSort = () => {
     return { history, sort };
 };
 
-// --- Shell Sort (Correct) ---
+// --- Shell Sort (Unchanged) ---
 function shellSort(inputArray, sequenceType) {
     const arr = [...inputArray];
     const n = arr.length;
@@ -46,7 +46,7 @@ function shellSort(inputArray, sequenceType) {
             h = Math.floor(h / 2);
         }
     }
-    
+
     for (const h of gaps) {
         for (let i = h; i < n; i++) {
             let temp = arr[i];
@@ -71,7 +71,7 @@ function shellSort(inputArray, sequenceType) {
 }
 
 
-// --- Quick Sort (Final Version) ---
+// --- Quick Sort (Final Version from you, with one addition per history push) ---
 function quickSort(inputArray) {
     const arr = [...inputArray];
     const history = [{
@@ -80,9 +80,6 @@ function quickSort(inputArray) {
     const sorted = new Set();
 
     recQuickSort(arr, 0, arr.length - 1, history, sorted);
-    
-    // **THE FIX IS HERE:** The redundant block that added the extra row has been removed.
-    // The recursion now correctly produces the final sorted state as its last step.
 
     return history;
 }
@@ -93,7 +90,7 @@ function recQuickSort(arr, left, right, history, sorted) {
             sorted.add(left);
             history.push({
                 array: [...arr],
-                highlights: { sortedIndices: [...sorted], newlySortedIndex: left },
+                highlights: { sortedIndices: [...sorted], newlySortedIndex: left, pivotValue: arr[left] }, // Added pivotValue
                 message: `Index ${left} fixed. Value ${arr[left]} is sorted.`
             });
         }
@@ -106,7 +103,7 @@ function recQuickSort(arr, left, right, history, sorted) {
     sorted.add(pivotIndex);
     history.push({
         array: [...arr],
-        highlights: { sortedIndices: [...sorted], newlySortedIndex: pivotIndex },
+        highlights: { sortedIndices: [...sorted], newlySortedIndex: pivotIndex, pivotValue: pivotValue }, // Added pivotValue
         message: `Pivot ${pivotValue} placed at index ${pivotIndex}.`
     });
 
@@ -124,13 +121,13 @@ function partitionIt(arr, left, right) {
         while (rightPtr > 0 && arr[--rightPtr] > pivot);
 
         if (leftPtr >= rightPtr) {
-            break; 
+            break;
         } else {
             [arr[leftPtr], arr[rightPtr]] = [arr[rightPtr], arr[leftPtr]];
         }
     }
 
     [arr[leftPtr], arr[right]] = [arr[right], arr[leftPtr]];
-    
+
     return leftPtr;
 }
