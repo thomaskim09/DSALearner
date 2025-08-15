@@ -89,6 +89,21 @@ export const useHeap = () => {
         return steps;
     }, [heap]);
 
+    const reheap = useCallback(() => {
+        const steps = [];
+        const newHeap = [...heap];
+        const n = newHeap.length;
+        steps.push({ heap: [...newHeap], message: 'Starting heapify process.' });
+
+        for (let i = Math.floor(n / 2) - 1; i >= 0; i--) {
+            heapify(newHeap, n, i);
+        }
+        
+        steps.push({ heap: [...newHeap], message: 'Array has been rearranged into a valid max heap.' });
+        setHeap(newHeap);
+        return steps;
+    }, [heap]);
+
     const heapSort = (inputArray) => {
         const arr = [...inputArray];
         let n = arr.length;
@@ -117,7 +132,7 @@ export const useHeap = () => {
     const refreshHeap = () => loadDummyData();
     const getHeapHeight = (index) => index < heap.length ? 1 + Math.max(getHeapHeight(2 * index + 1), getHeapHeight(2 * index + 2)) : 0;
 
-    return { heap, setHeap, insert, remove, clear, refreshHeap, getHeapHeight, heapSort, change };
+    return { heap, setHeap, insert, remove, clear, refreshHeap, getHeapHeight, heapSort, change, reheap };
 };
 
 function trickleUp(heap, index, steps) {

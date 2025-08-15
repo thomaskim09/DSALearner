@@ -7,7 +7,7 @@ import { useHeap } from '../hooks/useHeap';
 import '../assets/styles/Heap.css';
 
 const HeapPage = () => {
-    const { heap, setHeap, insert, remove, clear, refreshHeap, getHeapHeight, heapSort, change } = useHeap();
+    const { heap, setHeap, insert, remove, clear, refreshHeap, getHeapHeight, heapSort, change, reheap } = useHeap();
     const [operation, setOperation] = useState('insert');
     const [animation, setAnimation] = useState(null);
     const [currentStep, setCurrentStep] = useState(0);
@@ -18,8 +18,7 @@ const HeapPage = () => {
 
     const isAnimationPlaying = isPlaying;
 
-    // This effect syncs the UI (input field, history) with the hook's state.
-    // It runs on initial load and when the heap is refreshed via the hook.
+    // Syncs the UI (input field, history) with the hook's state.
     useEffect(() => {
         if (heap && heap.length > 0) {
             setHistory([{
@@ -37,7 +36,7 @@ const HeapPage = () => {
     const handleInputChange = (newInput) => {
         setHeapsortInput(newInput);
         const array = newInput.split(/[,\s]+/).map(n => parseInt(n.trim(), 10)).filter(n => !isNaN(n));
-        setHeap(array); // Directly update the hook's state. The useEffect above handles the rest.
+        setHeap(array); 
     };
 
     const handleOperation = useCallback((op, ...args) => {
@@ -61,7 +60,7 @@ const HeapPage = () => {
         setIsPlaying(true);
         setOperation(op.name);
 
-    }, [isAnimationPlaying, insert, remove, change]);
+    }, [isAnimationPlaying, insert, remove, change, reheap]);
 
     const handleHeapsort = useCallback(() => {
         if (isAnimationPlaying) return;
@@ -111,6 +110,7 @@ const HeapPage = () => {
                         onInsert={(val) => handleOperation(insert, val)}
                         onRemove={() => handleOperation(remove)}
                         onChange={(oldVal, newVal) => handleOperation(change, oldVal, newVal)}
+                        onReheap={() => handleOperation(reheap)}
                         onClear={clear}
                         onRefresh={refreshHeap}
                         isAnimating={isAnimationPlaying}

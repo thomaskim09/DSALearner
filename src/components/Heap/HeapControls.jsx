@@ -4,7 +4,7 @@ import { RefreshIcon, TrashIcon } from '../common/Icons';
 const HeapControls = ({
     onInsert, onRemove, onClear, onRefresh, isAnimating, setOperation,
     heapsortInput, setHeapsortInput, onHeapsort, onChange,
-    visualizationMode, setVisualizationMode
+    visualizationMode, setVisualizationMode, onReheap
 }) => {
     const [insertValue, setInsertValue] = useState('');
     const [oldValue, setOldValue] = useState('');
@@ -68,6 +68,9 @@ const HeapControls = ({
                         disabled={isAnimating}
                     />
                     <button onClick={handleChange} disabled={isAnimating || oldValue === '' || newValue === ''}>Change</button>
+                </div>
+                 <div className="control-group">
+                    <button onClick={onReheap} disabled={isAnimating}>Rearrange to Heap</button>
                 </div>
                 <div className="control-group" onMouseEnter={() => setOperation('heapSort')}>
                     <textarea
