@@ -28,13 +28,27 @@ const GraphsPage = () => {
 
     useEffect(() => {
         if (animation.steps.length > 0) {
-            const sequence = animation.steps
-                .slice(0, currentStep + 1)
-                .filter(step => step.type === 'visit' || step.type === 'start' || step.type === 'dequeue')
-                .map(step => graph.vertexList[step.vertexIndex].label);
+            let sequence = [];
+            if (operation === 'mst') {
+                // For MST, create pairs of vertex labels for each edge
+                sequence = animation.steps
+                    .slice(0, currentStep + 1)
+                    .filter(step => step.type === 'add_edge')
+                    .map(step => {
+                        const fromLabel = graph.vertexList[step.from].label;
+                        const toLabel = graph.vertexList[step.to].label;
+                        return `${fromLabel}${toLabel}`;
+                    });
+            } else {
+                // For DFS and BFS, create a sequence of visited vertices
+                sequence = animation.steps
+                    .slice(0, currentStep + 1)
+                    .filter(step => step.type === 'visit' || step.type === 'start' || step.type === 'dequeue')
+                    .map(step => graph.vertexList[step.vertexIndex].label);
+            }
             setTraversalSequence(sequence);
         }
-    }, [currentStep, animation.steps, graph.vertexList]);
+    }, [currentStep, animation.steps, graph.vertexList, operation]);
 
 
     return (
