@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useGraph } from '../hooks/useGraph';
 import GraphsControls from '../components/Graphs/GraphsControls';
 import GraphsVisualizer from '../components/Graphs/GraphsVisualizer';
@@ -7,9 +7,11 @@ import TraceLog from '../components/common/TraceLog';
 import '../assets/styles/Graphs.css';
 
 const GraphsPage = () => {
-    const { graph, animation, dfs, bfs, mst, setAnimation } = useGraph();
+    const { graph, animation, runAlgorithm, setAnimation } = useGraph();
     const [operation, setOperation] = useState('dfs');
+    const [startVertex, setStartVertex] = useState(0);
     const [currentStep, setCurrentStep] = useState(0);
+    const [traversalSequence, setTraversalSequence] = useState([]);
     const [visualizationMode, setVisualizationMode] = useState('graph');
 
     const handleStepHover = (index) => {
@@ -17,13 +19,23 @@ const GraphsPage = () => {
     };
 
     const handleRunAlgorithm = (algo) => {
-        setAnimation({ steps: [], isPlaying: false }); // Clear previous animation
+        setAnimation({ steps: [], isPlaying: false });
+        setTraversalSequence([]);
         setCurrentStep(0);
         setOperation(algo);
-        if (algo === 'dfs') dfs();
-        else if (algo === 'bfs') bfs();
-        else if (algo === 'mst') mst();
+        runAlgorithm(algo, startVertex);
     };
+
+    useEffect(() => {
+        if (animation.steps.length > 0) {
+            const sequence = animation.steps
+                .slice(0, currentStep + 1)
+                .filter(step => step.type === 'visit' || step.type === 'start' || step.type === 'dequeue')
+                .map(step => graph.vertexList[step.vertexIndex].label);
+            setTraversalSequence(sequence);
+        }
+    }, [currentStep, animation.steps, graph.vertexList]);
+
 
     return (
         <div className="chapter-page graphs-page">
@@ -34,6 +46,9 @@ const GraphsPage = () => {
                         isAnimating={animation.isPlaying}
                         visualizationMode={visualizationMode}
                         setVisualizationMode={setVisualizationMode}
+                        vertexList={graph.vertexList}
+                        startVertex={startVertex}
+                        setStartVertex={setStartVertex}
                     />
                     <GraphsVisualizer
                         graph={graph}
@@ -44,6 +59,7 @@ const GraphsPage = () => {
                         setIsPlaying={(val) => setAnimation(a => ({ ...a, isPlaying: val }))}
                         visualizationMode={visualizationMode}
                         operation={operation}
+                        traversalSequence={traversalSequence}
                     />
                 </div>
                 <div className="graphs-sidebar">

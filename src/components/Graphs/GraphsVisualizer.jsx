@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 
+// ... (AdjacencyMatrix component remains the same)
 const AdjacencyMatrix = ({ graph, animationStep }) => {
     const currentVertex = animationStep?.vertexIndex ?? animationStep?.from ?? animationStep?.to;
     const fromVertex = animationStep?.from;
@@ -38,8 +39,8 @@ const AdjacencyMatrix = ({ graph, animationStep }) => {
 };
 
 
-const GraphsVisualizer = ({ graph, animationSteps, currentStep, setCurrentStep, isPlaying, setIsPlaying, visualizationMode, operation }) => {
-    // ... (The rest of the component remains the same)
+const GraphsVisualizer = ({ graph, animationSteps, currentStep, setCurrentStep, isPlaying, setIsPlaying, visualizationMode, operation, traversalSequence }) => {
+    // ... (rest of the component logic is unchanged)
     const { vertexList, adjMat } = graph;
     const [viewMatrix, setViewMatrix] = useState({ x: 200, y: 250, zoom: 1 });
     const [isPanning, setIsPanning] = useState(false);
@@ -98,12 +99,19 @@ const GraphsVisualizer = ({ graph, animationSteps, currentStep, setCurrentStep, 
     );
 
     if (visualizationMode === 'table') {
-        return <AdjacencyMatrix graph={graph} animationStep={currentAnimationStep} />;
+        return (
+             <div className="visualizer-wrapper with-footer">
+                <AdjacencyMatrix graph={graph} animationStep={currentAnimationStep} />
+                <div className="traversal-sequence">
+                    <strong>Output:</strong> {traversalSequence.join(' → ')}
+                </div>
+            </div>
+        )
     }
 
     return (
         <div
-            className={`graphs-visualizer-container ${isPanning ? 'is-panning' : ''}`}
+            className="graphs-visualizer-container"
             ref={viewportRef}
             onMouseDown={handleMouseDown}
             onMouseUp={handleMouseUp}
@@ -113,6 +121,7 @@ const GraphsVisualizer = ({ graph, animationSteps, currentStep, setCurrentStep, 
         >
             <svg width="100%" height="100%">
                 <g transform={`translate(${viewMatrix.x}, ${viewMatrix.y}) scale(${viewMatrix.zoom})`}>
+                    {/* ... (SVG rendering logic is unchanged) ... */}
                     {adjMat.map((row, i) =>
                         row.map((col, j) => {
                             if (col === 1 && i < j) {
@@ -149,8 +158,13 @@ const GraphsVisualizer = ({ graph, animationSteps, currentStep, setCurrentStep, 
                     })}
                 </g>
             </svg>
-             <div className="visualizer-status-message">
-                {currentAnimationStep?.message || 'Select an algorithm to run.'}
+             <div className="visualizer-footer">
+                <div className="visualizer-status-message">
+                    {currentAnimationStep?.message || 'Select an algorithm to run.'}
+                </div>
+                <div className="traversal-sequence">
+                    <strong>Output:</strong> {traversalSequence.join(' → ')}
+                </div>
             </div>
         </div>
     );

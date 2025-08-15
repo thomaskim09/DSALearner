@@ -4,10 +4,11 @@ const GraphsCodeDisplay = ({ operation }) => {
     const snippets = {
         dfs: {
             title: "Java Implementation (DFS)",
-            code: `public void dfs() { // depth-first search
-    vertexList[0].wasVisited = true;
-    displayVertex(0);
-    theStack.push(0);
+            code: `// Start vertex is now a parameter
+public void dfs(int startVertex) {
+    vertexList[startVertex].wasVisited = true;
+    displayVertex(startVertex);
+    theStack.push(startVertex);
 
     while (!theStack.isEmpty()) {
         int v = getAdjUnvisitedVertex(theStack.peek());
@@ -24,10 +25,11 @@ const GraphsCodeDisplay = ({ operation }) => {
         },
         bfs: {
             title: "Java Implementation (BFS)",
-            code: `public void bfs() { // breadth-first search
-    vertexList[0].wasVisited = true;
-    displayVertex(0);
-    theQueue.insert(0);
+            code: `// Start vertex is now a parameter
+public void bfs(int startVertex) {
+    vertexList[startVertex].wasVisited = true;
+    displayVertex(startVertex);
+    theQueue.insert(startVertex);
     int v2;
 
     while(!theQueue.isEmpty()) {
@@ -43,9 +45,10 @@ const GraphsCodeDisplay = ({ operation }) => {
         },
         mst: {
             title: "Java Implementation (MST)",
-            code: `public void mst() { // minimum spanning tree
-    vertexList[0].wasVisited = true;
-    theStack.push(0);
+            code: `// Start vertex is now a parameter
+public void mst(int startVertex) {
+    vertexList[startVertex].wasVisited = true;
+    theStack.push(startVertex);
 
     while(!theStack.isEmpty()) {
         int currentVertex = theStack.peek();
@@ -56,8 +59,8 @@ const GraphsCodeDisplay = ({ operation }) => {
             vertexList[v].wasVisited = true;
             theStack.push(v);
             
-            displayVertex(currentVertex); // from
-            displayVertex(v);             // to
+            displayVertex(currentVertex);
+            displayVertex(v);
             System.out.print(" ");
         }
     }

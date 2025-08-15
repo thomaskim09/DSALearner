@@ -142,3 +142,41 @@
 .adjacency-matrix tr.highlight-row > td {
     background-color: #3a3a3a; /* A subtle highlight for the row being checked */
 }
+
+.visualizer-footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 10px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+.traversal-sequence {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+.visualizer-wrapper.with-footer {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.visualizer-wrapper.with-footer .adjacency-matrix-container {
+    flex-grow: 1;
+}
+
+.visualizer-wrapper.with-footer .traversal-sequence {
+    flex-shrink: 0;
+    padding: 1rem;
+    background-color: var(--bg-main);
+    border-top: 1px solid var(--border-color);
+    text-align: center;
+}
