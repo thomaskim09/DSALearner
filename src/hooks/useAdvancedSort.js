@@ -21,7 +21,7 @@ export const useAdvancedSort = () => {
     return { history, sort };
 };
 
-// --- Shell Sort (Unchanged) ---
+// --- Shell Sort (Corrected to track changes) ---
 function shellSort(inputArray, sequenceType) {
     const arr = [...inputArray];
     const n = arr.length;
@@ -39,7 +39,7 @@ function shellSort(inputArray, sequenceType) {
             gaps.push(h);
             h = Math.floor((h - 1) / 3);
         }
-    } else {
+    } else { // Original Shell sequence
         let h = Math.floor(n / 2);
         while (h > 0) {
             gaps.push(h);
@@ -48,6 +48,9 @@ function shellSort(inputArray, sequenceType) {
     }
 
     for (const h of gaps) {
+        const arrayBeforePass = [...arr]; // Snapshot of the array before this pass
+        
+        // Perform the sorting pass
         for (let i = h; i < n; i++) {
             let temp = arr[i];
             let j = i;
@@ -57,9 +60,18 @@ function shellSort(inputArray, sequenceType) {
             }
             arr[j] = temp;
         }
+
+        // Compare the array before and after to find which indices changed
+        const changedIndices = [];
+        for (let k = 0; k < n; k++) {
+            if (arr[k] !== arrayBeforePass[k]) {
+                changedIndices.push(k);
+            }
+        }
+
         history.push({
             array: [...arr],
-            highlights: { gap: h },
+            highlights: { gap: h, changedIndices: changedIndices },
             message: `After h=${h} pass. Elements ${h} positions apart are sorted.`
         });
     }
@@ -71,7 +83,7 @@ function shellSort(inputArray, sequenceType) {
 }
 
 
-// --- Quick Sort (Final Version from you, with one addition per history push) ---
+// --- Quick Sort ---
 function quickSort(inputArray) {
     const arr = [...inputArray];
     const history = [{
@@ -90,7 +102,7 @@ function recQuickSort(arr, left, right, history, sorted) {
             sorted.add(left);
             history.push({
                 array: [...arr],
-                highlights: { sortedIndices: [...sorted], newlySortedIndex: left, pivotValue: arr[left] }, // Added pivotValue
+                highlights: { sortedIndices: [...sorted], newlySortedIndex: left, pivotValue: arr[left] },
                 message: `Index ${left} fixed. Value ${arr[left]} is sorted.`
             });
         }
@@ -103,7 +115,7 @@ function recQuickSort(arr, left, right, history, sorted) {
     sorted.add(pivotIndex);
     history.push({
         array: [...arr],
-        highlights: { sortedIndices: [...sorted], newlySortedIndex: pivotIndex, pivotValue: pivotValue }, // Added pivotValue
+        highlights: { sortedIndices: [...sorted], newlySortedIndex: pivotIndex, pivotValue: pivotValue },
         message: `Pivot ${pivotValue} placed at index ${pivotIndex}.`
     });
 

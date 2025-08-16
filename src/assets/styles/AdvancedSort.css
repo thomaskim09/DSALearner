@@ -25,6 +25,11 @@
     color: black;
 }
 
+.sorting-table .cell.highlight-changed {
+    background-color: #ab47bc; /* Purple Lighten-1 */
+    color: white;
+}
+
 /* NEW: permanent sorted cell style */
 .sorting-table .cell.sorted-bubble {
     background-color: #4caf50; /* Green */

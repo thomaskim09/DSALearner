@@ -40,7 +40,7 @@ const AdvancedSortPage = () => {
                     <AdvancedSortVisualizer history={history} sortType={sortType} />
                 </div>
                 <div className="code-display-container-sort">
-                    <AdvancedSortCodeDisplay sortType={sortType} />
+                    <AdvancedSortCodeDisplay sortType={sortType} shellSequence={shellSequence} />
                 </div>
             </div>
         </div>

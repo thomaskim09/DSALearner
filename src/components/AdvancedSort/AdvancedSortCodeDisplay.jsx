@@ -1,9 +1,10 @@
 import React from 'react';
 
-const AdvancedSortCodeDisplay = ({ sortType }) => {
+const AdvancedSortCodeDisplay = ({ sortType, shellSequence }) => {
     const snippets = {
         shell: {
-            code: `// Shellsort using Knuth's interval sequence
+            knuth: {
+                code: `// Shellsort using Knuth's interval sequence
 public void shellSort() {
     int inner, outer;
     long temp;
@@ -24,7 +25,29 @@ public void shellSort() {
         h = (h-1) / 3; // decrease h
     }
 }`,
-            complexity: "O(N^(3/2)) or O(N^(5/4))"
+                complexity: "O(N^(3/2)) or O(N^(5/4))"
+            },
+            shell: {
+                code: `// Shellsort using original N/2 sequence
+public void shellSort() {
+    int inner, outer;
+    long temp;
+    int h = nElems / 2; // start with half the array size
+    while(h > 0) {
+        for(outer=h; outer<nElems; outer++) {
+            temp = theArray[outer];
+            inner = outer;
+            while(inner > h-1 && theArray[inner-h] >= temp) {
+                theArray[inner] = theArray[inner-h];
+                inner -= h;
+            }
+            theArray[inner] = temp;
+        }
+        h /= 2; // decrease h
+    }
+}`,
+                complexity: "O(N²)"
+            }
         },
         quick: {
             code: `// Quicksort using rightmost element as pivot
@@ -58,7 +81,7 @@ public int partitionIt(int left, int right, long pivot) {
         },
     };
 
-    const info = snippets[sortType];
+    const info = sortType === 'shell' ? snippets.shell[shellSequence] : snippets.quick;
     const sortName = sortType.charAt(0).toUpperCase() + sortType.slice(1);
 
     return (

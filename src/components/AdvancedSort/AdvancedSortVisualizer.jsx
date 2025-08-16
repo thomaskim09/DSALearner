@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 const AdvancedSortVisualizer = ({ history, sortType }) => {
     const [activeMessage, setActiveMessage] = useState('');
+    const [hoveredCell, setHoveredCell] = useState({ passIndex: -1, cellIndex: -1 });
 
     useEffect(() => {
         if (history && history.length > 0) {
@@ -17,6 +18,14 @@ const AdvancedSortVisualizer = ({ history, sortType }) => {
 
     const finalMessage = history.length > 0 ? history[history.length - 1].message : 'Hover over a pass to see details.';
 
+    const handleMouseOver = (passIndex, cellIndex) => {
+        setHoveredCell({ passIndex, cellIndex });
+    };
+
+    const handleMouseOut = () => {
+        setHoveredCell({ passIndex: -1, cellIndex: -1 });
+    };
+
     return (
         <div className="visualizer-wrapper">
             <div className="sort-tables-container">
@@ -29,21 +38,29 @@ const AdvancedSortVisualizer = ({ history, sortType }) => {
                             ))}
                         </tr>
                     </thead>
-                    <tbody onMouseLeave={() => setActiveMessage(finalMessage)}>
+                    <tbody onMouseLeave={() => { setActiveMessage(finalMessage); handleMouseOut(); }}>
                         {history.map((step, passIndex) => (
                             <tr key={passIndex} onMouseEnter={() => setActiveMessage(step.message)}>
-                                <td>{passIndex}</td>
+                                <td>{step.highlights.gap ? `h=${step.highlights.gap}` : passIndex}</td>
                                 {step.array.map((value, cellIndex) => {
                                     let classNames = 'cell';
                                     const { highlights } = step;
 
-                                    if (highlights.sorted) {
-                                        classNames += ' sorted-bubble';
-                                    } else if (sortType === 'shell' && highlights.gap) {
-                                        if (cellIndex % highlights.gap === (passIndex % highlights.gap)) {
-                                        classNames += ' highlight-shell-gap';
+                                    if (sortType === 'shell' && highlights.gap) {
+                                        const isHovered = hoveredCell.passIndex === passIndex && hoveredCell.cellIndex === cellIndex;
+                                        const isCompared = hoveredCell.passIndex === passIndex && (
+                                            hoveredCell.cellIndex - highlights.gap === cellIndex ||
+                                            hoveredCell.cellIndex + highlights.gap === cellIndex
+                                        );
+                                        
+                                        // Prioritize hover effect
+                                        if (isHovered || isCompared) {
+                                            classNames += ' highlight-shell-gap';
+                                        } else if (highlights.changedIndices?.includes(cellIndex)) {
+                                            classNames += ' highlight-changed';
                                         }
-                                    }  else if (sortType === 'quick') {
+
+                                    } else if (sortType === 'quick') {
                                         if (Array.isArray(highlights.sortedIndices) && highlights.sortedIndices.includes(cellIndex)) {
                                             classNames += ' sorted-bubble';
                                         }
@@ -58,7 +75,16 @@ const AdvancedSortVisualizer = ({ history, sortType }) => {
                                         if (highlights.swapping?.includes(cellIndex)) classNames += ' highlight-swap';
                                     }
                                     
-                                    return <td key={cellIndex} className={classNames}>{value}</td>;
+                                    return (
+                                        <td 
+                                            key={cellIndex} 
+                                            className={classNames}
+                                            onMouseOver={() => handleMouseOver(passIndex, cellIndex)}
+                                            onMouseOut={handleMouseOut}
+                                        >
+                                            {value}
+                                        </td>
+                                    );
                                 })}
                             </tr>
                         ))}
