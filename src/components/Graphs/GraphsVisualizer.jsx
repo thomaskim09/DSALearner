@@ -1,3 +1,5 @@
+// DSALearner_packaged/src/components/Graphs/GraphsVisualizer.jsx
+
 import React, { useEffect, useState, useRef } from 'react';
 
 // ... (AdjacencyMatrix component remains the same)
@@ -41,7 +43,7 @@ const AdjacencyMatrix = ({ graph, animationStep }) => {
 
 const GraphsVisualizer = ({ graph, animationSteps, currentStep, setCurrentStep, isPlaying, setIsPlaying, visualizationMode, operation, traversalSequence }) => {
     // ... (rest of the component logic is unchanged)
-    const { vertexList, adjMat } = graph;
+    const { vertexList, adjMat, positions } = graph;
     const [viewMatrix, setViewMatrix] = useState({ x: 200, y: 250, zoom: 1 });
     const [isPanning, setIsPanning] = useState(false);
     const lastMousePosition = useRef({ x: 0, y: 0 });
@@ -78,13 +80,6 @@ const GraphsVisualizer = ({ graph, animationSteps, currentStep, setCurrentStep, 
         const newZoom = e.deltaY < 0 ? viewMatrix.zoom * zoomFactor : viewMatrix.zoom / zoomFactor;
         setViewMatrix(prev => ({...prev, zoom: Math.max(0.2, Math.min(newZoom, 3))}));
     };
-
-
-    const positions = [
-        { x: 50, y: 200 }, { x: 150, y: 100 }, { x: 150, y: 200 },
-        { x: 150, y: 300 }, { x: 150, y: 400 }, { x: 250, y: 100 },
-        { x: 250, y: 300 }, { x: 350, y: 100 }, { x: 350, y: 300 }
-    ];
 
     const currentAnimationStep = animationSteps[currentStep];
     const visitedIndices = new Set(

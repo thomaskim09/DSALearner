@@ -1,4 +1,7 @@
+// DSALearner_packaged/src/hooks/useGraph.js
+
 import { useState, useCallback } from 'react';
+import { graphData } from '../utils/graphData';
 
 class Vertex {
     constructor(label) {
@@ -7,32 +10,26 @@ class Vertex {
     }
 }
 
-export const useGraph = () => {
-    const [graph, setGraph] = useState(() => {
-        const MAX_VERTS = 20;
-        const adjMat = Array.from({ length: MAX_VERTS }, () => Array(MAX_VERTS).fill(0));
-        const vertexList = [];
+const MAX_VERTS = 20;
 
-        const addVertex = (lab) => {
-            if (vertexList.length < MAX_VERTS) {
-                vertexList.push(new Vertex(lab));
-            }
-        };
-
-        const addEdge = (start, end) => {
-            adjMat[start][end] = 1;
-            adjMat[end][start] = 1;
-        };
-
-        addVertex('A'); addVertex('B'); addVertex('C'); addVertex('D'); addVertex('E');
-        addVertex('F'); addVertex('G'); addVertex('H'); addVertex('I');
-        addEdge(0, 1); addEdge(0, 2); addEdge(0, 3); addEdge(0, 4);
-        addEdge(1, 5); addEdge(3, 6); addEdge(5, 7); addEdge(6, 8);
-
-        return { vertexList, adjMat, nVerts: vertexList.length };
+const createGraphFromData = (data) => {
+    const adjMat = Array.from({ length: MAX_VERTS }, () => Array(MAX_VERTS).fill(0));
+    const vertexList = data.vertexLabels.map(label => new Vertex(label));
+    data.edges.forEach(([start, end]) => {
+        adjMat[start][end] = 1;
+        adjMat[end][start] = 1;
     });
+    return { vertexList, adjMat, nVerts: vertexList.length, positions: data.positions };
+};
 
+export const useGraph = () => {
+    const [graph, setGraph] = useState(() => createGraphFromData(graphData[0]));
     const [animation, setAnimation] = useState({ steps: [], isPlaying: false });
+
+    const loadGraph = useCallback((index) => {
+        setGraph(createGraphFromData(graphData[index]));
+        setAnimation({ steps: [], isPlaying: false }); // Reset animation
+    }, []);
 
     const getAdjUnvisitedVertex = useCallback((v, vertexList) => {
         for (let j = 0; j < graph.nVerts; j++) {
@@ -111,5 +108,5 @@ export const useGraph = () => {
     }, [graph, getAdjUnvisitedVertex]);
 
 
-    return { graph, animation, runAlgorithm, setAnimation };
+    return { graph, animation, runAlgorithm, setAnimation, loadGraph };
 };

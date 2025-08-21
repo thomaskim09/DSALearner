@@ -1,12 +1,27 @@
+// DSALearner_packaged/src/components/Graphs/GraphsControls.jsx
+
 import React from 'react';
+import { graphData } from '../../utils/graphData'; // Import graph data
 
 const GraphsControls = ({
     onRun, isAnimating, visualizationMode, setVisualizationMode,
-    vertexList, startVertex, setStartVertex
+    vertexList, startVertex, setStartVertex, onGraphChange
 }) => {
     return (
         <div className="controls-panel">
             <div className="control-grid">
+                <div className="control-group">
+                    <label htmlFor="graph-select">Graph Structure:</label>
+                    <select
+                        id="graph-select"
+                        onChange={(e) => onGraphChange(parseInt(e.target.value, 10))}
+                        disabled={isAnimating}
+                    >
+                        {graphData.map((graph, index) => (
+                            <option key={index} value={index}>{graph.name}</option>
+                        ))}
+                    </select>
+                </div>
                 <div className="control-group">
                     <label htmlFor="start-vertex-select">Start From:</label>
                     <select
@@ -37,4 +52,4 @@ const GraphsControls = ({
     );
 };
 
-export default GraphsControls;
+export default GraphsControls;  

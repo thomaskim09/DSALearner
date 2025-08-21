@@ -1,3 +1,5 @@
+// DSALearner_packaged/src/pages/GraphsPage.jsx
+
 import React, { useState, useEffect } from 'react';
 import { useGraph } from '../hooks/useGraph';
 import GraphsControls from '../components/Graphs/GraphsControls';
@@ -7,7 +9,7 @@ import TraceLog from '../components/common/TraceLog';
 import '../assets/styles/Graphs.css';
 
 const GraphsPage = () => {
-    const { graph, animation, runAlgorithm, setAnimation } = useGraph();
+    const { graph, animation, runAlgorithm, setAnimation, loadGraph } = useGraph();
     const [operation, setOperation] = useState('dfs');
     const [startVertex, setStartVertex] = useState(0);
     const [currentStep, setCurrentStep] = useState(0);
@@ -24,6 +26,11 @@ const GraphsPage = () => {
         setCurrentStep(0);
         setOperation(algo);
         runAlgorithm(algo, startVertex);
+    };
+
+    const handleGraphChange = (index) => {
+        loadGraph(index);
+        setStartVertex(0); // Reset start vertex to default
     };
 
     useEffect(() => {
@@ -63,6 +70,7 @@ const GraphsPage = () => {
                         vertexList={graph.vertexList}
                         startVertex={startVertex}
                         setStartVertex={setStartVertex}
+                        onGraphChange={handleGraphChange}
                     />
                     <GraphsVisualizer
                         graph={graph}
