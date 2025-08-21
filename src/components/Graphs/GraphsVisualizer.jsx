@@ -46,17 +46,19 @@ const MSTTable = ({ animationSteps, currentStep }) => {
             <table className="adjacency-matrix">
                 <thead>
                     <tr>
-                        <th>Step</th>
-                        <th>Added to Tree</th>
-                        <th>Edges in Priority Queue</th>
+                        <th>Step Number</th>
+                        <th>Unpruned Edge</th>
+                        <th>Pruned Edge (PQ)</th>
+                        <th>Duplicate Removed</th>
                     </tr>
                 </thead>
                 <tbody>
                     {stepsToShow.map((step, index) => (
                         <tr key={index} className="highlight-row">
                             <td>{step.tableRow.step}</td>
-                            <td>{step.tableRow.addedToTree}</td>
-                            <td>{step.tableRow.pq}</td>
+                            <td>{step.tableRow.unpruned}</td>
+                            <td>{step.tableRow.pruned}</td>
+                            <td>{step.tableRow.removed}</td>
                         </tr>
                     ))}
                 </tbody>
@@ -68,7 +70,7 @@ const MSTTable = ({ animationSteps, currentStep }) => {
 
 const GraphsVisualizer = ({ graph, animationSteps, currentStep, setCurrentStep, isPlaying, setIsPlaying, visualizationMode, operation, traversalSequence, showWeights }) => {
     const { vertexList, adjMat, positions } = graph;
-    const [viewMatrix, setViewMatrix] = useState({ x: 200, y: 250, zoom: 1 });
+    const [viewMatrix, setViewMatrix] = useState({ x: 200, y: 0, zoom: 1 });
     const [isPanning, setIsPanning] = useState(false);
     const lastMousePosition = useRef({ x: 0, y: 0 });
     const viewportRef = useRef(null);

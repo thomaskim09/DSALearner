@@ -7,15 +7,15 @@ import GraphsVisualizer from '../components/Graphs/GraphsVisualizer';
 import GraphsCodeDisplay from '../components/Graphs/GraphsCodeDisplay';
 import TraceLog from '../components/common/TraceLog';
 import '../assets/styles/Graphs.css';
+import { unweightedGraphExamples, weightedGraphExamples } from '../utils/graphData';
 
 const GraphsPage = () => {
-    const { graph, animation, runAlgorithm, setAnimation, loadGraph } = useGraph();
+    const { graph, graphType, animation, runAlgorithm, setAnimation, loadGraph, handleGraphTypeChange } = useGraph();
     const [operation, setOperation] = useState('dfs');
     const [startVertex, setStartVertex] = useState(0);
     const [currentStep, setCurrentStep] = useState(0);
     const [traversalSequence, setTraversalSequence] = useState([]);
     const [visualizationMode, setVisualizationMode] = useState('graph');
-    const [showWeights, setShowWeights] = useState(false);
 
     const handleStepHover = (index) => {
         setCurrentStep(index);
@@ -30,7 +30,7 @@ const GraphsPage = () => {
     };
 
     const handleGraphChange = (index) => {
-        loadGraph(index);
+        loadGraph(graphType, index);
         setStartVertex(0); // Reset start vertex to default
     };
 
@@ -38,7 +38,6 @@ const GraphsPage = () => {
         if (animation.steps.length > 0) {
             let sequence = [];
             if (operation === 'mst') {
-                // For MST, create pairs of vertex labels for each edge
                 sequence = animation.steps
                     .slice(0, currentStep + 1)
                     .filter(step => step.type === 'add_edge')
@@ -48,16 +47,19 @@ const GraphsPage = () => {
                         return `${fromLabel}${toLabel}`;
                     });
             } else {
-                // For DFS and BFS, create a sequence of visited vertices
                 sequence = animation.steps
                     .slice(0, currentStep + 1)
                     .filter(step => step.type === 'visit' || step.type === 'start' || step.type === 'dequeue')
-                    .map(step => graph.vertexList[step.vertexIndex].label);
+                    .map(step => {
+                        const vertex = graph.vertexList.find(v => v.label === step.vertexLabel);
+                        return vertex ? vertex.label : '';
+                    }).filter(Boolean);
             }
             setTraversalSequence(sequence);
         }
     }, [currentStep, animation.steps, graph.vertexList, operation]);
 
+    const graphExamples = graphType === 'weighted' ? weightedGraphExamples : unweightedGraphExamples;
 
     return (
         <div className="chapter-page graphs-page">
@@ -72,8 +74,9 @@ const GraphsPage = () => {
                         startVertex={startVertex}
                         setStartVertex={setStartVertex}
                         onGraphChange={handleGraphChange}
-                        showWeights={showWeights}
-                        setShowWeights={setShowWeights}
+                        graphType={graphType}
+                        onGraphTypeChange={handleGraphTypeChange}
+                        graphExamples={graphExamples}
                     />
                     <GraphsVisualizer
                         graph={graph}
@@ -85,7 +88,7 @@ const GraphsPage = () => {
                         visualizationMode={visualizationMode}
                         operation={operation}
                         traversalSequence={traversalSequence}
-                        showWeights={showWeights}
+                        showWeights={graphType === 'weighted'}
                     />
                 </div>
                 <div className="graphs-sidebar">
