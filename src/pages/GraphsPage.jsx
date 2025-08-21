@@ -15,6 +15,7 @@ const GraphsPage = () => {
     const [currentStep, setCurrentStep] = useState(0);
     const [traversalSequence, setTraversalSequence] = useState([]);
     const [visualizationMode, setVisualizationMode] = useState('graph');
+    const [showWeights, setShowWeights] = useState(false);
 
     const handleStepHover = (index) => {
         setCurrentStep(index);
@@ -71,6 +72,8 @@ const GraphsPage = () => {
                         startVertex={startVertex}
                         setStartVertex={setStartVertex}
                         onGraphChange={handleGraphChange}
+                        showWeights={showWeights}
+                        setShowWeights={setShowWeights}
                     />
                     <GraphsVisualizer
                         graph={graph}
@@ -82,6 +85,7 @@ const GraphsPage = () => {
                         visualizationMode={visualizationMode}
                         operation={operation}
                         traversalSequence={traversalSequence}
+                        showWeights={showWeights}
                     />
                 </div>
                 <div className="graphs-sidebar">

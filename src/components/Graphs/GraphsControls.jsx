@@ -1,16 +1,17 @@
 // DSALearner_packaged/src/components/Graphs/GraphsControls.jsx
 
 import React from 'react';
-import { graphData } from '../../utils/graphData'; // Import graph data
+import { graphData } from '../../utils/graphData';
 
 const GraphsControls = ({
     onRun, isAnimating, visualizationMode, setVisualizationMode,
-    vertexList, startVertex, setStartVertex, onGraphChange
+    vertexList, startVertex, setStartVertex, onGraphChange,
+    showWeights, setShowWeights
 }) => {
     return (
         <div className="controls-panel">
             <div className="control-grid">
-                <div className="control-group">
+                <div className="control-row">
                     <label htmlFor="graph-select">Graph Structure:</label>
                     <select
                         id="graph-select"
@@ -22,7 +23,7 @@ const GraphsControls = ({
                         ))}
                     </select>
                 </div>
-                <div className="control-group">
+                <div className="control-row">
                     <label htmlFor="start-vertex-select">Start From:</label>
                     <select
                         id="start-vertex-select"
@@ -35,12 +36,22 @@ const GraphsControls = ({
                         ))}
                     </select>
                 </div>
-                 <div className="control-group">
+                <div className="control-row">
                     <label htmlFor="vis-mode-select">View As:</label>
                     <select id="vis-mode-select" value={visualizationMode} onChange={(e) => setVisualizationMode(e.target.value)}>
                         <option value="graph">Graph Visualization</option>
                         <option value="table">Adjacency Matrix</option>
                     </select>
+                </div>
+                <div className="control-row">
+                    <label htmlFor="show-weights-toggle">Show Weights:</label>
+                    <input
+                        type="checkbox"
+                        id="show-weights-toggle"
+                        checked={showWeights}
+                        onChange={(e) => setShowWeights(e.target.checked)}
+                        disabled={isAnimating}
+                    />
                 </div>
                 <div className="button-grid">
                     <button onClick={() => onRun('dfs')} disabled={isAnimating}>Run DFS</button>
@@ -52,4 +63,4 @@ const GraphsControls = ({
     );
 };
 
-export default GraphsControls;  
+export default GraphsControls;

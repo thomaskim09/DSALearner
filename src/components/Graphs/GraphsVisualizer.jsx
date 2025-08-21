@@ -41,7 +41,7 @@ const AdjacencyMatrix = ({ graph, animationStep }) => {
 };
 
 
-const GraphsVisualizer = ({ graph, animationSteps, currentStep, setCurrentStep, isPlaying, setIsPlaying, visualizationMode, operation, traversalSequence }) => {
+const GraphsVisualizer = ({ graph, animationSteps, currentStep, setCurrentStep, isPlaying, setIsPlaying, visualizationMode, operation, traversalSequence, showWeights }) => {
     // ... (rest of the component logic is unchanged)
     const { vertexList, adjMat, positions } = graph;
     const [viewMatrix, setViewMatrix] = useState({ x: 200, y: 250, zoom: 1 });
@@ -119,19 +119,27 @@ const GraphsVisualizer = ({ graph, animationSteps, currentStep, setCurrentStep, 
                     {/* ... (SVG rendering logic is unchanged) ... */}
                     {adjMat.map((row, i) =>
                         row.map((col, j) => {
-                            if (col === 1 && i < j) {
+                            if (col > 0 && i < j) {
                                 const isTraversalEdge = currentAnimationStep &&
                                     ((currentAnimationStep.from === i && (currentAnimationStep.vertexIndex === j || currentAnimationStep.to === j)) ||
                                      (currentAnimationStep.from === j && (currentAnimationStep.vertexIndex === i || currentAnimationStep.to === i)));
                                 const isMstEdge = operation === 'mst' && mstEdges.has(`${i}-${j}`);
+                                const midX = (positions[i].x + positions[j].x) / 2;
+                                const midY = (positions[i].y + positions[j].y) / 2;
 
                                 return (
-                                    <line
-                                        key={`${i}-${j}`}
-                                        x1={positions[i].x} y1={positions[i].y}
-                                        x2={positions[j].x} y2={positions[j].y}
-                                        className={`graph-edge ${isTraversalEdge ? 'active' : ''} ${isMstEdge ? 'mst-edge' : ''}`}
-                                    />
+                                    <g key={`${i}-${j}`}>
+                                        <line
+                                            x1={positions[i].x} y1={positions[i].y}
+                                            x2={positions[j].x} y2={positions[j].y}
+                                            className={`graph-edge ${isTraversalEdge ? 'active' : ''} ${isMstEdge ? 'mst-edge' : ''}`}
+                                        />
+                                        {showWeights && (
+                                            <text x={midX} y={midY} className="graph-edge-weight">
+                                                {col}
+                                            </text>
+                                        )}
+                                    </g>
                                 );
                             }
                             return null;

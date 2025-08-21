@@ -15,9 +15,9 @@ const MAX_VERTS = 20;
 const createGraphFromData = (data) => {
     const adjMat = Array.from({ length: MAX_VERTS }, () => Array(MAX_VERTS).fill(0));
     const vertexList = data.vertexLabels.map(label => new Vertex(label));
-    data.edges.forEach(([start, end]) => {
-        adjMat[start][end] = 1;
-        adjMat[end][start] = 1;
+    data.edges.forEach(([start, end, weight]) => {
+        adjMat[start][end] = weight;
+        adjMat[end][start] = weight;
     });
     return { vertexList, adjMat, nVerts: vertexList.length, positions: data.positions };
 };
@@ -33,7 +33,7 @@ export const useGraph = () => {
 
     const getAdjUnvisitedVertex = useCallback((v, vertexList) => {
         for (let j = 0; j < graph.nVerts; j++) {
-            if (graph.adjMat[v][j] === 1 && !vertexList[j].wasVisited) {
+            if (graph.adjMat[v][j] > 0 && !vertexList[j].wasVisited) {
                 return j;
             }
         }
@@ -82,21 +82,38 @@ export const useGraph = () => {
                 }
             },
             'mst': () => {
-                const stack = [];
+                const priorityQueue = []; // Use an array as a simple priority queue
                 localVertexList[startVertexIndex].wasVisited = true;
-                stack.push(startVertexIndex);
-                steps.push({ type: 'start', vertexIndex: startVertexIndex, stack: [startVertexIndex], message: `Start at ${localVertexList[startVertexIndex].label}. Push.` });
 
-                while (stack.length > 0) {
-                    const currentVertex = stack[stack.length - 1];
-                    const v = getAdjUnvisitedVertex(currentVertex, localVertexList);
-                    if (v === -1) {
-                        stack.pop();
-                    } else {
-                        localVertexList[v].wasVisited = true;
-                        stack.push(v);
-                        steps.push({ type: 'add_edge', from: currentVertex, to: v, stack: [...stack], message: `Add edge ${localVertexList[currentVertex].label}-${localVertexList[v].label}.` });
+                // Add all edges from the starting vertex to the priority queue
+                for (let j = 0; j < graph.nVerts; j++) {
+                    if (graph.adjMat[startVertexIndex][j] > 0) {
+                        priorityQueue.push({ from: startVertexIndex, to: j, weight: graph.adjMat[startVertexIndex][j] });
                     }
+                }
+                priorityQueue.sort((a, b) => a.weight - b.weight); // Sort by weight
+
+                const mstEdges = [];
+                steps.push({ type: 'start', vertexIndex: startVertexIndex, message: `Start at ${localVertexList[startVertexIndex].label}.` });
+
+                while (priorityQueue.length > 0 && mstEdges.length < graph.nVerts - 1) {
+                    const { from, to, weight } = priorityQueue.shift(); // Get the edge with the minimum weight
+
+                    if (localVertexList[to].wasVisited) {
+                        continue; // Skip if the vertex is already in the tree
+                    }
+
+                    localVertexList[to].wasVisited = true;
+                    mstEdges.push({ from, to, weight });
+                    steps.push({ type: 'add_edge', from, to, message: `Add edge ${localVertexList[from].label}-${localVertexList[to].label} with weight ${weight}.` });
+
+                    // Add new edges from the newly added vertex
+                    for (let j = 0; j < graph.nVerts; j++) {
+                        if (graph.adjMat[to][j] > 0 && !localVertexList[j].wasVisited) {
+                            priorityQueue.push({ from: to, to: j, weight: graph.adjMat[to][j] });
+                        }
+                    }
+                    priorityQueue.sort((a, b) => a.weight - b.weight); // Re-sort the priority queue
                 }
             }
         };
