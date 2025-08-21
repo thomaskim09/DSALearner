@@ -36,11 +36,11 @@ const GraphsControls = ({
                         ))}
                     </select>
                 </div>
-                <div className="control-row">
+                 <div className="control-row">
                     <label htmlFor="vis-mode-select">View As:</label>
                     <select id="vis-mode-select" value={visualizationMode} onChange={(e) => setVisualizationMode(e.target.value)}>
-                        <option value="graph">Graph Visualization</option>
-                        <option value="table">Adjacency Matrix</option>
+                        <option value="graph">Graph</option>
+                        <option value="table">Table</option>
                     </select>
                 </div>
                 <div className="control-row">

@@ -25,24 +25,12 @@ export const graphData = [
         ]
     },
     {
-        name: "Weighted Graph Example",
-        vertexLabels: ['A', 'B', 'C', 'D', 'E', 'F'],
-        edges: [
-            [0, 1, 6], [0, 3, 4], [1, 2, 10], [1, 3, 7], [1, 4, 7],
-            [2, 4, 5], [2, 5, 6], [3, 4, 12], [4, 5, 7]
-        ],
-        positions: [
-            { x: 100, y: 200 }, { x: 250, y: 100 }, { x: 400, y: 100 },
-            { x: 250, y: 300 }, { x: 400, y: 300 }, { x: 550, y: 200 }
-        ]
-    },
-    {
         name: "City Connections",
-        vertexLabels: ["Ajo", "Bordo", "Colina", "Danza", "Erizo", "Flor"],
+        vertexLabels: ["A", "B", "C", "D", "E", "F"],
         edges: [
             [0, 1, 6], [0, 3, 4], 
             [1, 2, 10], [1, 3, 7], [1, 4, 7],
-            [2, 4, 5], [2, 5, 6],
+            [2, 3, 8], [2, 4, 5], [2, 5, 6],
             [3, 4, 12],
             [4, 5, 7]
         ],

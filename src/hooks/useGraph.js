@@ -23,7 +23,7 @@ const createGraphFromData = (data) => {
 };
 
 export const useGraph = () => {
-    const [graph, setGraph] = useState(() => createGraphFromData(graphData[0]));
+    const [graph, setGraph] = useState(() => createGraphFromData(graphData[2])); // Default to "City Connections"
     const [animation, setAnimation] = useState({ steps: [], isPlaying: false });
 
     const loadGraph = useCallback((index) => {
@@ -82,38 +82,55 @@ export const useGraph = () => {
                 }
             },
             'mst': () => {
-                const priorityQueue = []; // Use an array as a simple priority queue
-                localVertexList[startVertexIndex].wasVisited = true;
-
-                // Add all edges from the starting vertex to the priority queue
-                for (let j = 0; j < graph.nVerts; j++) {
-                    if (graph.adjMat[startVertexIndex][j] > 0) {
-                        priorityQueue.push({ from: startVertexIndex, to: j, weight: graph.adjMat[startVertexIndex][j] });
-                    }
-                }
-                priorityQueue.sort((a, b) => a.weight - b.weight); // Sort by weight
-
+                const priorityQueue = []; 
+                let currentVert = startVertexIndex;
                 const mstEdges = [];
-                steps.push({ type: 'start', vertexIndex: startVertexIndex, message: `Start at ${localVertexList[startVertexIndex].label}.` });
 
-                while (priorityQueue.length > 0 && mstEdges.length < graph.nVerts - 1) {
-                    const { from, to, weight } = priorityQueue.shift(); // Get the edge with the minimum weight
+                steps.push({
+                    type: 'start',
+                    vertexIndex: currentVert,
+                    message: `Start at vertex ${localVertexList[currentVert].label}.`,
+                    tableRow: { step: 1, addedToTree: localVertexList[currentVert].label, pq: 'Empty' }
+                });
 
-                    if (localVertexList[to].wasVisited) {
-                        continue; // Skip if the vertex is already in the tree
-                    }
+                while (mstEdges.length < graph.nVerts - 1) {
+                    localVertexList[currentVert].wasVisited = true;
 
-                    localVertexList[to].wasVisited = true;
-                    mstEdges.push({ from, to, weight });
-                    steps.push({ type: 'add_edge', from, to, message: `Add edge ${localVertexList[from].label}-${localVertexList[to].label} with weight ${weight}.` });
-
-                    // Add new edges from the newly added vertex
                     for (let j = 0; j < graph.nVerts; j++) {
-                        if (graph.adjMat[to][j] > 0 && !localVertexList[j].wasVisited) {
-                            priorityQueue.push({ from: to, to: j, weight: graph.adjMat[to][j] });
+                        if (graph.adjMat[currentVert][j] > 0 && !localVertexList[j].wasVisited) {
+                            priorityQueue.push({ from: currentVert, to: j, weight: graph.adjMat[currentVert][j] });
                         }
                     }
-                    priorityQueue.sort((a, b) => a.weight - b.weight); // Re-sort the priority queue
+                    priorityQueue.sort((a, b) => a.weight - b.weight);
+
+                    if (priorityQueue.length === 0) break;
+
+                    let edge = priorityQueue.shift();
+                    let destVert = edge.to;
+                    
+                    if(localVertexList[destVert].wasVisited) {
+                        while(localVertexList[destVert].wasVisited && priorityQueue.length > 0) {
+                            const nextEdge = priorityQueue.shift();
+                            edge = nextEdge;
+                            destVert = nextEdge.to;
+                        }
+                    }
+
+                    if(!localVertexList[destVert].wasVisited) {
+                        mstEdges.push(edge);
+                        steps.push({
+                            type: 'add_edge',
+                            from: edge.from,
+                            to: edge.to,
+                            message: `Add edge ${localVertexList[edge.from].label}-${localVertexList[edge.to].label} with weight ${edge.weight}.`,
+                            tableRow: {
+                                step: mstEdges.length + 1,
+                                addedToTree: `${localVertexList[edge.from].label}${localVertexList[edge.to].label}`,
+                                pq: priorityQueue.map(e => `${localVertexList[e.from].label}${localVertexList[e.to].label}${e.weight}`).join(', ')
+                            }
+                        });
+                        currentVert = destVert;
+                    }
                 }
             }
         };

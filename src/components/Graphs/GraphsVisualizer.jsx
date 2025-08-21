@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 
-// ... (AdjacencyMatrix component remains the same)
 const AdjacencyMatrix = ({ graph, animationStep }) => {
     const currentVertex = animationStep?.vertexIndex ?? animationStep?.from ?? animationStep?.to;
     const fromVertex = animationStep?.from;
@@ -40,9 +39,34 @@ const AdjacencyMatrix = ({ graph, animationStep }) => {
     );
 };
 
+const MSTTable = ({ animationSteps, currentStep }) => {
+    const stepsToShow = animationSteps.slice(0, currentStep + 1).filter(step => step.tableRow);
+    return (
+        <div className="adjacency-matrix-container">
+            <table className="adjacency-matrix">
+                <thead>
+                    <tr>
+                        <th>Step</th>
+                        <th>Added to Tree</th>
+                        <th>Edges in Priority Queue</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {stepsToShow.map((step, index) => (
+                        <tr key={index} className="highlight-row">
+                            <td>{step.tableRow.step}</td>
+                            <td>{step.tableRow.addedToTree}</td>
+                            <td>{step.tableRow.pq}</td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
+    );
+};
+
 
 const GraphsVisualizer = ({ graph, animationSteps, currentStep, setCurrentStep, isPlaying, setIsPlaying, visualizationMode, operation, traversalSequence, showWeights }) => {
-    // ... (rest of the component logic is unchanged)
     const { vertexList, adjMat, positions } = graph;
     const [viewMatrix, setViewMatrix] = useState({ x: 200, y: 250, zoom: 1 });
     const [isPanning, setIsPanning] = useState(false);
@@ -61,7 +85,6 @@ const GraphsVisualizer = ({ graph, animationSteps, currentStep, setCurrentStep, 
         return () => clearTimeout(timer);
     }, [isPlaying, currentStep, animationSteps.length, setCurrentStep, setIsPlaying]);
 
-    // Panning and Zooming handlers
     const handleMouseDown = (e) => {
         setIsPanning(true);
         lastMousePosition.current = { x: e.clientX, y: e.clientY };
@@ -96,7 +119,10 @@ const GraphsVisualizer = ({ graph, animationSteps, currentStep, setCurrentStep, 
     if (visualizationMode === 'table') {
         return (
              <div className="visualizer-wrapper with-footer">
-                <AdjacencyMatrix graph={graph} animationStep={currentAnimationStep} />
+                {operation === 'mst' ? 
+                    <MSTTable animationSteps={animationSteps} currentStep={currentStep} /> :
+                    <AdjacencyMatrix graph={graph} animationStep={currentAnimationStep} />
+                }
                 <div className="traversal-sequence">
                     <strong>Output:</strong> {traversalSequence.join(' → ')}
                 </div>
@@ -116,7 +142,6 @@ const GraphsVisualizer = ({ graph, animationSteps, currentStep, setCurrentStep, 
         >
             <svg width="100%" height="100%">
                 <g transform={`translate(${viewMatrix.x}, ${viewMatrix.y}) scale(${viewMatrix.zoom})`}>
-                    {/* ... (SVG rendering logic is unchanged) ... */}
                     {adjMat.map((row, i) =>
                         row.map((col, j) => {
                             if (col > 0 && i < j) {
