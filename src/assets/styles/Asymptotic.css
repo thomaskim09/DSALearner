@@ -2,11 +2,17 @@
 
 .asymptotic-page .interactive-area {
     display: grid;
-    grid-template-columns: 2fr 1fr; /* Two-column layout */
+    grid-template-columns: 1fr; /* Single column for mobile */
     gap: 1.5rem;
     align-items: stretch;
-    min-width: 1200px;
+    width: 100%;
     height: 100%;
+}
+
+@media (min-width: 992px) {
+    .asymptotic-page .interactive-area {
+        grid-template-columns: 2fr 1fr; /* Two columns for larger screens */
+    }
 }
 
 .asymptotic-main-content {

@@ -38,12 +38,13 @@ body {
     -moz-osx-font-smoothing: grayscale;
     background-color: var(--bg-main);
     color: var(--text-primary);
-    overflow-x: auto; /* Enable horizontal scrolling */
+    overflow-x: hidden; /* Prevent horizontal scrolling */
 }
 
 .app-container {
     display: flex;
-    min-width: 100vw;
+    width: 100vw;
+    overflow-x: hidden;
 }
 
 /* Main Layout Fix */
@@ -52,12 +53,13 @@ body {
     padding: 2rem;
     flex-grow: 1;
     transition: margin-left 0.3s ease;
+    width: calc(100% - var(--sidebar-width));
 }
 
 .app-container.sidebar-collapsed .content-area {
     margin-left: var(--sidebar-width-collapsed);
+    width: calc(100% - var(--sidebar-width-collapsed));
 }
-
 
 /* General Chapter Page Styling */
 .chapter-page, .home-page-container {
@@ -66,13 +68,15 @@ body {
 
 /* Generic Layout Classes - moved from Tree.css */
 .chapter-page {
-    height: calc(100vh - 4rem);
+    height: auto;
+    min-height: calc(100vh - 4rem);
     display: flex;
     flex-direction: column;
 }
 
 .interactive-area {
     display: flex;
+    flex-direction: column; /* Stack elements vertically on mobile */
     flex-grow: 1;
     overflow: hidden;
     min-height: 0;
@@ -82,17 +86,18 @@ body {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
-    border-right: 1px solid var(--border-color);
+    border-right: none; /* Remove border for mobile */
     min-width: 0;
     min-height: 400px; /* Ensures a minimum height */
 }
 
 .code-display-container {
-    flex: 0 0 450px;
+    flex: 0 0 auto; /* Allow code display to take its own height */
     background-color: var(--bg-main);
     overflow-y: auto;
     display: flex;
     flex-direction: column;
+    margin-top: 1.5rem;
 }
 
 .code-display {
@@ -115,7 +120,7 @@ body {
 
 .control-row {
     display: flex;
-    justify-content: space-around;
+    flex-direction: column; /* Stack controls vertically on mobile */
     gap: 10px;
 }
 
@@ -167,6 +172,7 @@ body {
 
 .playground-header {
     display: flex;
+    flex-direction: column;
     justify-content: space-between;
     align-items: center;
     border-bottom: 2px solid var(--border-color);
@@ -182,4 +188,46 @@ body {
 
 .code-display pre {
     margin: 0;
+}
+
+/* --- Responsive Styles --- */
+
+@media (max-width: 768px) {
+    .content-area {
+        margin-left: 0;
+        padding: 1rem;
+        width: 100%;
+    }
+
+    .sidebar {
+        position: fixed;
+        left: -100%;
+        transition: left 0.3s ease;
+    }
+
+    .sidebar.open {
+        left: 0;
+    }
+    .interactive-area {
+        flex-direction: column;
+    }
+    .code-display-container {
+        width: 100%;
+        margin-top: 1rem;
+        border-left: none;
+    }
+}
+
+@media (min-width: 769px) {
+    .interactive-area {
+        flex-direction: row;
+    }
+
+    .control-row {
+        flex-direction: row;
+    }
+
+    .code-display-container {
+      flex: 0 0 450px;
+    }
 }

@@ -2,11 +2,10 @@
 
 .hash-table-page .interactive-area {
     display: grid;
-    grid-template-columns: 300px 320px 350px 320px 450px;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 1.5rem;
-    align-items: start; /* Align items to the top of the grid area */
-    min-width: 1800px;
-    overflow-x: auto;
+    align-items: start;
+    width: 100%;
 }
 
 .hash-table-control-container,

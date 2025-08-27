@@ -2,9 +2,15 @@
 
 .graphs-page .interactive-area {
     display: grid;
-    grid-template-columns: 3fr 1fr;
+    grid-template-columns: 1fr; /* Single column for mobile */
     gap: 1.5rem;
     height: 100%;
+}
+
+@media (min-width: 992px) {
+    .graphs-page .interactive-area {
+        grid-template-columns: 3fr 1fr; /* Two columns for larger screens */
+    }
 }
 
 .graphs-main-content {
