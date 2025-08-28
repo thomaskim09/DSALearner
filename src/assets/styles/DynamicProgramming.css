@@ -1,0 +1,135 @@
+.floyd-warshall-step {
+    margin-bottom: 2rem;
+}
+
+.dp-controls {
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: flex-end;
+}
+
+.dp-controls .control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-width: 150px;
+}
+
+.dp-controls label {
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.binomial-recursive-visualizer {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1.2rem;
+    line-height: 2;
+    text-align: left;
+    background-color: var(--bg-main);
+    padding: 1.5rem;
+    border-radius: 8px;
+    overflow: auto;
+    height: 100%;
+}
+
+.recursion-equation-line {
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.recursion-term {
+    padding: 0 0.2em;
+}
+
+.recursion-term.highlight {
+    color: #ffd700; /* Gold */
+    font-weight: bold;
+}
+
+.recursion-term.sum {
+    color: #90ee90; /* LightGreen */
+    font-weight: bold;
+    font-size: 1.3em;
+}
+
+.pascal-visualizer-container {
+    display: flex;
+    gap: 2rem;
+    font-family: 'Courier New', Courier, monospace;
+    height: 100%;
+}
+
+.pascal-equations {
+    flex: 1;
+    background-color: var(--bg-main);
+    padding: 1.5rem;
+    border-radius: 8px;
+    overflow-y: auto;
+}
+
+.pascal-equations h3, .pascal-triangle-container h3 {
+    margin-top: 0;
+    color: var(--accent-color);
+    text-align: center;
+}
+
+.equation-line {
+    margin-bottom: 0.75rem;
+    font-size: 1.1em;
+}
+
+.pascal-triangle-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+}
+
+.pascal-row {
+    display: flex;
+    justify-content: center;
+}
+
+.pascal-cell {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1em;
+    margin: 2px;
+}
+
+.pascal-cell.highlight-cell {
+    background-color: var(--node-highlight-bg);
+    color: black;
+    border-radius: 50%;
+    font-weight: bold;
+}
+
+.pascal-triangle-container .visualizer-status-message {
+    margin-top: auto;
+    width: 100%;
+}
+
+.formula-display {
+    padding: 1.5rem;
+}
+
+.formula-display h3 {
+     margin-top: 0;
+    color: var(--accent-color);
+}
+
+.formula-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--bg-main);
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+    font-family: 'Times New Roman', serif;
+}

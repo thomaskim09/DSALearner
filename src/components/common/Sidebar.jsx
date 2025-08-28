@@ -21,6 +21,7 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
                 <NavLink to="/hash-table" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Chapter 10: Hash Tables</NavLink>
                 <NavLink to="/heap" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Chapter 11: Heaps</NavLink>
                 <NavLink to="/graphs" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Chapter 12: Graphs</NavLink>
+                <NavLink to="/dynamic-programming" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Chapter 13: Dynamic Programming</NavLink>
             </nav>
             <button onClick={onToggle} className="sidebar-toggle">
                 {isCollapsed ? '»' : '«'}

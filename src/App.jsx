@@ -13,6 +13,7 @@ import AdvancedSortPage from './pages/AdvancedSortPage';
 import MultiplicationPage from './pages/MultiplicationPage';
 import StackQueuePage from './pages/StackQueuePage';
 import GraphsPage from './pages/GraphsPage';
+import DynamicProgrammingPage from './pages/DynamicProgrammingPage';
 import './App.css';
 
 function App() {
@@ -60,6 +61,7 @@ function App() {
             <Route path="/hash-table" element={<HashTablePage />} />
             <Route path="/heap" element={<HeapPage />} />
             <Route path="/graphs" element={<GraphsPage />} />
+            <Route path="/dynamic-programming" element={<DynamicProgrammingPage />} />
           </Routes>
         </main>
       </div>
