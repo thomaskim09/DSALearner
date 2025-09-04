@@ -4,7 +4,8 @@ const DynamicProgrammingControls = ({ onCalculate, visualizationType, setVisuali
     
     const handleAlgoChange = (e) => {
         const newAlgo = e.target.value;
-        onCalculate(newAlgo, {n, r});
+        // Notify parent with the chosen algorithm so it can update state
+        onCalculate(newAlgo);
     }
 
     return (
@@ -46,7 +47,7 @@ const DynamicProgrammingControls = ({ onCalculate, visualizationType, setVisuali
                     </div>
                 </>
             )}
-            <button onClick={onCalculate}>{algorithm === 'floydWarshall' ? 'Run' : 'Calculate'}</button>
+            <button onClick={() => onCalculate()}>{algorithm === 'floydWarshall' ? 'Run' : 'Calculate'}</button>
         </div>
     );
 };

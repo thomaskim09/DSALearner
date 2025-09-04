@@ -16,9 +16,14 @@ const DynamicProgrammingPage = () => {
     const [n, setN] = useState(5);
     const [r, setR] = useState(2);
 
-    const handleCalculate = useCallback(() => {
-        const currentAlgorithm = algorithm.startsWith('binomial') ? 'binomial' : algorithm;
-        const fullAlgoName = currentAlgorithm === 'binomial' ? (visualizationType === 'recursive' ? 'binomialRecursive' : 'binomial') : currentAlgorithm;
+    // Allow an override so the controls can switch algorithms immediately
+    const handleCalculate = useCallback((algoOverride) => {
+        const baseAlgo = (algoOverride || algorithm);
+        const currentAlgorithm = baseAlgo.startsWith('binomial') ? 'binomial' : baseAlgo;
+        const fullAlgoName =
+            currentAlgorithm === 'binomial'
+                ? (visualizationType === 'recursive' ? 'binomialRecursive' : 'binomial')
+                : currentAlgorithm;
         calculate(fullAlgoName, { n, r });
     }, [calculate, visualizationType, n, r, algorithm]);
 

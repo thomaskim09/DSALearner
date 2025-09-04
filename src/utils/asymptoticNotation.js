@@ -93,6 +93,19 @@ export function normalizeInput(s) {
     out = out.replace(/\b(log) (\d+)\b/g, 'log_$2');
     out = out.replace(/\b(ln)\b/g, 'log_e');
     out = out.replace(/\b(logn)\b/g, 'log ( n )');
+
+    // Additional robust handling for log terms:
+    //  - "log n" => "log ( n )"
+    //  - "log^k n" => "( log ( n ) ) ^ k"
+    //  - "log n^k" => "( log ( n ) ) ^ k" (interpreted as (log n)^k which is common in CS notation)
+    //  - Same for log bases like log_2 and log_e
+    // Work on a token/spaces aware string created above.
+    // 2.1 log^k n  (covers log_2^k n and log_e^k n too)
+    out = out.replace(/\b(log(?:_[a-zA-Z0-9]+)?)\s*\^\s*(\d+)\s*n\b/g, '( $1 ( n ) ) ^ $2');
+    // 2.2 log n^k  (covers log_2 n^k and log_e n^k)
+    out = out.replace(/\b(log(?:_[a-zA-Z0-9]+)?)\s*n\s*\^\s*(\d+)\b/g, '( $1 ( n ) ) ^ $2');
+    // 2.3 plain "log n" (or with base)
+    out = out.replace(/\b(log(?:_[a-zA-Z0-9]+)?)\s+n\b/g, '$1 ( n )');
     
     out = out.replace(/\s+/g, ' ').trim();
 
